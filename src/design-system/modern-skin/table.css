@@ -1,0 +1,171 @@
+/* Modern skin for legacy <Tables/> (react-bootstrap Table inside .table-container) */
+
+:root[data-design="modern"] .table-container,
+:root[data-design="modern"] .scrollView,
+:root[data-design="modern"] .table-responsive {
+  --mt-radius: 12px;
+  --mt-border: var(--ds-color-border, #E2E8F0);
+  --mt-panel: var(--ds-color-panel, #FFFFFF);
+  --mt-panel2: var(--ds-color-panel2, #F8FAFC);
+  --mt-text: var(--ds-color-text, #0F172A);
+  --mt-muted: var(--ds-color-text-muted, #64748B);
+  --mt-accent: var(--ds-color-accent, #0F766E);
+  --mt-accent-soft: var(--ds-color-accent-soft, rgba(15, 118, 110, 0.08));
+  --mt-grad: var(--ds-color-header-gradient, linear-gradient(110deg, #0F766E, #14B8A6));
+
+  background: var(--mt-panel);
+  border: 1px solid var(--mt-border);
+  border-radius: var(--mt-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 18px -10px rgba(15, 23, 42, 0.18);
+}
+
+:root[data-design="modern"] .table,
+:root[data-design="modern"] .table-bordered,
+:root[data-design="modern"] table.table {
+  margin-bottom: 0 !important;
+  border: none !important;
+  font-family: "Plus Jakarta Sans", "Outfit", system-ui, sans-serif;
+  font-size: 12.5px;
+  color: var(--mt-text, #0F172A);
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+:root[data-design="modern"] .table thead th,
+:root[data-design="modern"] table.table thead th,
+:root[data-design="modern"] .table-bordered thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mt-panel2, #F8FAFC) !important;
+  color: var(--mt-muted, #64748B) !important;
+  font-weight: 700 !important;
+  font-size: 10.5px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 8px 10px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--mt-border, #E2E8F0) !important;
+  white-space: nowrap;
+}
+
+:root[data-design="modern"] .table tbody td,
+:root[data-design="modern"] table.table tbody td,
+:root[data-design="modern"] .table-bordered tbody td {
+  padding: 6px 10px !important;
+  border: none !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--mt-border, #E2E8F0) 60%, transparent) !important;
+  vertical-align: middle !important;
+  font-size: 12px;
+}
+
+:root[data-design="modern"] .table tbody tr {
+  transition: background 0.15s;
+}
+
+:root[data-design="modern"] .table tbody tr:nth-child(even) td {
+  background: var(--mt-panel2, #F8FAFC);
+}
+:root[data-design="modern"] .table tbody tr:nth-child(odd) td {
+  background: var(--mt-panel, #FFFFFF);
+}
+
+:root[data-design="modern"] .table tbody tr:hover td {
+  background: var(--mt-accent-soft, rgba(15, 118, 110, 0.08)) !important;
+}
+
+:root[data-design="modern"] .table tbody tr.active-row td,
+:root[data-design="modern"] .table tbody tr.selected td,
+:root[data-design="modern"] .table tbody tr.activeRowClass td {
+  background: var(--mt-accent-soft, rgba(15, 118, 110, 0.10)) !important;
+  box-shadow: inset 3px 0 0 0 var(--mt-accent, #0F766E);
+}
+
+:root[data-design="modern"] .table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+:root[data-design="modern"] .scrollView {
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+:root[data-design="modern"] .scrollView::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+:root[data-design="modern"] .scrollView::-webkit-scrollbar-thumb {
+  background: var(--mt-border);
+  border-radius: 3px;
+}
+:root[data-design="modern"] .scrollView::-webkit-scrollbar-thumb:hover {
+  background: var(--mt-accent);
+}
+
+:root[data-design="modern"] .table thead th svg {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+:root[data-design="modern"] .table thead th:hover svg {
+  opacity: 1;
+}
+
+:root[data-design="modern"] .table-container > .table-toolbar,
+:root[data-design="modern"] .table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, var(--mt-accent-soft), transparent);
+  border-bottom: 1px solid var(--mt-border);
+  flex-wrap: wrap;
+}
+
+:root[data-design="modern"] .table tbody td .fa,
+:root[data-design="modern"] .table tbody td .fas {
+  transition: transform 0.15s, color 0.15s;
+  cursor: pointer;
+}
+:root[data-design="modern"] .table tbody td .fa:hover,
+:root[data-design="modern"] .table tbody td .fas:hover {
+  transform: scale(1.15);
+  color: var(--mt-accent);
+}
+
+:root[data-design="modern"] .table tbody tr.no-data td,
+:root[data-design="modern"] .table tbody tr.nodata td {
+  text-align: center;
+  color: var(--mt-muted);
+  font-style: italic;
+  padding: 18px 12px !important;
+}
+
+:root[data-design="modern"] .table tfoot td {
+  background: var(--mt-panel2) !important;
+  font-weight: 700;
+  border: none !important;
+  border-top: 1.5px solid var(--mt-border) !important;
+  padding: 8px 10px !important;
+  color: var(--mt-text);
+}
+
+:root[data-design="modern"] .table-container.compact .table tbody td,
+:root[data-design="modern"] .compact .table tbody td {
+  padding: 3px 8px !important;
+  font-size: 11.5px;
+}
+:root[data-design="modern"] .table-container.compact .table thead th,
+:root[data-design="modern"] .compact .table thead th {
+  padding: 5px 8px !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .table tbody tr:nth-child(even) td {
+  background: var(--ds-color-panel2, #0F172A);
+}
+:root[data-design="modern"][data-theme="dark"] .table tbody tr:nth-child(odd) td {
+  background: var(--ds-color-panel, #111827);
+}
+:root[data-design="modern"][data-theme="dark"] .table thead th {
+  background: var(--ds-color-panel2, #0F172A) !important;
+}

@@ -1,0 +1,128 @@
+/* Modern skin for rc-easyui <DataGrid/> (EasyUI search dropdown, etc.).
+   rc-easyui renders its own .datagrid-* DOM (NOT the .table markup that
+   table.css styles), so it needs its own overrides. Activates only when
+   html[data-design="modern"]. Colors mirror modern-skin/table.css. */
+
+:root[data-design="modern"] .datagrid {
+  --dg-radius: 12px;
+  --dg-border: var(--ds-color-border, #e2e8f0);
+  --dg-panel: var(--ds-color-panel, #ffffff);
+  --dg-panel2: var(--ds-color-panel2, #f8fafc);
+  --dg-text: var(--ds-color-text, #0f172a);
+  --dg-muted: var(--ds-color-text-muted, #64748b);
+  --dg-accent: var(--ds-color-accent, #0f766e);
+  --dg-accent-soft: var(--ds-color-accent-soft, rgba(15, 118, 110, 0.08));
+
+  border: 1px solid var(--dg-border) !important;
+  border-radius: var(--dg-radius) !important;
+  box-shadow: 0 8px 26px -12px rgba(15, 23, 42, 0.28) !important;
+  overflow: hidden;
+  background: var(--dg-panel) !important;
+  font-family: "Plus Jakarta Sans", "Outfit", system-ui, sans-serif;
+  /* Fit the dropdown container instead of the hardcoded inline width:1000px */
+  width: 100% !important;
+  max-width: 100%;
+}
+
+:root[data-design="modern"] .datagrid .panel-body {
+  background: var(--dg-panel) !important;
+  border: none !important;
+}
+
+/* Header — muted uppercase, like modern .table thead */
+:root[data-design="modern"] .datagrid-header {
+  background: var(--dg-panel2) !important;
+  border-color: var(--dg-border) !important;
+}
+:root[data-design="modern"] .datagrid-header td {
+  background: var(--dg-panel2) !important;
+  border-color: var(--dg-border) !important;
+  border-style: solid !important;
+}
+:root[data-design="modern"] .datagrid-header .datagrid-cell {
+  padding: 2px 8px !important;
+}
+:root[data-design="modern"] .datagrid-header .datagrid-cell span {
+  color: var(--dg-muted) !important;
+  font-weight: 700 !important;
+  font-size: 10.5px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Body cells */
+:root[data-design="modern"] .datagrid-htable,
+:root[data-design="modern"] .datagrid-btable,
+:root[data-design="modern"] .datagrid-ftable {
+  color: var(--dg-text) !important;
+}
+:root[data-design="modern"] .datagrid-body td {
+  border-color: color-mix(in srgb, var(--dg-border) 60%, transparent) !important;
+  border-style: solid !important;
+}
+:root[data-design="modern"] .datagrid-cell {
+  padding: 3px 8px !important;
+  font-size: 11.5px !important;
+  line-height: 16px !important;
+}
+
+/* Zebra striping */
+:root[data-design="modern"] .datagrid-row {
+  background: var(--dg-panel) !important;
+}
+:root[data-design="modern"] .datagrid-row-alt {
+  background: var(--dg-panel2) !important;
+}
+
+/* Hover */
+:root[data-design="modern"] .datagrid-row-over,
+:root[data-design="modern"] .datagrid-header td.datagrid-header-over {
+  background: var(--dg-accent-soft) !important;
+  color: var(--dg-text) !important;
+}
+
+/* Selected — accent tint + left accent bar (mouse + keyboard nav) */
+:root[data-design="modern"] .datagrid-row-selected,
+:root[data-design="modern"] .datagrid-row.selected-row {
+  background: var(--dg-accent-soft) !important;
+  color: var(--dg-text) !important;
+  box-shadow: inset 3px 0 0 0 var(--dg-accent);
+}
+
+/* Pager — slim, panel2 */
+:root[data-design="modern"] .datagrid-pager,
+:root[data-design="modern"] .datagrid .pagination {
+  background: var(--dg-panel2) !important;
+  border-color: var(--dg-border) !important;
+}
+:root[data-design="modern"] .datagrid-pager .pagination-info {
+  color: var(--dg-muted) !important;
+}
+
+/* Dark theme parity with table.css */
+:root[data-design="modern"][data-theme="dark"] .datagrid-row {
+  background: var(--ds-color-panel, #111827) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .datagrid-row-alt {
+  background: var(--ds-color-panel2, #0f172a) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .datagrid-header,
+:root[data-design="modern"][data-theme="dark"] .datagrid-header td {
+  background: var(--ds-color-panel2, #0f172a) !important;
+}
+
+/* Brighten body row text in dark — default was low-contrast/dim */
+:root[data-design="modern"][data-theme="dark"] .datagrid-body,
+:root[data-design="modern"][data-theme="dark"] .datagrid-btable,
+:root[data-design="modern"][data-theme="dark"] .datagrid-row,
+:root[data-design="modern"][data-theme="dark"] .datagrid-row td,
+:root[data-design="modern"][data-theme="dark"] .datagrid-body .datagrid-cell,
+:root[data-design="modern"][data-theme="dark"] .datagrid-row .datagrid-cell span {
+  color: var(--ds-color-text, #E8EEF6) !important;
+}
+/* keep hover/selected rows readable too */
+:root[data-design="modern"][data-theme="dark"] .datagrid-row-over .datagrid-cell,
+:root[data-design="modern"][data-theme="dark"] .datagrid-row-selected .datagrid-cell,
+:root[data-design="modern"][data-theme="dark"] .datagrid-row.selected-row .datagrid-cell {
+  color: #ffffff !important;
+}

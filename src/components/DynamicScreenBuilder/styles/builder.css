@@ -1,0 +1,6926 @@
+/* ===========================================================================
+   Dynamic Screen Builder — BUILDER CHROME.
+   Its own palette (--b-*), deliberately independent of the screen theme so a
+   dark screen theme never makes the tool itself unreadable.
+   =========================================================================== */
+
+/* Builder palette. Also applied to `.dsb-portal`, the wrapper used for popovers
+   rendered into <body> — they live outside .dsb-root and would otherwise lose
+   every variable. */
+.dsb-root,
+.dsb-portal {
+  --b-bg: #f5f7fb;
+  --b-surface: #ffffff;
+  --b-surface-2: #fafbfe;
+  --b-border: #e6eaf2;
+  --b-border-2: #d5dbe8;
+  --b-text: #0f172a;
+  --b-muted: #6b7a90;
+  --b-accent: #4f46e5;
+  --b-accent-soft: #eef0ff;
+  --b-accent-2: #0ea5e9;
+  --b-danger: #dc2626;
+  --b-ok: #16a34a;
+  --b-radius: 10px;
+  --b-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --b-shadow-lg: 0 12px 34px rgba(15, 23, 42, 0.14);
+  --b-topbar: 48px;
+  --b-statusbar: 26px;
+  --b-dock-left: 258px;
+  --b-dock-right: 316px;
+  --b-dock-ease: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dsb-portal {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 1.0417rem;
+  color: var(--b-text);
+}
+.dsb-portal *,
+.dsb-portal *::before,
+.dsb-portal *::after {
+  box-sizing: border-box;
+}
+.dsb-portal button {
+  font-family: inherit;
+}
+
+.dsb-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px);
+  min-height: 560px;
+  background: var(--b-bg);
+  color: var(--b-text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 1.0417rem;
+  border-radius: 14px;
+  border: 1px solid var(--b-border);
+  overflow: hidden;
+  box-shadow: var(--b-shadow);
+}
+.dsb-root *,
+.dsb-root *::before,
+.dsb-root *::after {
+  box-sizing: border-box;
+}
+.dsb-root button {
+  font-family: inherit;
+}
+/* The host theme paints every bare button solid (`.sky_blue_theme button`,
+   0,1,1 — plus :hover/:focus), which outranks the builder's single-class
+   button rules and turned Preview, the icon picker and the dock handles into
+   solid theme-blue blocks. Neutralise it here, at the top, so every later
+   builder rule of equal weight still wins; the buttons that should carry a
+   colour get a pastel tone in the block at the end of this file. The screen
+   on the canvas (.dsb-frame) is left alone — it must look as it will in the
+   app, theme included; :where() keeps that exclusion weightless. */
+:is(.dsb-root, .dsb-portal) button:where(:not(.dsb-frame *)),
+:is(.dsb-root, .dsb-portal) button:where(:not(.dsb-frame *)):is(:hover, :focus) {
+  background-color: transparent;
+}
+body.dsb-dragging {
+  cursor: grabbing !important;
+  user-select: none;
+}
+body.dsb-pan {
+  cursor: grab;
+}
+
+/* ------------------------------------------------------------------ boot */
+
+.dsb-boot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+}
+.dsb-boot-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 22px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e6eaf2;
+  color: #4f46e5;
+  font-weight: 600;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
+}
+
+/* --------------------------------------------------------------- toolbar */
+
+.dsb-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: var(--b-topbar);
+  padding: 0 10px;
+  background: var(--b-surface);
+  border-bottom: 1px solid var(--b-border);
+  flex: none;
+  z-index: 20;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.dsb-toolbar::-webkit-scrollbar {
+  height: 4px;
+}
+.dsb-toolbar::-webkit-scrollbar-thumb {
+  background: var(--b-border-2);
+  border-radius: 999px;
+}
+.dsb-tb-left,
+.dsb-tb-mid,
+.dsb-tb-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* Only the left section gives up space; the controls keep their size. */
+.dsb-tb-left {
+  flex: 0 1 auto;
+}
+.dsb-tb-mid {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+.dsb-tb-right {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+.dsb-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--b-accent), #7c3aed);
+  color: #fff;
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  flex: none;
+}
+.dsb-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.dsb-doc-name {
+  flex: 1 1 auto;
+  width: 190px;
+  min-width: 90px;
+  max-width: 26vw;
+  height: 28px;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 1.0833rem;
+  font-weight: 700;
+  color: var(--b-text);
+  outline: none;
+  transition: all 0.16s ease;
+}
+.dsb-doc-name:hover {
+  background: var(--b-surface-2);
+}
+.dsb-doc-name:focus {
+  background: #fff;
+  border-color: var(--b-accent);
+  box-shadow: 0 0 0 3px var(--b-accent-soft);
+}
+/* Says the name is editable without waiting for someone to hover it. */
+.dsb-doc-edit {
+  flex: none;
+  margin-right: -6px;
+  color: var(--b-muted);
+}
+.dsb-doc:focus-within .dsb-doc-edit {
+  color: var(--b-accent);
+}
+.dsb-doc-flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.dsb-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  white-space: nowrap;
+  line-height: 1.6;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+.dsb-status.s-published {
+  background: #dcfce7;
+  color: #15803d;
+}
+/* What auto-save says instead of a toast. */
+.dsb-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.8333rem;
+  font-style: normal;
+  opacity: 0.6;
+}
+.dsb-auto.is-bad {
+  color: var(--b-danger);
+  opacity: 1;
+}
+.dsb-tb-auto.is-on {
+  color: var(--b-accent);
+}
+
+.dsb-dirty {
+  flex: none;
+  white-space: nowrap;
+  line-height: 1.6;
+  font-size: 0.8333rem;
+  font-style: normal;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.dsb-tb-group {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  background: var(--b-surface-2);
+}
+.dsb-tb-group button,
+.dsb-tb-right > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+  min-width: 30px;
+  flex: none;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.dsb-tb-group button:hover:not(:disabled),
+.dsb-tb-right > button:hover:not(:disabled) {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-tb-group button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.dsb-tb-group button.is-on {
+  background: #fff;
+  color: var(--b-accent);
+  box-shadow: var(--b-shadow);
+}
+.dsb-zoom-val {
+  font-size: 0.9167rem;
+  font-weight: 700;
+  min-width: 42px;
+}
+.dsb-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  white-space: nowrap;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 8px;
+  background: var(--b-surface);
+  color: var(--b-text);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.dsb-preview-btn:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsb-preview-btn.is-on {
+  background: var(--b-accent);
+  border-color: var(--b-accent);
+  color: #fff;
+}
+.dsb-btn-primary,
+.dsb-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  white-space: nowrap;
+  height: 30px;
+  padding: 0 13px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.dsb-btn-primary {
+  background: var(--b-accent);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.4);
+}
+.dsb-btn-primary:hover {
+  background: #4338ca;
+}
+.dsb-btn-primary:disabled {
+  opacity: 0.6;
+}
+.dsb-btn-ghost {
+  background: var(--b-surface);
+  border-color: var(--b-border-2);
+  color: var(--b-text);
+}
+.dsb-btn-ghost:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+
+/* Shed the optional bits as the window narrows, widest-first, so the bar
+   never has to scroll on a normal laptop screen. */
+@media (max-width: 1500px) {
+  .dsb-brand b {
+    display: none;
+  }
+  .dsb-brand {
+    padding: 4px 7px;
+  }
+}
+@media (max-width: 1380px) {
+  .dsb-doc-name {
+    width: 150px;
+  }
+}
+@media (max-width: 1160px) {
+  .dsb-preview-btn span {
+    display: none;
+  }
+  .dsb-preview-btn {
+    padding: 0 9px;
+  }
+}
+@media (max-width: 1040px) {
+  .dsb-btn-primary span,
+  .dsb-btn-ghost span {
+    display: none;
+  }
+  .dsb-btn-primary,
+  .dsb-btn-ghost {
+    padding: 0 10px;
+  }
+}
+
+/* ------------------------------------------------------------------ body */
+
+.dsb-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.dsb-side-left {
+  width: var(--b-dock-left);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border-right: 1px solid var(--b-border);
+  min-height: 0;
+}
+.dsb-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------------------ collapsible side panels */
+
+.dsb-dock {
+  flex: none;
+  min-height: 0;
+  overflow: hidden;
+  transition: width var(--b-dock-ease);
+}
+.dsb-dock.is-left {
+  width: var(--b-dock-left);
+}
+.dsb-dock.is-right {
+  width: var(--b-dock-right);
+}
+.dsb-dock.is-collapsed {
+  width: 0;
+}
+.dsb-dock > * {
+  height: 100%;
+}
+
+/* The drag grip: the whole panel edge, not a dot on it. Six pixels wide and
+   invisible until it is wanted, so it never looks like a border. */
+.dsb-dock-grip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+  transition:
+    left var(--b-dock-ease),
+    right var(--b-dock-ease),
+    background 120ms ease;
+}
+.dsb-dock-grip:hover,
+.dsb-dock-grip:focus-visible,
+.dsb-dock-grip.is-on {
+  background: var(--b-accent);
+  outline: none;
+}
+.dsb-dock-grip.is-left {
+  left: var(--b-dock-left);
+  transform: translateX(-3px);
+}
+.dsb-dock-grip.is-right {
+  right: var(--b-dock-right);
+  transform: translateX(3px);
+}
+
+/* While a drag is on: one cursor everywhere, no text selection, and a canvas
+   that does not try to interpret the pointer as a drop. */
+.dsb-body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+.dsb-body.is-resizing .dsb-main {
+  pointer-events: none;
+}
+
+/* The handle rides the panel edge rather than living inside the panel: a
+   collapse button that disappears with the thing it collapsed leaves no way
+   back. */
+.dsb-dock-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--b-border);
+  background: var(--b-surface);
+  color: var(--b-muted);
+  cursor: pointer;
+  box-shadow: var(--b-shadow);
+  transition:
+    left var(--b-dock-ease),
+    right var(--b-dock-ease),
+    color 120ms ease,
+    background 120ms ease;
+}
+.dsb-dock-btn:hover {
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+}
+.dsb-dock-btn.is-left {
+  left: var(--b-dock-left);
+  transform: translate(-1px, -50%);
+  border-radius: 0 7px 7px 0;
+  border-left: 0;
+}
+.dsb-dock-btn.is-left.is-off {
+  left: 0;
+}
+.dsb-dock-btn.is-right {
+  right: var(--b-dock-right);
+  transform: translate(1px, -50%);
+  border-radius: 7px 0 0 7px;
+  border-right: 0;
+}
+.dsb-dock-btn.is-right.is-off {
+  right: 0;
+}
+
+/* Someone who has asked for less motion still gets the collapse, just not the
+   slide. */
+@media (prefers-reduced-motion: reduce) {
+  .dsb-dock,
+  .dsb-dock-btn,
+  .dsb-panel-right {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------------- palette */
+
+.dsb-panel-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 55%;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-pal-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--b-border);
+  color: var(--b-muted);
+}
+.dsb-pal-search input {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  color: var(--b-text);
+}
+.dsb-pal-search button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+}
+.dsb-pal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 6px;
+  scrollbar-width: thin;
+}
+.dsb-pal-cat {
+  margin-bottom: 4px;
+}
+/* Every colour below carries !important, and the reason is assets/css/theme.css:
+   the active theme repaints EVERY <button> on the page — `.<theme>_theme button
+   { background-color: <theme>; border-color: <theme> !important }` — which
+   turned the whole palette into one block of solid theme colour. The palette is
+   a legend: each category has to keep its own hue, so it states its colours
+   loudly enough to survive that. `--dsb-cat` is set per section in Palette.jsx
+   and every tint below is mixed from it, so adding a category needs no CSS. */
+.dsb-pal-cat-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--dsb-cat, #64748b) 20%, #fff) !important;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--dsb-cat, #64748b) 9%, #fff) !important;
+  color: color-mix(in srgb, var(--dsb-cat, #64748b) 72%, #0f172a) !important;
+  font-size: 0.9167rem;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.dsb-pal-cat-head:hover {
+  background: color-mix(in srgb, var(--dsb-cat, #64748b) 16%, #fff) !important;
+  border-color: color-mix(in srgb, var(--dsb-cat, #64748b) 34%, #fff) !important;
+}
+.dsb-pal-cat-head.is-static {
+  cursor: default;
+}
+.dsb-pal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  flex: none;
+}
+.dsb-pal-n {
+  margin-left: auto;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsb-cat, #64748b) 16%, #fff);
+  font-size: 0.8333rem;
+  color: color-mix(in srgb, var(--dsb-cat, #64748b) 70%, #0f172a);
+  font-weight: 800;
+}
+.dsb-pal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 3px 2px 8px;
+}
+.dsb-pal-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 8px 8px 7px;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  background: var(--b-surface);
+  cursor: grab;
+  text-align: left;
+  transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.dsb-pal-item {
+  background: #fff !important;
+  border-color: color-mix(in srgb, var(--dsb-cat, var(--b-accent)) 18%, #fff) !important;
+  color: var(--b-text);
+}
+.dsb-pal-item:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--dsb-cat, var(--b-accent)) 7%, #fff) !important;
+  border-color: color-mix(in srgb, var(--dsb-cat, var(--b-accent)) 42%, #fff) !important;
+  box-shadow: var(--b-shadow);
+}
+.dsb-pal-item:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+.dsb-pal-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  /* Darkened against white so a pastel category (amber) is still readable as
+     an icon, which the raw hue is not. */
+  color: color-mix(in srgb, var(--dsb-cat, #4f46e5) 78%, #0f172a);
+  background: color-mix(in srgb, var(--dsb-cat, #4f46e5) 14%, #fff);
+}
+.dsb-pal-label {
+  font-size: 0.9167rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--b-text);
+}
+.dsb-pal-flag {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.6667rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--b-muted);
+  background: var(--b-surface-2);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+/* The search box's clear button is a <button> too — same theme repaint. */
+.dsb-pal-search button {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.dsb-pal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 3px 2px 8px;
+}
+.dsb-pal-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dsb-pal-group-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--b-border);
+  border-radius: 8px;
+  background: var(--b-surface);
+  font-size: 0.9583rem;
+  font-weight: 600;
+  color: var(--b-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dsb-pal-group-main {
+  background: #fff !important;
+  border-color: color-mix(in srgb, var(--b-ok) 18%, #fff) !important;
+}
+.dsb-pal-group-main:hover {
+  background: color-mix(in srgb, var(--b-ok) 7%, #fff) !important;
+  border-color: color-mix(in srgb, var(--b-ok) 42%, #fff) !important;
+  color: color-mix(in srgb, var(--b-ok) 75%, #0f172a);
+}
+.dsb-pal-empty,
+.dsb-lib-empty {
+  padding: 18px 12px;
+  text-align: center;
+  font-size: 0.9583rem;
+  color: var(--b-muted);
+}
+.dsb-pal-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--b-border);
+  font-size: 0.875rem;
+  color: var(--b-muted);
+  background: var(--b-surface-2);
+}
+
+/* ---------------------------------------------------------------- layers */
+
+.dsb-layers {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--b-surface);
+}
+.dsb-layers-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--b-border);
+  font-size: 0.9167rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  color: var(--b-muted);
+}
+.dsb-layers-tools {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+}
+.dsb-layers-tools button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 3px;
+}
+.dsb-layers-tools button:hover:not(:disabled) {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-layers-tools button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.dsb-layers-body {
+  flex: 1;
+  overflow: auto;
+  padding: 4px 0 10px;
+  scrollbar-width: thin;
+}
+.dsb-layer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 25px;
+  padding-right: 6px;
+  cursor: pointer;
+  color: var(--b-text);
+  border-left: 2px solid transparent;
+  transition: background 0.12s ease;
+}
+.dsb-layer:hover,
+.dsb-layer.is-hover {
+  background: var(--b-surface-2);
+}
+.dsb-layer.is-sel {
+  background: var(--b-accent-soft);
+  border-left-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsb-layer.is-hidden {
+  opacity: 0.45;
+}
+.dsb-layer-caret {
+  width: 14px;
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.dsb-layer-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--b-border-2);
+}
+.dsb-layer-grip {
+  color: var(--b-border-2);
+  cursor: grab;
+  display: inline-flex;
+}
+.dsb-layer:hover .dsb-layer-grip {
+  color: var(--b-muted);
+}
+.dsb-layer-name {
+  flex: 1;
+  font-size: 0.9583rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-layer-rename {
+  flex: 1;
+  height: 19px;
+  border: 1px solid var(--b-accent);
+  border-radius: 4px;
+  padding: 0 4px;
+  font-size: 0.9583rem;
+  outline: none;
+}
+.dsb-layer-tools {
+  display: none;
+  gap: 1px;
+}
+.dsb-layer:hover .dsb-layer-tools,
+.dsb-layer.is-sel .dsb-layer-tools {
+  display: flex;
+}
+.dsb-layer-tools button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: inline-flex;
+}
+.dsb-layer-tools button:hover {
+  background: #fff;
+  color: var(--b-accent);
+}
+
+/* ---------------------------------------------------------------- canvas */
+
+.dsb-canvas-wrap {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  padding: 22px 18px 40px;
+  background: var(--b-bg);
+  scrollbar-width: thin;
+}
+.dsb-canvas-wrap.has-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.075) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+.dsb-canvas-wrap.is-panning {
+  cursor: grabbing;
+}
+.dsb-canvas-zoom {
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+  display: flex;
+  justify-content: center;
+}
+.dsb-frame {
+  width: 100%;
+  min-height: 400px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--b-border);
+  border-radius: 14px;
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), max-width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-frame.bp-tablet,
+.dsb-frame.bp-mobile {
+  border-radius: 18px;
+}
+.dsb-canvas {
+  min-height: 400px;
+}
+.dsb-canvas-hud {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(4px);
+}
+.dsb-canvas-hud em {
+  font-style: normal;
+  opacity: 0.6;
+}
+
+/* -------------------------------------------------- design node decoration */
+
+.dsb-dnode {
+  position: relative;
+  min-width: 0;
+}
+/* When a node carries its own size, the wrapper mirrors it so the selection
+   outline and the resize handles hug the real component instead of the full
+   row, and the child fills that wrapper exactly (its own width would
+   otherwise be applied twice — 50% of 50%). */
+.dsb-canvas.is-design .dsb-dnode[data-dsb-sized="1"] > *:first-child {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 1 auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+/* In design mode the components must not steal the pointer: the wrapper does
+   the selecting, nested wrappers stay selectable, and anything explicitly
+   marked interactive (tab bars, view toggles) keeps working. */
+.dsb-canvas.is-design .dsb-dnode {
+  pointer-events: auto;
+}
+.dsb-canvas.is-design .dsb-dnode * {
+  pointer-events: none;
+}
+.dsb-canvas.is-design .dsb-dnode .dsb-dnode,
+.dsb-canvas.is-design [data-dsb-interactive],
+.dsb-canvas.is-design [data-dsb-interactive] *,
+.dsb-canvas.is-design .dsb-dnode-tag,
+.dsb-canvas.is-design .dsb-dnode-tag *,
+.dsb-canvas.is-design .dsb-rz {
+  pointer-events: auto;
+}
+.dsb-dnode::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 7px;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.dsb-canvas.is-design .dsb-dnode:hover::after {
+  border-color: color-mix(in srgb, #4f46e5 45%, transparent);
+}
+.dsb-dnode.is-sel::after {
+  border-color: #4f46e5;
+  border-width: 1.5px;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+.dsb-dnode.is-droptarget::after {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+}
+.dsb-dnode.is-hidden {
+  opacity: 0.4;
+}
+.dsb-dnode.is-hidden::after {
+  border-style: dashed;
+  border-color: #94a3b8;
+}
+.dsb-dnode.is-root::after {
+  display: none;
+}
+.dsb-dnode.is-locked::after {
+  border-style: dotted;
+}
+/* The name tag is always in the DOM and shown by CSS on hover/selection —
+   hovering must never touch React state or the canvas would re-render on
+   every mouse move. */
+.dsb-dnode-tag {
+  display: none;
+  position: absolute;
+  top: -19px;
+  left: -2px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 17px;
+  padding: 0 6px;
+  border-radius: 5px 5px 5px 0;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+  animation: dsb-tagin 0.14s ease;
+}
+@keyframes dsb-tagin {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dsb-canvas.is-design .dsb-dnode:hover > .dsb-dnode-tag,
+.dsb-canvas.is-design .dsb-dnode.is-sel > .dsb-dnode-tag {
+  display: inline-flex;
+}
+.dsb-dnode.is-sel > .dsb-dnode-tag {
+  background: #4f46e5;
+}
+.dsb-dnode-grip {
+  display: inline-flex;
+  cursor: grab;
+  opacity: 0.85;
+}
+.dsb-dnode-grip:active {
+  cursor: grabbing;
+}
+.dsb-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 58px;
+  margin: 2px;
+  border: 1.5px dashed var(--b-border-2);
+  border-radius: 9px;
+  color: var(--b-muted);
+  font-size: 0.9167rem;
+  font-weight: 600;
+  background: rgba(248, 250, 252, 0.7);
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+.dsb-dnode.is-droptarget .dsb-dropzone {
+  border-color: #0ea5e9;
+  color: #0284c7;
+  background: rgba(14, 165, 233, 0.06);
+}
+.dsb-rz {
+  position: absolute;
+  z-index: 13;
+  background: #4f46e5;
+  border: 1.5px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+}
+.dsb-rz.r {
+  width: 8px;
+  height: 22px;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+.dsb-rz.b {
+  height: 8px;
+  width: 22px;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+.dsb-rz.br {
+  width: 9px;
+  height: 9px;
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
+}
+.dsb-guide {
+  position: fixed;
+  z-index: 9998;
+  height: 0;
+  border-top: 1px dashed #ec4899;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------- dnd overlays */
+
+.dsb-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  /* elementsFromPoint skips pointer-events:none, which is exactly what the drop
+     resolver needs — the ghost follows the cursor and must never be what the
+     cursor is judged to be over. */
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 9px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.9583rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.4);
+  pointer-events: none;
+  will-change: transform;
+  animation: dsb-ghostin 0.12s ease;
+}
+@keyframes dsb-ghostin {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+.dsb-dropind {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  transition: left 0.08s linear, top 0.08s linear, width 0.08s linear, height 0.08s linear;
+}
+.dsb-dropind.is-line {
+  background: #0ea5e9;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.22);
+}
+.dsb-dropind.is-line::before,
+.dsb-dropind.is-line::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #0ea5e9;
+  border-radius: 50%;
+  background: #fff;
+}
+.dsb-dropind.is-line::before {
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dsb-dropind.is-line::after {
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dsb-dropind.is-box {
+  border: 2px dashed #0ea5e9;
+  border-radius: 10px;
+  background: rgba(14, 165, 233, 0.07);
+}
+
+/* ------------------------------------------------------------- inspector */
+
+.dsb-panel-right {
+  width: var(--b-dock-right);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border-left: 1px solid var(--b-border);
+  min-height: 0;
+}
+.dsb-panel-empty {
+  margin: auto;
+  padding: 26px 22px;
+  text-align: center;
+  color: var(--b-muted);
+}
+.dsb-panel-empty h4 {
+  margin: 8px 0 4px;
+  font-size: 1.0833rem;
+  color: var(--b-text);
+}
+.dsb-panel-empty p {
+  margin: 0;
+  font-size: 0.9583rem;
+  line-height: 1.5;
+}
+.dsb-insp-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-insp-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+  flex: none;
+}
+.dsb-insp-name {
+  flex: 1;
+  min-width: 0;
+}
+.dsb-insp-name input {
+  width: 100%;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 0 4px;
+  font-size: 1.0417rem;
+  font-weight: 700;
+  background: transparent;
+  outline: none;
+}
+.dsb-insp-name input:focus {
+  border-color: var(--b-accent);
+  background: #fff;
+}
+.dsb-insp-name strong {
+  display: block;
+  padding: 0 4px;
+  font-size: 1.0417rem;
+  font-weight: 700;
+  line-height: 22px;
+}
+.dsb-insp-name span {
+  display: block;
+  padding-left: 4px;
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-insp-tools {
+  display: flex;
+  gap: 2px;
+}
+.dsb-insp-tools button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 5px;
+}
+.dsb-insp-tools button:hover,
+.dsb-insp-tools button.is-on {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+
+/* Full screen: the panel covers the whole workspace under the toolbar — canvas
+   and components panel included — and is positioned against .dsb-body, so the
+   dock's overflow and animated width do not clip it. Below the drawers (40)
+   and the library modal (80), above the canvas's own tags and the dock grips. */
+.dsb-panel-right.is-full {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  z-index: 30;
+  border-left: 0;
+  transform: none;
+  box-shadow: none;
+}
+/* Props: the groups sit side by side instead of in one long column. A grid,
+   not CSS columns — a column split would carry the portalled pickers' anchors
+   across fragments. */
+.dsb-panel-right.is-full .dsb-insp-body.is-props {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  /* A section clips its corners (overflow: hidden), which drops its automatic
+     minimum height to 0 — auto rows would then be squeezed to the panel's
+     height and the next row would ride over a tall section. */
+  grid-auto-rows: max-content;
+  gap: 10px;
+  align-items: start;
+  align-content: start;
+  padding: 14px 18px;
+}
+/* "]" still hides it: the dock collapsing is the one way everyone knows. */
+.dsb-dock.is-collapsed > .dsb-panel-right.is-full {
+  display: none;
+}
+.dsb-panel-right.is-full .dsb-insp-body.is-props > .dsbi-sec {
+  margin-bottom: 0;
+}
+/* Every other tab is one editor: kept to a readable measure and centred. */
+.dsb-panel-right.is-full .dsb-insp-body:not(.is-props) {
+  padding: 14px max(18px, calc((100% - 980px) / 2));
+}
+/* Seven tabs do not fit across a 360px panel. They used to scroll sideways
+   with the scrollbar hidden, which reads as "there are four tabs" — Rules,
+   Colours and Screens were cut off at the edge with nothing to say they were
+   there. Wrapping costs one row of height and shows all of them. */
+.dsb-insp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-insp-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--b-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.dsb-insp-tabs button:hover {
+  background: var(--b-surface-2);
+  color: var(--b-text);
+}
+.dsb-insp-tabs button.is-on {
+  background: var(--b-accent);
+  color: #fff;
+}
+.dsb-insp-body {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  scrollbar-width: thin;
+}
+.dsb-insp-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+}
+.dsb-id {
+  flex: 1;
+  font-size: 0.7917rem;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--b-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------- inspector fields */
+
+.dsbi-sec {
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  margin-bottom: 7px;
+  background: var(--b-surface);
+  overflow: hidden;
+}
+/* Same reason as the rows: a header is something to press, not to select. */
+.dsbi-sec-head,
+.dsbi-insp-tab,
+.dsbi-scope-head,
+.dsbi-scope-title {
+  user-select: none;
+}
+.dsbi-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  background: var(--b-surface-2);
+  color: var(--b-text);
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.dsbi-sec-head:hover {
+  background: var(--b-accent-soft);
+}
+.dsbi-sec-right {
+  margin-left: auto;
+}
+.dsbi-sec-body {
+  padding: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Flex and grid children default to `min-width: auto`, which is the intrinsic
+   width of the input inside them — that is what pushed the colour/icon rows
+   past the right edge of the panel. Every track and child below is allowed to
+   shrink instead. */
+.dsbi-sec,
+.dsbi-list,
+.dsbi-list-item,
+.dsbi-stackgap,
+.dsbi-iconfield,
+.dsbi-slider,
+.dsbi-color {
+  min-width: 0;
+}
+.dsbi-grid2 > *,
+.dsbi-grid3 > *,
+.dsbi-kv > *,
+.dsb-swatchrow-edit > * {
+  min-width: 0;
+}
+.dsbi-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 15px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+  font-size: 0.7917rem;
+  font-weight: 800;
+}
+.dsbi-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.dsbi-row.is-stack {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 5px;
+}
+.dsbi-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--b-muted);
+  line-height: 1.25;
+}
+.dsbi-ctl {
+  min-width: 0;
+  max-width: 100%;
+}
+.dsbi-hint {
+  grid-column: 1 / -1;
+  font-size: 0.7917rem;
+  color: var(--b-muted);
+}
+.dsbi-note {
+  margin: 0 0 6px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--b-muted);
+}
+/* The picked component's own props: the ones it may need, as chips that add
+   themselves to "Pass to the component", and a line on what is handled. */
+.dsbi-propnames {
+  margin: -2px 0 8px;
+}
+.dsbi-propnames-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.dsbi-propnames .dsbi-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.dsbi-propnames /* How many keys the catalog described, on the button that uses them. */
+.dsbi-mini-n {
+  padding: 0 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--b-accent) 16%, #fff);
+  color: var(--b-accent);
+  font-size: 0.7917rem;
+}
+.dsbi-mini:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+/* A trend case's value and direction: the value box keeps the room. */
+.dsbi-trendcase-then {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 6px;
+  align-items: center;
+  margin-top: 6px;
+}
+/* A trend case's own colours: a short label, then the usual colour field. */
+.dsbi-trendcase-colors {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 0.9167rem;
+  color: var(--b-text-2, #64748b);
+}
+.dsbi-trendcase-colors .dsbi-color {
+  min-width: 0;
+}
+/* A field a dialog reports: read-only, picked from Map… rather than clicked. */
+.dsbi-fieldchip {
+  padding: 1px 6px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 4px;
+  font-size: 0.9167rem;
+}
+.dsbi-dialogfill {
+  margin: 0 0 8px;
+}
+.dsbi-dialogfill .dsbi-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.dsbi-dialogfill .dsbi-hint {
+  margin-top: 4px;
+}
+/* A chain inside a chain — the Save button's actions under an Open modal —
+   set in by a rule so it does not read as more of the outer list. */
+.dsbi-subchain {
+  margin: 2px 0 8px;
+  padding: 6px 0 2px 9px;
+  border-left: 2px solid var(--b-border-2);
+}
+/* A note about something already wrong, not about how something works. */
+.dsbi-note.is-warn {
+  color: var(--b-danger);
+  background: color-mix(in srgb, var(--b-danger) 7%, transparent);
+  border-left: 2px solid var(--b-danger);
+  border-radius: 0 4px 4px 0;
+  padding: 4px 7px;
+}
+.dsbi-note code {
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+  border-radius: 4px;
+  padding: 0 3px;
+  font-size: 0.7917rem;
+}
+.dsbi-input {
+  width: 100%;
+  min-width: 0;
+  height: 27px;
+  padding: 0 7px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-text);
+  font-size: 0.9583rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.dsbi-input:focus {
+  border-color: var(--b-accent);
+  box-shadow: 0 0 0 3px var(--b-accent-soft);
+}
+textarea.dsbi-input {
+  height: auto;
+  padding: 6px 7px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.dsbi-code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.875rem;
+}
+.dsbi-input.is-inline {
+  width: 92px;
+  height: 22px;
+}
+select.dsbi-input {
+  cursor: pointer;
+}
+.dsbi-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px 0 3px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--b-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.dsbi-toggle-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--b-border-2);
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsbi-toggle.is-on {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+}
+.dsbi-toggle.is-on .dsbi-toggle-dot {
+  background: var(--b-accent);
+  transform: translateX(1px);
+}
+/* The segmented control is a runtime class, but its --dsb-* tokens only exist
+   inside .dsb-screen. Repaint it with the builder palette when it is used in a
+   side panel — never inside the canvas, where the runtime styling is correct. */
+.dsb-panel-right .dsb-seg,
+.dsb-drawer-panel .dsb-seg {
+  border-color: var(--b-border-2);
+  background: var(--b-surface-2);
+  border-radius: 7px;
+}
+.dsb-panel-right .dsb-seg button,
+.dsb-drawer-panel .dsb-seg button {
+  height: 24px;
+  color: var(--b-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.dsb-panel-right .dsb-seg button.is-on,
+.dsb-drawer-panel .dsb-seg button.is-on {
+  background: #fff;
+  color: var(--b-accent);
+  box-shadow: var(--b-shadow);
+}
+.dsbi-sizeseg {
+  margin-bottom: 2px;
+}
+
+.dsbi-grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+}
+.dsbi-grid3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+}
+.dsbi-kv {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 20px;
+}
+.dsbi-inline {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.dsbi-stackgap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dsbi-slider {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dsbi-slider input {
+  flex: 1;
+  accent-color: var(--b-accent);
+}
+.dsbi-slider span {
+  font-size: 0.875rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: right;
+}
+.dsbi-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dsbi-mini:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsbi-mini.is-danger:hover {
+  border-color: var(--b-danger);
+  color: var(--b-danger);
+}
+.dsbi-mini.is-primary {
+  border-color: var(--b-accent);
+  background: var(--b-accent);
+  color: #fff;
+}
+.dsbi-mini.is-primary:hover {
+  filter: brightness(1.06);
+  color: #fff;
+}
+.dsbi-mini:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The builder's own name prompt (builder/AskName) — window.prompt does not
+   exist in every host this runs in. */
+.dsb-ask {
+  width: min(380px, 92vw);
+  background: var(--b-surface, #fff);
+  border: 1px solid var(--b-border-2);
+  border-radius: 12px;
+  box-shadow: 0 18px 44px rgb(15 23 42 / 22%);
+  overflow: hidden;
+}
+.dsb-ask-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--b-border-2);
+  font-size: 1.0417rem;
+  font-weight: 700;
+  color: var(--b-text);
+}
+.dsb-ask-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 12px 4px;
+  font-size: 0.9167rem;
+  font-weight: 700;
+  color: var(--b-muted);
+}
+.dsb-ask-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+}
+.dsbi-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 26px;
+  border: 1px dashed var(--b-border-2);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--b-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dsbi-add:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+}
+.dsbi-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+}
+.dsbi-x:hover {
+  background: #fee2e2;
+  color: var(--b-danger);
+}
+.dsbi-x.is-plain:hover {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+
+/* Export action: one line per column — field, heading, up, down, remove. */
+.dsbi-expcol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 20px 20px 20px;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+}
+.dsbi-expcol > * {
+  min-width: 0;
+}
+.dsbi-expcol-foot .dsbi-add {
+  flex: 1 1 120px;
+  width: auto;
+}
+
+.dsbi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsbi-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px;
+  min-width: 0;
+  border: 1px solid var(--b-border);
+  border-radius: 8px;
+  background: var(--b-surface-2);
+}
+.dsbi-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dsbi-list-n {
+  font-size: 0.7917rem;
+  font-weight: 800;
+  color: var(--b-muted);
+}
+.dsbi-list-tools {
+  display: flex;
+  gap: 1px;
+}
+.dsbi-list-tools button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  padding: 2px 3px;
+  border-radius: 4px;
+  display: inline-flex;
+}
+.dsbi-list-tools button:hover {
+  background: #fff;
+  color: var(--b-accent);
+}
+.dsbi-sub {
+  padding: 6px;
+  border: 1px dashed var(--b-border-2);
+  border-radius: 7px;
+  background: #fff;
+}
+.dsbi-sub-title {
+  font-size: 0.7917rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--b-muted);
+  margin-bottom: 5px;
+}
+.dsbi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.dsbi-chipedit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 8px;
+  border-radius: 999px;
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.dsbi-chipedit button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0;
+}
+
+/* ------------------------------------------- Edit fill: form field ← value
+   One line per binding — field picker, arrow, value box, remove — instead
+   of a numbered card each, so a handful of them fit in the panel at once. */
+.dsbi-fill {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-fill > .dsbi-sub-title {
+  margin: 4px 0 0;
+}
+.dsbi-bind {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.dsbi-bind-head,
+.dsbi-bind-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr) 46px 20px 20px;
+  align-items: center;
+  gap: 4px;
+}
+.dsbi-bind-kind {
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--b-muted);
+  font-size: 0.7083rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.dsbi-bind-kind.is-text {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #b45309;
+}
+.dsbi-bind-kind.is-tmpl {
+  border-color: var(--b-accent);
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsbi-bind-kind.is-js {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+/* ▶ beside a binding: works it out on a sample row, result on the line below. */
+.dsbi-bind-test-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--b-border-2);
+  border-radius: 5px;
+  background: #fff;
+  color: #16a34a;
+  cursor: pointer;
+}
+.dsbi-bind-test-btn:hover:not(:disabled) {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+.dsbi-bind-test-btn:disabled {
+  color: var(--b-muted);
+  opacity: 0.5;
+  cursor: default;
+}
+.dsbi-bind-test {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: -1px 0 2px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  min-width: 0;
+}
+.dsbi-bind-test > svg {
+  flex: none;
+}
+.dsbi-bind-test-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.dsbi-bind-test-src {
+  flex: none;
+  opacity: 0.7;
+}
+.dsbi-bind-test.is-ok {
+  background: #f0fdf4;
+  color: #15803d;
+}
+.dsbi-bind-test.is-warn {
+  background: #fffbeb;
+  color: #b45309;
+}
+.dsbi-bind-test.is-err {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+/* A JS binding reads as code. */
+.dsbi-bind-row:has(.dsbi-bind-kind.is-js) .dsbi-input {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8333rem;
+}
+.dsbi-bind-head {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--b-muted);
+}
+.dsbi-bind-row > * {
+  min-width: 0;
+}
+.dsbi-bind-arrow {
+  color: var(--b-muted);
+}
+
+/* ---------------------------------------------------------- colour picker */
+
+.dsbi-color {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+.dsbi-color .dsbi-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsbi-color-chip {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--b-muted);
+  background-image: linear-gradient(45deg, #eef1f6 25%, transparent 25%, transparent 75%, #eef1f6 75%),
+    linear-gradient(45deg, #eef1f6 25%, transparent 25%, transparent 75%, #eef1f6 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+.dsbi-color-native {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+/* Popovers are portalled to <body> and positioned in viewport coordinates, so
+   the inspector's own scroll container can never clip them; `left/top/width/
+   max-height` are set inline once the trigger has been measured. */
+.dsbi-pop {
+  position: fixed;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  padding: 9px;
+  border: 1px solid var(--b-border);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--b-shadow-lg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  animation: dsb-tagin 0.14s ease;
+}
+.dsbi-pop > * {
+  flex: none;
+}
+/* Stays put while the rest of the popover scrolls. The negative offset cancels
+   the popover's own padding so the sticky row sits flush with its top edge. */
+.dsbi-popsearch {
+  position: sticky;
+  top: -9px;
+  z-index: 1;
+  margin: -9px -9px 0;
+  padding: 9px;
+  width: calc(100% + 18px);
+  height: auto;
+  border: 0;
+  border-bottom: 1px solid var(--b-border);
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+}
+.dsbi-popsearch:focus {
+  box-shadow: none;
+  border-bottom-color: var(--b-accent);
+}
+.dsbi-popclear {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.dsbi-pop-title {
+  font-size: 0.7917rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--b-muted);
+  margin: 4px 0 5px;
+}
+.dsbi-swatches,
+.dsbi-swatchrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.dsbi-swatchrow {
+  margin-top: 4px;
+}
+.dsbi-swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.14s ease;
+}
+.dsbi-swatch:hover {
+  transform: scale(1.12);
+}
+.dsbi-swatch.is-lg {
+  width: 34px;
+  height: 26px;
+}
+.dsbi-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.dsbi-token {
+  padding: 2px 6px;
+  border: 1px solid var(--b-border);
+  border-radius: 5px;
+  background: var(--b-surface-2);
+  font-size: 0.7917rem;
+  cursor: pointer;
+  color: var(--b-muted);
+}
+.dsbi-token:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+
+.dsbi-iconfield {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  max-width: 100%;
+}
+/* The suggested icon beside an empty picker: one click, no grid. */
+.dsbi-iconsugg-quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  flex: none;
+  height: 27px;
+  padding: 0 6px;
+  border: 1px dashed var(--b-accent);
+  border-radius: 6px;
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+  cursor: pointer;
+}
+.dsbi-iconsugg-quick:hover {
+  border-style: solid;
+}
+/* Search row: the sticky header of the picker, with its own glyph. */
+.dsbi-iconsearch {
+  position: sticky;
+  top: -9px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: -9px -9px 0;
+  padding-left: 11px;
+  border-bottom: 1px solid var(--b-border);
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+  color: var(--b-muted);
+}
+.dsbi-iconsearch:focus-within {
+  border-bottom-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsbi-iconsearch .dsbi-popsearch {
+  position: static;
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 9px 9px 9px 5px;
+  border: 0;
+  border-radius: 0;
+}
+.dsbi-iconsugg {
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--b-accent-soft);
+}
+.dsbi-iconsugg-t {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+  font-size: 0.8333rem;
+  font-weight: 700;
+  color: var(--b-accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-iconsugg-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.dsbi-icontile.is-sugg {
+  background: #fff;
+  color: var(--b-accent);
+}
+/* Category chips: scroll sideways rather than wrap into a second toolbar. */
+.dsbi-iconcats {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  padding-bottom: 3px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.dsbi-iconcats button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--b-muted);
+  font-size: 0.8333rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dsbi-iconcats button:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsbi-iconcats button.is-on {
+  border-color: var(--b-accent);
+  background: var(--b-accent);
+  color: #fff;
+}
+.dsbi-iconnone {
+  grid-column: 1 / -1;
+  margin: 6px 0;
+  text-align: center;
+}
+.dsbi-iconbtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 27px;
+  padding: 0 7px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-text);
+  font-size: 0.9167rem;
+  cursor: pointer;
+}
+.dsbi-iconbtn:hover {
+  border-color: var(--b-accent);
+}
+.dsbi-iconbtn span {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-icongrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-top: 6px;
+  min-height: 0;
+}
+.dsbi-icontile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--b-surface-2);
+  color: var(--b-muted);
+  cursor: pointer;
+  transition: all 0.13s ease;
+}
+.dsbi-icontile:hover {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsbi-icontile.is-on {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+  background: #fff;
+}
+
+/* ------------------------------------------------------------ side drawer */
+
+.dsb-drawer-host {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  animation: dsb-drawerin 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes dsb-drawerin {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+.dsb-drawer-panel {
+  width: 340px;
+  max-width: 92vw;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border-left: 1px solid var(--b-border);
+  box-shadow: var(--b-shadow-lg);
+}
+.dsb-dp-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--b-border);
+  color: var(--b-accent);
+}
+.dsb-dp-head h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.0417rem;
+  color: var(--b-text);
+}
+.dsb-dp-head button {
+  border: 0;
+  background: transparent;
+  color: var(--b-muted);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 5px;
+}
+.dsb-dp-head button:hover {
+  background: var(--b-surface-2);
+  color: var(--b-text);
+}
+.dsb-dp-body {
+  flex: 1;
+  overflow: auto;
+  padding: 9px;
+  scrollbar-width: thin;
+}
+.dsb-dp-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+}
+.dsb-swatchlist {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dsb-swatchrow-edit {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 20px;
+  gap: 4px;
+  align-items: center;
+}
+.dsb-src {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  background: var(--b-surface-2);
+  margin-bottom: 7px;
+}
+.dsb-src-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--b-accent);
+}
+.dsb-src-id {
+  font-size: 0.75rem;
+  font-family: ui-monospace, Menlo, monospace;
+  color: var(--b-muted);
+  background: #fff;
+  border: 1px solid var(--b-border);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.dsb-src-id.is-block {
+  display: block;
+  padding: 4px 6px;
+  font-size: 0.8333rem;
+}
+.dsb-err-line {
+  font-size: 0.8333rem;
+  color: var(--b-danger);
+}
+
+/* ---------------------------------------------------------------- library */
+
+.dsb-modal-root {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  animation: dsb-fade 0.16s ease;
+}
+.dsb-lib {
+  width: 95%;
+  max-height: 86%;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border-radius: 14px;
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  animation: dsb-pop 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-lib-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-lib-tabs {
+  display: flex;
+  gap: 3px;
+}
+.dsb-lib-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--b-muted);
+  font-size: 0.9583rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dsb-lib-tabs button span {
+  font-size: 0.7917rem;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--b-surface-2);
+}
+.dsb-lib-tabs button.is-on {
+  background: var(--b-accent);
+  color: #fff;
+}
+.dsb-lib-tabs button.is-on span {
+  background: rgba(255, 255, 255, 0.22);
+}
+.dsb-lib-search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  height: 28px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 8px;
+  color: var(--b-muted);
+}
+.dsb-lib-search input {
+  border: 0;
+  outline: none;
+  font-size: 0.9583rem;
+  width: 150px;
+  background: transparent;
+}
+.dsb-lib-body {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  background: var(--b-bg);
+  scrollbar-width: thin;
+}
+.dsb-lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(198px, 1fr));
+  gap: 11px;
+}
+.dsb-lib-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--b-border);
+  border-radius: 11px;
+  background: #fff;
+  overflow: hidden;
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease;
+}
+.dsb-lib-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--b-shadow-lg);
+}
+.dsb-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 96px;
+  padding: 10px;
+  background: linear-gradient(160deg, #eef2ff, #f8fafc);
+  overflow: hidden;
+}
+.dsb-thumb-b {
+  height: 8px;
+  border-radius: 3px;
+  background: rgba(79, 70, 229, 0.22);
+  width: 62%;
+}
+.dsb-thumb-b.is-wide {
+  width: 100%;
+  background: rgba(79, 70, 229, 0.14);
+}
+.dsb-thumb-empty {
+  margin: auto;
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-lib-meta {
+  padding: 8px 10px 4px;
+}
+.dsb-lib-meta strong {
+  display: block;
+  font-size: 1rem;
+}
+.dsb-lib-meta span {
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-lib-meta em {
+  display: inline-block;
+  margin-left: 5px;
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--b-accent);
+}
+.dsb-lib-actions {
+  display: flex;
+  /* Four buttons do not fit one card width, and a row that cannot wrap simply
+     hides the last of them — which is how Delete became invisible. */
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px 8px;
+}
+/* An armed delete reads as the destructive thing it is, without waiting for a
+   hover the person is already past. */
+.dsbi-mini.is-danger.is-armed {
+  border-color: var(--b-danger);
+  background: var(--b-danger);
+  color: #fff;
+}
+.dsbi-mini.is-danger.is-armed:hover {
+  color: #fff;
+  filter: brightness(0.94);
+}
+.dsb-lib-foot {
+  padding: 8px 12px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface);
+}
+.dsb-verlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsb-ver {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  background: #fff;
+}
+.dsb-ver div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.dsb-ver span {
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+.dsb-ver em {
+  font-style: normal;
+  font-size: 0.8333rem;
+  color: var(--b-accent);
+}
+
+/* -------------------------------------------------------------- statusbar */
+
+.dsb-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--b-statusbar);
+  padding: 0 11px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface);
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+  flex: none;
+}
+.dsb-statusbar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.dsb-sb-hint {
+  margin-left: auto;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-sb-route {
+  font-family: ui-monospace, Menlo, monospace;
+  color: var(--b-accent);
+}
+
+/* --------------------------------------------------------------- narrow */
+
+@media (max-width: 1180px) {
+  .dsb-root {
+    --b-dock-left: 218px;
+    --b-dock-right: 262px;
+  }
+  .dsb-sb-hint {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .dsb-dock.is-left,
+  .dsb-dock-btn.is-left {
+    display: none;
+  }
+  .dsb-panel-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 30;
+    box-shadow: var(--b-shadow-lg);
+    transition: transform var(--b-dock-ease);
+  }
+  /* At this width the properties panel already floats over the canvas, so it
+     slides off the edge instead of squeezing the canvas that is not there. */
+  .dsb-dock.is-right {
+    width: 0;
+    overflow: visible;
+  }
+  .dsb-dock.is-right.is-collapsed > .dsb-panel-right {
+    transform: translateX(100%);
+  }
+  .dsb-dock-btn.is-right,
+  .dsb-dock-btn.is-right.is-off {
+    right: 0;
+  }
+}
+
+
+/* ------------------------------------------------------------ rows editor */
+
+.dsbi-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-rowsbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.dsbi-rowsbar-r {
+  display: flex;
+  gap: 4px;
+}
+.dsbi-mini.is-primary {
+  background: var(--b-accent);
+  border-color: var(--b-accent);
+  color: #fff;
+}
+.dsbi-rowgrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-rowcell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.dsbi-rowcell > span {
+  font-size: 0.8333rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--b-muted);
+}
+.dsbi-jsonerr {
+  font-size: 0.9167rem;
+  color: var(--b-danger);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: 6px;
+  padding: 5px 7px;
+}
+
+
+/* ------------------------------------------------------------- API picker */
+
+.dsb-apipick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-param {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  margin-bottom: 6px;
+}
+.dsbi-param-h {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+.dsbi-param-h b {
+  color: var(--b-text);
+  font-size: 0.9167rem;
+}
+.dsbi-param-h em {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+}
+.dsbi-param-h em.is-req {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #b45309;
+}
+.dsbi-paramtype.dsbi-input {
+  height: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 4px;
+  border-radius: 999px;
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+  color: var(--b-muted);
+}
+.dsbi-syncbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.dsbi-mini.is-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dsbi-syncok {
+  font-size: 0.9167rem;
+  color: #15803d;
+  background: #dcfce7;
+  border-radius: 6px;
+  padding: 5px 7px;
+}
+.dsbi-preview {
+  margin: 0;
+  max-height: 150px;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+  border-radius: 7px;
+  padding: 6px 8px;
+  color: var(--b-muted);
+}
+.dsbi-sub-title.is-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+
+/* -------------------------------------------------- searchable select */
+
+.dsbi-combo {
+  min-width: 0;
+}
+.dsbi-combo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.dsbi-combo-btn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.dsbi-combo-btn.is-empty > span {
+  color: var(--b-muted);
+}
+.dsbi-combo-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* A plain block, deliberately: as a flex column its children shrink to fit the
+   list's height, which squashed 300 options into 230px of sliced text. The
+   popover is already the scroll container, so the list adds no height cap of
+   its own either. */
+.dsbi-combo-list {
+  display: block;
+  margin-top: 4px;
+}
+.dsbi-combo-opt {
+  display: block;
+  width: 100%;
+  min-height: 26px;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  padding: 5px 7px;
+  font-size: 0.9583rem;
+  line-height: 1.45;
+  color: var(--b-text);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-combo-opt.is-active {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsbi-combo-opt.is-on {
+  font-weight: 700;
+}
+.dsbi-combo-opt.is-clear {
+  color: var(--b-muted);
+  font-style: italic;
+}
+/* The "add a new field" row: an action, not one of the listed options. */
+.dsbi-combo-opt.is-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--b-accent);
+  font-weight: 600;
+  border-bottom: 1px solid var(--b-border);
+}
+
+/* Heading over a run of options that share a `group`. */
+.dsbi-combo-group {
+  font-size: 0.8333rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--b-muted);
+  padding: 8px 7px 3px;
+}
+.dsbi-combo-group:first-child {
+  padding-top: 2px;
+}
+
+.dsbi-combo-empty,
+.dsbi-combo-more {
+  font-size: 0.875rem;
+  color: var(--b-muted);
+  padding: 6px 7px;
+}
+/* Pinned to the bottom the way the search box is pinned to the top, so the
+   count stays readable while the list scrolls past it. */
+.dsbi-combo-more {
+  position: sticky;
+  bottom: -9px;
+  margin: 4px -9px -9px;
+  padding: 6px 9px;
+  background: #fff;
+  border-top: 1px solid var(--b-border);
+}
+
+
+/* --------------------------------------------------------- column designer */
+
+.dsbi-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.dsbi-cols-form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+  background: var(--b-surface-2);
+  min-width: 0;
+}
+.dsbi-cols-formhead {
+  /* The title and the one-click column sit on the same line: the button is an
+     alternative to filling the form below it, not another field in it. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--b-accent);
+}
+.dsbi-cols-formhead .dsbi-mini {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.dsbi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.dsbi-field > span {
+  font-size: 0.8333rem;
+  font-weight: 600;
+  color: var(--b-muted);
+}
+.dsbi-cols-flags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+}
+.dsbi-cols-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* The list is a table on purpose: a dozen columns have to be readable at a
+   glance, which a stack of expanded forms never is. It scrolls sideways rather
+   than squeezing the inspector. */
+.dsbi-cols-tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--b-border);
+  border-radius: 9px;
+}
+.dsbi-cols-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9167rem;
+  white-space: nowrap;
+}
+.dsbi-cols-table th {
+  text-align: left;
+  font-weight: 700;
+  color: var(--b-accent);
+  background: var(--b-surface-2);
+  padding: 5px 7px;
+  border-bottom: 1px solid var(--b-border);
+  position: sticky;
+  top: 0;
+}
+.dsbi-cols-table td {
+  padding: 4px 7px;
+  border-bottom: 1px solid var(--b-border);
+  color: var(--b-text);
+}
+.dsbi-cols-table tr:last-child td {
+  border-bottom: 0;
+}
+.dsbi-cols-table tr {
+  cursor: grab;
+}
+.dsbi-cols-table tr.is-editing td {
+  background: var(--b-accent-soft);
+}
+.dsbi-cols-table tr.is-drop td {
+  box-shadow: inset 0 2px 0 var(--b-accent);
+}
+.dsbi-cols-table tr.is-hidden td {
+  opacity: 0.5;
+  font-style: italic;
+}
+.dsbi-cols-n {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--b-muted);
+}
+.dsbi-cols-act {
+  display: flex;
+  gap: 3px;
+}
+.dsbi-cols-act button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--b-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-muted);
+  cursor: pointer;
+  padding: 0;
+}
+.dsbi-cols-act button:first-child:hover {
+  border-color: var(--b-danger);
+  color: var(--b-danger);
+}
+.dsbi-cols-act button:last-child:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+
+.dsbi-chipcol {
+  padding-top: 6px;
+  margin-top: 6px;
+  border-top: 1px solid var(--b-border);
+}
+.dsbi-chipcol:first-of-type {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+.dsbi-chipcol-h {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9167rem;
+  margin-bottom: 4px;
+  color: var(--b-text);
+}
+
+/* The route a library card publishes to — the thing you actually paste into a
+   menu row, so it is on the card rather than only inside the open screen. */
+.dsb-lib-route {
+  display: block;
+  margin-top: 3px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.8333rem;
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------- payload mapping */
+/* A payload key and what fills it. The picker is narrow on purpose: the box
+   is the answer, the dropdown is only a way to find one. */
+.dsbi-vmap {
+  display: grid;
+  /* box · peek · picker · JS. The peek panel below spans all of them. */
+  grid-template-columns: 1fr auto 92px auto;
+  gap: 4px;
+  align-items: center;
+}
+.dsbi-vmap > .dsbi-peek-btn {
+  padding: 0 6px;
+}
+.dsbi-vmap > .dsbi-peek-btn.is-on {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+  background: color-mix(in srgb, var(--b-accent) 10%, #fff);
+}
+
+/* What the box actually holds, read out of the mounted screen. */
+.dsbi-peek {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+  padding: 6px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 7px;
+  background: var(--b-surface-2, #f8fafc);
+}
+.dsbi-peek-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dsbi-peek-in {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.dsbi-peek-out {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dsbi-peek-type {
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--b-accent) 14%, #fff);
+  color: var(--b-accent);
+  font-size: 0.8333rem;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+.dsbi-peek-val {
+  margin: 0;
+  max-height: 190px;
+  overflow: auto;
+  padding: 6px 7px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9167rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* ------------------------------------------------ full screen: two columns */
+/* Docked, the panel is a 360px strip and the split must not exist at all —
+   `display: contents` leaves the body exactly where it was. Full screen, it
+   becomes the editor and, beside it, what there is to put in it. */
+.dsb-insp-split {
+  display: contents;
+}
+.dsb-panel-right.is-full .dsb-insp-split {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(320px, 3fr);
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.dsb-panel-right.is-full .dsb-insp-split > .dsb-insp-body {
+  min-width: 0;
+}
+.dsb-insp-rail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid var(--b-border-2);
+  background: var(--b-surface-2, #f8fafc);
+  animation: dsb-rail-in 0.18s ease both;
+}
+@keyframes dsb-rail-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-insp-rail {
+    animation: none;
+  }
+}
+/* Narrow full screen (a laptop at 1280) has no room for a 30% rail beside a
+   payload form; the rail goes under instead of squeezing both. */
+@media (max-width: 1180px) {
+  .dsb-panel-right.is-full .dsb-insp-split {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  }
+  .dsb-insp-rail {
+    border-left: 0;
+    border-top: 1px solid var(--b-border-2);
+  }
+}
+
+/* Everything the screen holds, by name — the panel above the payload keys. */
+.dsbi-scope {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 8px;
+  padding: 6px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 8px;
+  background: var(--b-surface-2, #f8fafc);
+}
+/* In the rail it IS the panel: no border of its own, no disclosure, and the
+   list takes whatever height is left rather than a fixed 260px. */
+.dsbi-scope.is-docked {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  gap: 8px;
+}
+.dsbi-scope.is-docked .dsbi-scope-list {
+  flex: 1 1 auto;
+  max-height: none;
+}
+.dsbi-scope.is-docked .dsbi-scope-line {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.dsbi-scope-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.dsbi-scope-title b {
+  font-size: 1rem;
+}
+.dsbi-scope-title span {
+  font-size: 0.875rem;
+  opacity: 0.6;
+}
+.dsbi-scope-hint {
+  margin: 0;
+  font-size: 0.8333rem;
+  opacity: 0.55;
+}
+/* The handle says the row can be dragged before anyone tries it. */
+.dsbi-scope-grip {
+  flex: 0 0 auto;
+  opacity: 0.35;
+}
+.dsbi-scope-row:hover .dsbi-scope-grip {
+  opacity: 0.8;
+}
+.dsbi-scope-row {
+  cursor: grab;
+}
+/* Nothing in this list is text to select.
+   Every row is a drag handle, so a drag that the browser does not take up as a
+   drag becomes a text sweep instead — and one sweep paints the whole list in
+   the selection colour, which reads as a solid blue block over the design.
+   The exception for the token is gone with it: leaving one selectable child
+   inside an unselectable row is enough for a sweep started there to run on
+   across everything after it.
+   Copying does not need a selection — see copyText, which puts the text
+   through an off-screen textarea when the clipboard API is not available. */
+.dsbi-scope-list,
+.dsbi-scope-list *,
+.dsbi-sug,
+.dsbi-sug * {
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Belt and braces: if anything ever does get selected in here — a rule
+   overridden, a browser that ignores the above — it is drawn in the row's own
+   pastel rather than the system blue, so a stray highlight cannot put a solid
+   block of colour over the panel. */
+.dsbi-scope-list ::selection,
+.dsbi-sug ::selection {
+  background: var(--k-wash, #eef2ff);
+  color: inherit;
+}
+.dsbi-scope-row:active {
+  cursor: grabbing;
+}
+
+.dsbi-scope-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--b-text);
+  font-size: 0.9167rem;
+  text-align: left;
+  cursor: pointer;
+}
+.dsbi-scope-head b {
+  font-size: 0.9167rem;
+}
+.dsbi-scope-head span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.65;
+}
+.dsbi-scope-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.dsbi-scope-tools .dsbi-input {
+  flex: 3 1 150px;
+  min-width: 0;
+}
+/* Search narrows by what is typed; this narrows by WHERE a name comes from.
+   Two different questions, so two controls, side by side — and when there is
+   no room for both they wrap as a pair rather than the button alone falling
+   to a line of its own. */
+.dsbi-scope-tools .dsbi-scope-filter {
+  display: flex;
+  flex: 2 1 130px;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 200px;
+  text-align: left;
+  cursor: pointer;
+}
+.dsbi-scope-filter > span {
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: var(--k, inherit);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-scope-filter > svg {
+  flex: 0 0 auto;
+  opacity: 0.5;
+  transition: transform 0.15s ease;
+}
+.dsbi-scope-filter.is-open > svg {
+  transform: rotate(180deg);
+}
+.dsbi-scope-filter.is-open {
+  border-color: var(--b-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-accent) 16%, transparent);
+}
+
+/* The menu itself. A native <select> with <optgroup>s draws the operating
+   system's list — full window width, its own type size — which is how a
+   control the width of a panel came to open something the size of a screen.
+   This one is the width of the control it belongs to. */
+.dsbi-filter-menu {
+  max-height: inherit;
+  padding: 3px;
+  overflow: auto;
+  outline: none;
+  overscroll-behavior: contain;
+}
+.dsbi-filter-head {
+  padding: 7px 7px 2px;
+  color: var(--k);
+  font-size: 0.7917rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dsbi-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.dsbi-filter-row span {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Indented under their heading, so a key reads as belonging to the group
+   above it rather than as another group. */
+.dsbi-filter-row.is-in {
+  padding-left: 16px;
+}
+.dsbi-filter-row.is-at {
+  background: var(--k-wash);
+  box-shadow: inset 3px 0 0 var(--k);
+}
+.dsbi-filter-row.is-on {
+  color: var(--k);
+  font-weight: 700;
+}
+.dsbi-filter-row svg {
+  flex: 0 0 auto;
+  color: var(--k);
+}
+.dsbi-scope-tools .dsbi-mini {
+  flex: 0 0 auto;
+}
+/* Opt-in for {{local.*}}: its own line under the search, so it never squeezes it. */
+.dsbi-scope-local {
+  display: inline-flex;
+  flex: 1 0 100%;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 0.9583rem;
+  color: var(--b-text-2, #475569);
+  cursor: pointer;
+  user-select: none;
+}
+.dsbi-scope-local input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  cursor: pointer;
+}
+.dsbi-scope-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+}
+.dsbi-scope-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  /* Explicit, not `none`: this row used to be a <button>, and the host app's
+     global button rules reached it. It is a div now, and it says what its
+     background is rather than leaving it to whatever else is on the page. */
+  border-bottom: 1px solid var(--b-border-1, #eef2f7);
+  border-radius: 0;
+  background-color: transparent;
+  background-image: none;
+  color: var(--b-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dsbi-scope-row:focus-visible {
+  outline: 2px solid var(--k);
+  outline-offset: -2px;
+}
+.dsbi-scope-row:last-child {
+  border-bottom: 0;
+}
+/* The stripe is what makes a long list scannable: the eye follows one colour
+   down the left edge instead of reading every name. */
+.dsbi-scope-row .dsbi-scope-line {
+  border-left: 3px solid var(--k-wash);
+}
+.dsbi-scope-row:hover .dsbi-scope-line {
+  border-left-color: var(--k);
+  background: var(--k-wash);
+}
+.dsbi-scope-row.is-copied .dsbi-scope-line {
+  border-left-color: var(--k);
+  background: color-mix(in srgb, var(--k) 12%, #fff);
+}
+/* ------------------------------------------------ a colour per kind of name */
+/* Sixty rows in one colour is sixty rows to read one at a time. A form field,
+   a grid's rows and something the browser saved are different kinds of thing,
+   so each gets a quiet tint — enough to find the right part of the list
+   before reading a single name, not enough to shout. Pastels: this sits
+   beside a form being filled in, and it is not the thing being worked on.
+
+   `--k` is the hue; everything below is drawn from it. */
+.dsbi-scope-row,
+.dsbi-scope-group,
+.dsbi-sug-row,
+.dsbi-sug-group,
+.dsbi-filter-row,
+.dsbi-filter-head,
+.dsbi-scope-filter > span {
+  --k: #64748b;
+  --k-wash: #f8fafc;
+}
+[data-kind="form"] {
+  --k: #0e7490;
+  --k-wash: #ecfeff;
+}
+[data-kind="text"] {
+  --k: #0369a1;
+  --k-wash: #f0f9ff;
+}
+[data-kind="picked"] {
+  --k: #7c3aed;
+  --k-wash: #f5f3ff;
+}
+[data-kind="vars"] {
+  --k: #c2410c;
+  --k-wash: #fff7ed;
+}
+[data-kind="grid"] {
+  --k: #be123c;
+  --k-wash: #fff1f2;
+}
+[data-kind="source"] {
+  --k: #4d7c0f;
+  --k-wash: #f7fee7;
+}
+[data-kind="user"] {
+  --k: #a16207;
+  --k-wash: #fefce8;
+}
+[data-kind="site"] {
+  --k: #0f766e;
+  --k-wash: #f0fdfa;
+}
+[data-kind="local"] {
+  --k: #9333ea;
+  --k-wash: #faf5ff;
+}
+[data-kind="modal"] {
+  --k: #b45309;
+  --k-wash: #fffbeb;
+}
+[data-kind="record"] {
+  --k: #1d4ed8;
+  --k-wash: #eff6ff;
+}
+[data-kind="date"] {
+  --k: #475569;
+  --k-wash: #f8fafc;
+}
+
+.dsbi-scope-group {
+  user-select: none;
+  padding: 5px 7px 3px;
+  background: var(--k-wash);
+  color: var(--k);
+  font-size: 0.7917rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.dsbi-scope-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 7px;
+}
+.dsbi-scope-line code {
+  flex: 0 0 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9167rem;
+  font-weight: 700;
+  color: var(--k);
+}
+.dsbi-scope-name {
+  flex: 0 0 auto;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.dsbi-scope-line em {
+  flex: 0 0 auto;
+  font-size: 0.7917rem;
+  font-style: normal;
+  opacity: 0.6;
+}
+.dsbi-scope-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  opacity: 0.75;
+}
+.dsbi-scope-line i {
+  flex: 0 0 auto;
+  font-size: 0.7917rem;
+  font-style: normal;
+  opacity: 0.5;
+}
+
+/* --------------------------------------------- the names, at the caret ---- */
+/* Typing `{{` opens this under the box. It is a list of names being read at
+   speed, so the name leads and what it holds sits under it in a lighter hand —
+   scanning is by the left edge. */
+.dsbi-sug {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: inherit;
+}
+.dsbi-sug-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--b-border-2);
+  color: var(--b-ink-3, #64748b);
+  font-size: 0.8333rem;
+  white-space: nowrap;
+}
+.dsbi-sug-list {
+  overflow: auto;
+  padding: 4px;
+  overscroll-behavior: contain;
+}
+.dsbi-sug-row {
+  display: block;
+  width: 100%;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 6px;
+  background-color: transparent;
+  background-image: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+/* One highlight, moved by the arrow keys AND by the pointer, so there is never
+   a question of which row Enter would take. */
+.dsbi-sug-row.is-at {
+  background: var(--k-wash);
+  box-shadow: inset 3px 0 0 var(--k);
+}
+.dsbi-sug-line code {
+  color: var(--k);
+}
+.dsbi-sug-group {
+  display: block;
+  margin: 6px -3px 3px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: var(--k-wash);
+  color: var(--k);
+  font-size: 0.7917rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dsbi-sug-row:first-child .dsbi-sug-group {
+  margin-top: 0;
+}
+.dsbi-sug-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.dsbi-sug-line code {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.9167rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-sug-line em {
+  flex: 0 0 auto;
+  color: var(--b-ink-3, #64748b);
+  font-size: 0.75rem;
+  font-style: normal;
+  opacity: 0.8;
+}
+/* The part of the name that was typed. Weight and colour, not a highlighter
+   block — forty rows of yellow is harder to read than none. */
+.dsbi-sug-row mark {
+  padding: 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--b-accent) 22%, transparent);
+  color: inherit;
+  font-weight: 700;
+}
+.dsbi-sug-val {
+  display: block;
+  overflow: hidden;
+  color: var(--b-ink-2, #475569);
+  font-size: 0.8333rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A box a token is being dragged over. Drawn on the box itself so the target
+   is the thing that will change, not a region around it. */
+.dsbi-input.is-drop {
+  border-color: var(--b-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--b-accent) 6%, #fff);
+}
+
+/* "the rest of the answer is here" — one press away. */
+.dsbi-peek-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px dashed var(--b-border-2);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-text);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.dsbi-peek-hint:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+.dsbi-peek-hint code {
+  flex: 0 0 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+}
+.dsbi-peek-hint span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.dsbi-peek-err {
+  margin: 0;
+  color: var(--b-danger);
+  font-size: 0.9167rem;
+}
+
+.dsbi-vmap .dsbi-input {
+  min-width: 0;
+}
+/* The searchable variant is a Combo, whose trigger is a button in its own
+   wrapper — it has to fill the same 92px column the plain select sat in. */
+.dsbi-vmap .dsbi-combo,
+.dsbi-vmap .dsbi-combo-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Several data keys: the chosen ones as chips over a picker for the rest. */
+.dsbi-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.dsbi-keys .dsbi-note {
+  margin: 0;
+}
+
+/* A value picked from the screen's keys, with a pencil to type it instead.
+   The dropdown takes the room; the note under it shows what is written. */
+.dsbi-vpick-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+  align-items: center;
+}
+.dsbi-vpick-row .dsbi-combo,
+.dsbi-vpick-row .dsbi-combo-btn,
+.dsbi-vpick-row .dsbi-input {
+  width: 100%;
+  min-width: 0;
+}
+/* box · pencil · JS — and in JS mode: code · ▶ · JS */
+.dsbi-vpick-row.has-js {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+/* --------------------------------------------------- JS value boxes ---
+   The JS icon beside a value box, and the box itself once it holds code. */
+.dsbi-js-btn {
+  min-width: 24px;
+  padding: 0 5px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.7083rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--b-muted);
+}
+.dsbi-js-btn.is-on {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+}
+.dsbi-js-run {
+  color: #16a34a;
+}
+.dsbi-vmap.is-js .dsbi-input,
+.dsbi-vpick.is-js .dsbi-input,
+.dsbi-jsin.is-js > .dsbi-input {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8333rem;
+  border-color: #86efac;
+}
+/* A bare value box with the icon: box · (▶) · JS, the run panel under it. */
+.dsbi-jsin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+}
+.dsbi-jsin:not(.is-js) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.dsbi-jsin > .dsbi-input {
+  min-width: 0;
+}
+.dsbi-vpick .dsbi-note {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.dsbi-param-add {
+  display: grid;
+  grid-template-columns: 1fr 92px auto;
+  gap: 4px;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--b-border-2);
+}
+
+.dsbi-param-x {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--b-border-2);
+  background: var(--b-surface);
+  color: var(--b-muted);
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dsbi-param-x:hover {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+}
+
+.dsbi-param-x.is-danger:hover {
+  border-color: var(--b-danger);
+  color: var(--b-danger);
+}
+
+/* ------------------------------------------------ record-aware text props */
+/* A text box plus the field picker that writes {{row.Field}} into it. */
+/* The picker and its "+": the button never shrinks, the list takes the rest. */
+.dsbi-addmodal-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+.dsbi-addmodal-wrap > *:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.dsbi-addmodal-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+.dsbi-pastepath {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-pastepath > .dsbi-input {
+  flex: 1;
+  min-width: 0;
+}
+.dsbi-note.is-ok {
+  color: var(--b-ok);
+}
+.dsbi-note.is-bad {
+  color: var(--b-danger);
+}
+.dsbi-addmodal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 2px;
+}
+.dsbi-addmodal .dsbi-note {
+  margin: 0;
+}
+.dsbi-addmodal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding-top: 2px;
+}
+.dsbi-mini[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dsbi-dyncolor {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.dsbi-dyncolor select.dsbi-input {
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+.dsbi-dyncolor-def {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsbi-dyncolor-def > span {
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+  flex: none;
+}
+.dsbi-dyncolor-def > .dsbi-color {
+  flex: 1;
+  min-width: 0;
+}
+
+.dsbi-tmpl {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.dsbi-tmpl > textarea.dsbi-input {
+  resize: vertical;
+}
+.dsbi-tmpl-pick select.dsbi-input {
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+
+/* The icon picker's binding half — an icon name that comes from the data. */
+.dsbi-iconbind {
+  border-top: 1px solid var(--b-border, #e5e9f0);
+  margin-top: 6px;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dsbi-iconbtn > span.is-bound {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The conditions an action or a payload key runs under. A stack of three-part
+   rows with a remove button on the value, and one button that adds the next —
+   deliberately the same shape as the visibility rules, because it is the same
+   idea and somebody who has written one should recognise the other. */
+.dsbi-when {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsbi-when-val {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.dsbi-when-val > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsbi-when .dsbi-mini.is-danger {
+  flex: 0 0 auto;
+}
+.dsbi-rules-note {
+  font-size: 0.9167rem;
+  color: var(--dsbi-muted, #6b7280);
+  margin: 4px 0 0;
+}
+
+/* One payload key's value: either a single mapping, or a stack of cases with
+   the fallback last. The switch between the two sits with the value, because
+   that is where somebody is standing when they discover they need it. */
+/* The value box has to stay readable — `{{modal.proName.value}}` is long — so
+   in a narrow column (a Save chain nested under an Open modal) "by condition"
+   drops to its own line rather than squeezing the box to a few letters. */
+.dsbi-paramval {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.dsbi-paramval > :first-child {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.dsbi-paramrules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--dsbi-line, #e2e6eb);
+  border-radius: 6px;
+}
+.dsbi-paramrule {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dsbi-paramrule-tag {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dsbi-muted, #6b7280);
+}
+.dsbi-paramrules-foot {
+  display: flex;
+  gap: 6px;
+}
+
+/* A list or record parameter's value is JSON, or a template that resolves to
+   one. Either way it is longer than a word, so the box is a readable height
+   and keeps the monospace the JSON editors elsewhere use. */
+.dsbi-input-json {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9583rem;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 52px;
+}
+
+/* A payload key built one object per item: the list it repeats over, then a
+   row per key of the object it builds. */
+.dsbi-paramitems {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsbi-itemfor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsbi-itemfor-lbl {
+  flex: 0 0 auto;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+.dsbi-itemfor .dsbi-vmap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Date calc: a small panel under the key it fills. */
+.dsbi-datecalc {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px;
+  border: 1px dashed var(--b-border-2);
+  border-left: 2px solid var(--b-accent);
+  border-radius: 0 7px 7px 0;
+  background: var(--b-surface-2, #f8fafc);
+}
+.dsbi-datecalc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 5px;
+}
+.dsbi-datecalc-out {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 0.9167rem;
+}
+.dsbi-datecalc-out code {
+  word-break: break-all;
+}
+
+/* "Only where" under a for-each: label beside, the condition rows filling. */
+.dsbi-itemwhere {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.dsbi-itemwhere > .dsbi-itemfor-lbl {
+  padding-top: 7px;
+}
+.dsbi-itemwhere > .dsbi-when {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* One key of a record: the row itself, and — when the key holds a list — the
+   repeat that hangs under it. */
+.dsbi-keyrow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dsbi-keynest {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 0 2px 16px;
+  padding: 6px;
+  border: 1px dashed var(--b-border-2);
+  border-left: 2px solid var(--b-accent);
+  border-radius: 0 7px 7px 0;
+  background: var(--b-surface-2, #f8fafc);
+}
+.dsbi-arrbtn {
+  padding: 0 6px;
+}
+.dsbi-arrbtn.is-on {
+  border-color: var(--b-accent);
+  color: var(--b-accent);
+  background: color-mix(in srgb, var(--b-accent) 10%, #fff);
+}
+.dsbi-keyrow-tag {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.dsbi-itemfield {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsbi-itemfield > .dsbi-input {
+  flex: 0 0 34%;
+  min-width: 0;
+}
+.dsbi-itemfield .dsbi-vmap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsbi-vmap > .dsbi-sendas.dsbi-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 0.875rem;
+}
+
+/* ======================================================= Tap (builder/Tap)
+   A clickable span with a button's role. The host theme paints every bare
+   `button` solid in its own colour; a span is out of its reach, so the
+   payload panel's controls can finally carry their own colours. */
+.dsbi-tap {
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.dsbi-tap:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-accent) 28%, transparent);
+}
+.dsbi-tap[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.dsbi-tap.dsbi-mini {
+  flex: 0 0 auto;
+  justify-content: center;
+  min-width: max-content;
+  height: 27px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-weight: 650;
+  line-height: 1;
+}
+/* Icon-only controls say so (is-icon): :only-child ignores text nodes, so
+   "+ Add a key" would match it and be squeezed to a square. */
+.dsbi-tap.dsbi-mini.is-icon {
+  width: 27px;
+  padding: 0;
+}
+.dsbi-tap.dsbi-mini:active {
+  transform: translateY(1px);
+}
+
+/* ----- pastel tones: one colour per kind of act, so a row reads by colour.
+   add = mint · list = lavender · record = peach · remove = rose
+   mode switch = butter · look inside = sky · pick a field = periwinkle
+   main act = soft blue · extra info = teal                                */
+.dsbi-tap.tone-add,
+.dsbi-tap.tone-list,
+.dsbi-tap.tone-record,
+.dsbi-tap.tone-danger,
+.dsbi-tap.tone-mode,
+.dsbi-tap.tone-peek,
+.dsbi-tap.tone-refresh,
+.dsbi-tap.tone-primary,
+.dsbi-tap.tone-info {
+  background: var(--tone-bg);
+  border: 1px solid var(--tone-line);
+  color: var(--tone-ink);
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+}
+.dsbi-tap.tone-add,
+.dsbi-tap.tone-list,
+.dsbi-tap.tone-record,
+.dsbi-tap.tone-danger,
+.dsbi-tap.tone-mode,
+.dsbi-tap.tone-peek,
+.dsbi-tap.tone-refresh,
+.dsbi-tap.tone-primary,
+.dsbi-tap.tone-info {
+  --tone-bg-on: color-mix(in srgb, var(--tone-line) 55%, #fff);
+}
+.dsbi-tap.tone-add { --tone-bg: #e9f8f0; --tone-line: #b8e8cc; --tone-ink: #19774a; }
+.dsbi-tap.tone-list { --tone-bg: #f1edfe; --tone-line: #d7cdfa; --tone-ink: #5b41c2; }
+.dsbi-tap.tone-record { --tone-bg: #fff3e8; --tone-line: #f9d4b3; --tone-ink: #b0550f; }
+.dsbi-tap.tone-danger { --tone-bg: #fdeef1; --tone-line: #f6c7d0; --tone-ink: #c03650; }
+.dsbi-tap.tone-mode { --tone-bg: #fff9e0; --tone-line: #f1e1a2; --tone-ink: #876600; }
+.dsbi-tap.tone-peek,
+.dsbi-tap.tone-refresh { --tone-bg: #eaf5fd; --tone-line: #c0dff5; --tone-ink: #1f6ea6; }
+.dsbi-tap.tone-primary { --tone-bg: #e5edff; --tone-line: #b8cafa; --tone-ink: #2747b5; }
+.dsbi-tap.tone-info { --tone-bg: #e6f7f5; --tone-line: #b4e3dd; --tone-ink: #0f746c; }
+
+.dsbi-tap.tone-add:hover,
+.dsbi-tap.tone-list:hover,
+.dsbi-tap.tone-record:hover,
+.dsbi-tap.tone-danger:hover,
+.dsbi-tap.tone-mode:hover,
+.dsbi-tap.tone-peek:hover,
+.dsbi-tap.tone-refresh:hover,
+.dsbi-tap.tone-primary:hover,
+.dsbi-tap.tone-info:hover {
+  background: var(--tone-bg-on);
+  border-color: var(--tone-ink);
+  color: var(--tone-ink);
+  filter: none;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--tone-ink) 18%, transparent);
+}
+/* A toggle that is ON (list / record / peek): filled deeper, ink border. */
+.dsbi-tap.tone-list.is-on,
+.dsbi-tap.tone-record.is-on,
+.dsbi-tap.tone-peek.is-on {
+  background: var(--tone-bg-on);
+  border-color: var(--tone-ink);
+  color: var(--tone-ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone-ink) 25%, transparent);
+}
+
+/* The small chips on a payload key's heading ("+ 3 fields", trash). */
+.dsbi-tap.dsbi-param-x {
+  height: 19px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 0.7917rem;
+}
+
+/* "Map…": a picker, so it looks like a field — tinted periwinkle. */
+.dsbi-vmap .tone-map,
+.dsbi-vmap .dsbi-tap.tone-map {
+  background: #f1f3ff;
+  border-color: #cfd6fb;
+  color: #3a4db5;
+  font-weight: 600;
+}
+.dsbi-vmap .tone-map:hover {
+  border-color: #3a4db5;
+}
+.dsbi-vmap .dsbi-tap.tone-map.is-empty > span {
+  color: #5d6cc4;
+}
+.dsbi-vmap .dsbi-tap.tone-map > svg {
+  flex: 0 0 auto;
+  opacity: 0.8;
+}
+
+/* The scope browser's filter: same periwinkle family, lighter. */
+.dsbi-tap.tone-filter {
+  background: #f6f7ff;
+  border-color: #d9def9;
+  color: #3a4db5;
+}
+.dsbi-tap.tone-filter:hover,
+.dsbi-tap.tone-filter.is-open {
+  border-color: #3a4db5;
+}
+.dsbi-tap.dsbi-scope-head {
+  width: 100%;
+}
+.dsbi-tap.dsbi-sub-title.is-btn:hover {
+  color: var(--b-accent);
+}
+.dsbi-tap.dsbi-peek-hint {
+  display: flex;
+}
+
+/* ----- spacing: every key row lines up on one 27px rhythm */
+.dsbi-itemfield {
+  gap: 5px;
+}
+.dsbi-vmap {
+  gap: 5px;
+  grid-template-columns: minmax(0, 1fr) auto 104px auto;
+}
+/* box · if empty · send as · peek · picker · JS */
+.dsbi-vmap.has-before {
+  grid-template-columns: minmax(0, 1fr) 56px 78px auto 104px auto;
+}
+.dsbi-fallback {
+  min-width: 0;
+}
+.dsbi-fallback .dsbi-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 5px;
+  font-size: 0.875rem;
+}
+.dsbi-keyrow + .dsbi-keyrow {
+  margin-top: 1px;
+}
+.dsbi-paramrules-foot {
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.dsbi-paramitems {
+  gap: 7px;
+}
+.dsbi-keynest {
+  margin-left: 12px;
+  padding: 8px;
+  gap: 6px;
+}
+.dsbi-scope-tools {
+  gap: 6px;
+}
+
+/* AND / OR between two conditions of a "Run only when" list. */
+.dsbi-when-join {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--dsbi-line, #e5e7eb);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: -2px 0;
+}
+.dsbi-tap.dsbi-when-joinbtn {
+  padding: 1px 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: transparent;
+  color: var(--dsbi-muted, #6b7280);
+  border: 0;
+  border-radius: 0;
+  min-height: 0;
+  line-height: 18px;
+}
+.dsbi-tap.dsbi-when-joinbtn.is-on {
+  background: #4f46e5;
+  color: #fff;
+}
+.dsbi-when-add {
+  display: flex;
+  gap: 6px;
+}
+.dsbi-when-add > * {
+  flex: 1 1 0;
+}
+
+/* ------------------------------------------- foldable left-column sections
+
+   The palette and the layers tree share one column. Either folds down to its
+   header; the other then takes the whole height. Folded, a section is just
+   its header bar. */
+.dsb-panel-left.is-folded,
+.dsb-layers.is-folded {
+  flex: 0 0 auto;
+}
+.dsb-layers.is-folded .dsb-layers-head {
+  border-bottom: 0;
+}
+.dsbi-tap.dsb-fold-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--b-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--b-muted);
+  font: inherit;
+  font-size: 0.9167rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+}
+.dsbi-tap.dsb-fold-head:hover {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-fold-head:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: -2px;
+}
+.dsb-panel-left.is-folded > .dsb-fold-head {
+  border-bottom: 0;
+}
+/* Inside the layers header the tools keep their place on the right, so the
+   toggle is only as wide as its words. */
+.dsbi-tap.dsb-fold-head.is-inline {
+  width: auto;
+  flex: 0 1 auto;
+  padding: 2px 6px 2px 2px;
+  margin: -2px 0 -2px -2px;
+  border-bottom: 0;
+  border-radius: 5px;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+.dsb-fold-chev {
+  flex: none;
+}
+
+/* -------------------------------------- the bar between palette and layers
+
+   SideSplit sets --dsb-pal-share (0–1): the palette's part of the column.
+   Layers takes whatever is left. Folding either section hides the bar and
+   lets the open one fill the column. */
+.dsb-side-left > .dsb-panel-left:not(.is-folded) {
+  flex: 0 0 calc(var(--dsb-pal-share, 0.55) * 100%);
+  min-height: 0;
+  border-bottom: 0;
+}
+.dsb-side-left > .dsb-layers:not(.is-folded) {
+  flex: 1 1 0;
+  min-height: 0;
+}
+.dsb-side-left:has(> .dsb-layers.is-folded) > .dsb-panel-left:not(.is-folded) {
+  flex: 1 1 0;
+}
+.dsb-side-left:has(> .dsb-panel-left.is-folded) > .dsb-panel-left {
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-side-grip {
+  flex: 0 0 7px;
+  position: relative;
+  cursor: row-resize;
+  touch-action: none;
+  background: var(--b-surface-2);
+  border-top: 1px solid var(--b-border);
+  border-bottom: 1px solid var(--b-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dsb-side-grip > span {
+  width: 28px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--b-border);
+  transition: background 120ms ease;
+}
+.dsb-side-grip:hover > span,
+.dsb-side-grip:focus-visible > span,
+.dsb-side-grip.is-on > span {
+  background: var(--b-accent);
+}
+.dsb-side-grip:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--b-accent);
+}
+.dsb-side-left:has(> .is-folded) > .dsb-side-grip {
+  display: none;
+}
+/* While the bar is dragged: one cursor, no text selection. */
+.dsb-side-left.is-splitting {
+  cursor: row-resize;
+  user-select: none;
+}
+
+/* ------------------------------------------------ Common / Custom switch
+
+   Sits at the end of the palette's search row. A pill slides under the side
+   that is on: green for Common (the Common Components colour), indigo for
+   Custom. Tap spans, not <button>s, so the host theme cannot paint them. */
+.dsb-pal-switch {
+  --sw-on: #16a34a;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  flex: none;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--b-surface-2, #f1f5f9);
+  box-shadow: inset 0 0 0 1px var(--b-border);
+  isolation: isolate;
+}
+.dsb-pal-switch.is-custom {
+  --sw-on: #4f46e5;
+}
+.dsb-pal-switch-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 999px;
+  background: var(--sw-on);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.18),
+    0 2px 8px color-mix(in srgb, var(--sw-on) 35%, transparent);
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+.dsb-pal-switch.is-custom .dsb-pal-switch-thumb {
+  transform: translateX(100%);
+}
+.dsbi-tap.dsb-pal-switch-opt {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--b-muted);
+  transition: color 200ms ease;
+}
+.dsbi-tap.dsb-pal-switch-opt:hover:not(.is-on) {
+  color: var(--b-text);
+}
+.dsbi-tap.dsb-pal-switch-opt.is-on {
+  color: #fff;
+}
+.dsbi-tap.dsb-pal-switch-opt:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sw-on) 45%, transparent);
+}
+/* The list under it eases in on every switch (the body is keyed by view). */
+.dsb-panel-left .dsb-pal-body {
+  animation: dsb-pal-swap 200ms ease;
+}
+@keyframes dsb-pal-swap {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-pal-switch-thumb,
+  .dsbi-tap.dsb-pal-switch-opt {
+    transition: none;
+  }
+  .dsb-panel-left .dsb-pal-body {
+    animation: none;
+  }
+}
+/* Search came up empty on this side but found something on the other. */
+.dsbi-tap.dsb-pal-elsewhere {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 7px 9px;
+  border-radius: 7px;
+  white-space: normal;
+  font-size: 0.9167rem;
+  color: #4338ca;
+  background: #eef2ff;
+  box-shadow: inset 0 0 0 1px #c7d2fe;
+}
+.dsbi-tap.dsb-pal-elsewhere:hover {
+  background: #e0e7ff;
+}
+
+/* Icon-only switch: two round halves; the words live in a tooltip that
+   Palette draws on document.body (the dock clips anything inside it), fixed
+   above the hovered icon: left/top are the icon's centre and top edge. */
+.dsbi-tap.dsb-pal-switch-opt {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  gap: 0;
+}
+.dsb-pal-tip {
+  --tip-c: #22c55e;
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: max-content;
+  max-width: 210px;
+  padding: 8px 11px 7px;
+  border-radius: 9px;
+  background: #0f172a;
+  color: #fff;
+  font-family: inherit;
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  text-align: left;
+  pointer-events: none;
+  /* Bottom edge 9px above the icon; the arrow sits over the icon's centre,
+     18px in from the tooltip's right edge. */
+  transform: translate(calc(-100% + 18px), calc(-100% - 9px));
+  transform-origin: calc(100% - 18px) 100%;
+  animation: dsb-pal-tip-in 190ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.dsb-pal-tip.is-custom {
+  --tip-c: #818cf8;
+}
+.dsb-pal-tip::before {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+.dsb-pal-tip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 11px;
+  right: 11px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--tip-c);
+}
+.dsb-pal-tip b {
+  font-size: 0.9583rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.dsb-pal-tip small {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #cbd5e1;
+}
+@keyframes dsb-pal-tip-in {
+  from {
+    opacity: 0;
+    transform: translate(calc(-100% + 18px), calc(-100% - 5px)) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(calc(-100% + 18px), calc(-100% - 9px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-pal-tip {
+    animation: none;
+  }
+}
+
+
+/* ------------------------------------------------------- action type picker
+   builder/editors ActionTypePicker: a chain step's action, grouped by family,
+   each family a pastel tone (--t accent, --t-soft wash, --t-ink text). */
+.dsbi-act-btn,
+.dsbi-act-opt,
+.dsbi-act-group {
+  --t: #64748b;
+  --t-soft: #f1f5f9;
+  --t-ink: #334155;
+}
+.dsbi-act-btn.is-sky,
+.dsbi-act-opt.is-sky,
+.dsbi-act-group.is-sky { --t: #0ea5e9; --t-soft: #e0f2fe; --t-ink: #075985; }
+.dsbi-act-btn.is-teal,
+.dsbi-act-opt.is-teal,
+.dsbi-act-group.is-teal { --t: #14b8a6; --t-soft: #ccfbf1; --t-ink: #115e59; }
+.dsbi-act-btn.is-mint,
+.dsbi-act-opt.is-mint,
+.dsbi-act-group.is-mint { --t: #10b981; --t-soft: #d1fae5; --t-ink: #065f46; }
+.dsbi-act-btn.is-butter,
+.dsbi-act-opt.is-butter,
+.dsbi-act-group.is-butter { --t: #f59e0b; --t-soft: #fef3c7; --t-ink: #92400e; }
+.dsbi-act-btn.is-rose,
+.dsbi-act-opt.is-rose,
+.dsbi-act-group.is-rose { --t: #ec4899; --t-soft: #fce7f3; --t-ink: #9d174d; }
+.dsbi-act-btn.is-lavender,
+.dsbi-act-opt.is-lavender,
+.dsbi-act-group.is-lavender { --t: #8b5cf6; --t-soft: #ede9fe; --t-ink: #5b21b6; }
+.dsbi-act-btn.is-peach,
+.dsbi-act-opt.is-peach,
+.dsbi-act-group.is-peach { --t: #f97316; --t-soft: #ffedd5; --t-ink: #9a3412; }
+
+.dsbi-act {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsbi-act-btn.dsbi-tap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 4px 8px 4px 5px;
+  border: 1px solid color-mix(in srgb, var(--t) 35%, #e2e8f0);
+  border-radius: 10px;
+  background: linear-gradient(100deg, var(--t-soft) 0%, #fff 75%);
+  color: var(--t-ink);
+  font-size: 1.0833rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.18s ease, transform 0.12s ease;
+}
+.dsbi-act-btn.dsbi-tap:hover {
+  border-color: color-mix(in srgb, var(--t) 60%, #e2e8f0);
+  box-shadow: 0 4px 14px -8px color-mix(in srgb, var(--t) 70%, transparent);
+}
+.dsbi-act-btn.dsbi-tap:focus-visible,
+.dsbi-act-btn.is-open {
+  outline: 0;
+  border-color: var(--t);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--t) 18%, transparent);
+}
+.dsbi-act-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--t) 18%, #fff);
+  color: var(--t);
+}
+.dsbi-act-btn .dsbi-act-ic {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--t) 75%, #fff), var(--t));
+  color: #fff;
+  box-shadow: 0 2px 6px -2px color-mix(in srgb, var(--t) 70%, transparent);
+}
+.dsbi-act-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-act-chev {
+  display: inline-flex;
+  flex: none;
+  color: color-mix(in srgb, var(--t) 70%, #64748b);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsbi-act-btn.is-open .dsbi-act-chev {
+  transform: rotate(180deg);
+}
+
+/* The list: slides and fades in from the trigger. */
+.dsbi-pop.dsbi-act-pop {
+  border-radius: 12px;
+  border-color: #e5e7eb;
+  box-shadow: 0 18px 40px -16px rgba(15, 23, 42, 0.35), 0 2px 6px rgba(15, 23, 42, 0.06);
+  transform-origin: top center;
+  animation: dsbi-act-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes dsbi-act-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dsbi-act-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+.dsbi-act-group.dsbi-act-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 2px 2px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--t-soft) 85%, #fff);
+  color: var(--t-ink);
+  font-size: 0.8333rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.dsbi-act-group::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t);
+}
+.dsbi-act-opt.dsbi-tap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+.dsbi-act-opt.is-active {
+  background: var(--t-soft);
+  border-color: color-mix(in srgb, var(--t) 25%, transparent);
+  transform: translateX(2px);
+}
+.dsbi-act-opt.is-on {
+  background: color-mix(in srgb, var(--t-soft) 70%, #fff);
+  border-color: color-mix(in srgb, var(--t) 45%, transparent);
+}
+.dsbi-act-txt {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.25;
+}
+.dsbi-act-txt b {
+  font-size: 1.0417rem;
+  font-weight: 600;
+  color: var(--t-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-act-txt small {
+  font-size: 0.875rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-act-tick {
+  display: inline-flex;
+  flex: none;
+  color: var(--t);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsbi-pop.dsbi-act-pop,
+  .dsbi-act-chev,
+  .dsbi-act-opt.dsbi-tap {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Add row / Update row: a key the table has no column for — kept on the row
+   and sent in the payload, never drawn. */
+.dsbi-hidden-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin: 3px 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px dashed #c4b5fd;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.dsbi-tap.dsbi-hidden-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 6px 0 2px;
+}
+
+/* Payload key rows in a narrow place — a record or list nested inside a
+   record, or the inspector at its default width. On one line the key, its
+   buttons, the value box, if-empty, send-as, peek, Map… and the trash need
+   ~560px; below that they overflowed and the trash sat on the send-as box.
+   So the row measures itself and, when narrow, puts the value on a line of
+   its own under the key: key · list · record · trash, then the value. */
+.dsbi-keyrow {
+  container-type: inline-size;
+  container-name: keyrow;
+}
+@container keyrow (max-width: 560px) {
+  .dsbi-itemfield {
+    flex-wrap: wrap;
+    row-gap: 5px;
+  }
+  .dsbi-itemfield > .dsbi-input {
+    flex: 1 1 140px;
+  }
+  .dsbi-itemfield .dsbi-vmap,
+  .dsbi-itemfield .dsbi-keyrow-tag {
+    order: 10;
+    flex: 1 1 100%;
+  }
+  .dsbi-vmap.has-before {
+    grid-template-columns: minmax(0, 1fr) 56px 82px auto 92px auto;
+  }
+}
+
+/* ------------------------------------------- inspector sections: smooth fold
+   builder/editors Section: the body slides open and shut (a grid row going
+   0fr <-> 1fr) instead of popping; the chevron turns with it. */
+.dsbi-sec-chev {
+  display: inline-flex;
+  transform: rotate(-90deg);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsbi-sec.is-open > .dsbi-sec-head .dsbi-sec-chev {
+  transform: none;
+}
+.dsbi-sec-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsbi-sec.is-open > .dsbi-sec-wrap {
+  grid-template-rows: 1fr;
+}
+.dsbi-sec-clip {
+  min-height: 0;
+  min-width: 0;
+}
+.dsbi-sec:not(.is-open) > .dsbi-sec-wrap > .dsbi-sec-clip,
+.dsbi-sec.is-moving > .dsbi-sec-wrap > .dsbi-sec-clip {
+  overflow: hidden;
+}
+.dsbi-sec-clip > .dsbi-sec-body {
+  transition: opacity 0.2s ease;
+}
+.dsbi-sec:not(.is-open) > .dsbi-sec-wrap > .dsbi-sec-clip > .dsbi-sec-body {
+  opacity: 0;
+}
+
+/* --------------------------------------- full screen: resizable columns
+   builder/Inspector useFullLayout: the editor and "What this screen holds"
+   split by a draggable gutter (the rail folds away from its button); the
+   property groups take a column width the right edge of any group drags. */
+.dsb-panel-right.is-full .dsb-insp-split {
+  grid-template-columns: minmax(0, 1fr) 10px var(--dsb-rail-w, 420px);
+  transition: grid-template-columns 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-panel-right.is-full .dsb-insp-split.is-rail-closed {
+  grid-template-columns: minmax(0, 1fr) 10px 0px;
+}
+.dsb-panel-right.is-full .dsb-insp-body.is-props {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--dsb-col-w, 420px)), 1fr));
+}
+.dsb-insp-rail {
+  overflow: hidden;
+  border-left: 0;
+}
+.dsb-insp-rail-in {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 260px;
+  min-height: 0;
+  transition: opacity 0.2s ease;
+}
+.is-rail-closed .dsb-insp-rail-in {
+  opacity: 0;
+  pointer-events: none;
+}
+.dsb-insp-gutter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  background: var(--b-surface-2, #f8fafc);
+  border-left: 1px solid var(--b-border-2);
+  border-right: 1px solid var(--b-border-2);
+  touch-action: none;
+}
+.dsb-insp-gutter::before {
+  content: "";
+  width: 3px;
+  height: 36px;
+  border-radius: 3px;
+  background: var(--b-border, #cbd5e1);
+  transition: background 0.15s ease, height 0.15s ease;
+}
+.dsb-insp-gutter:hover::before {
+  height: 56px;
+  background: var(--b-accent, #6366f1);
+}
+.is-rail-closed > .dsb-insp-gutter {
+  cursor: default;
+}
+.dsb-panel-right .dsb-insp-gutter-btn {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin-left: -10px;
+  border: 1px solid var(--b-border, #cbd5e1) !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: var(--b-text-2, #475569) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+  z-index: 1;
+}
+.dsb-panel-right .dsb-insp-gutter-btn:hover {
+  color: var(--b-accent, #6366f1) !important;
+  border-color: var(--b-accent, #6366f1) !important;
+}
+/* One property group in the full-screen grid, with its width grip. */
+.dsb-insp-cell {
+  position: relative;
+  min-width: 0;
+}
+.dsb-insp-cell > .dsbi-sec {
+  margin-bottom: 0;
+}
+.dsb-insp-colgrip {
+  position: absolute;
+  top: 8px;
+  right: -7px;
+  bottom: 8px;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.dsb-insp-colgrip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 3px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 3px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+.dsb-insp-cell:hover > .dsb-insp-colgrip::after {
+  background: var(--b-border, #cbd5e1);
+}
+.dsb-insp-colgrip:hover::after {
+  background: var(--b-accent, #6366f1) !important;
+}
+/* A narrow full screen stacks the rail under the editor: no gutter then. */
+@media (max-width: 1180px) {
+  .dsb-panel-right.is-full .dsb-insp-split,
+  .dsb-panel-right.is-full .dsb-insp-split.is-rail-closed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dsb-insp-gutter {
+    display: none;
+  }
+  .is-rail-closed > .dsb-insp-rail {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsbi-sec-chev,
+  .dsbi-sec-wrap,
+  .dsbi-sec-clip > .dsbi-sec-body,
+  .dsb-panel-right.is-full .dsb-insp-split,
+  .dsb-insp-rail-in {
+    transition: none;
+  }
+}
+.dsb-resizing .dsb-panel-right.is-full .dsb-insp-split {
+  transition: none;
+}
+
+/* ===========================================================================
+   Version history (builder/VersionHistory.jsx) — the toolbar clock, its
+   drop-down and the "viewing an old version" strip. Colour says what a row
+   is: Saved blue, Published green, Restored violet, Before-restore slate;
+   amber is "this one is on the canvas and not saved yet".
+   =========================================================================== */
+.dsb-tb-right > button.dsb-tb-hist {
+  position: relative;
+}
+.dsb-tb-right > button.dsb-tb-hist.is-on {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-tb-right > button.dsb-tb-hist.is-viewing {
+  background: #fef3c7;
+  color: #b45309;
+}
+.dsb-tb-hist-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px var(--b-surface);
+}
+
+.dsb-vh {
+  position: fixed;
+  z-index: 3000;
+  width: 340px;
+  max-width: calc(100vw - 16px);
+  max-height: min(520px, calc(100vh - 80px));
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border: 1px solid var(--b-border);
+  border-radius: 12px;
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  animation: dsb-vh-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: top right;
+}
+@keyframes dsb-vh-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dsb-vh-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px 7px 10px;
+  background: linear-gradient(180deg, #f8f9ff, var(--b-surface));
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-vh-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 1.0417rem;
+  color: var(--b-text);
+}
+.dsb-vh-title > svg {
+  color: var(--b-accent);
+}
+.dsb-vh-count {
+  min-width: 18px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.dsb-vh-tools {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.dsbi-tap.dsb-vh-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--b-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.dsbi-tap.dsb-vh-icon:hover {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsbi-tap.dsb-vh-icon.tone-open:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.dsbi-tap.dsb-vh-icon.tone-danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.dsbi-tap.dsb-vh-icon[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: transparent;
+}
+.dsb-vh-spin {
+  animation: dsb-vh-spin 0.8s linear infinite;
+}
+@keyframes dsb-vh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* What is on the canvas now. */
+.dsb-vh-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 6px 2px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+.dsb-vh-current.is-viewing {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.dsb-vh-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px #dcfce7;
+}
+.dsb-vh-current.is-viewing .dsb-vh-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px #fef3c7;
+}
+.dsb-vh-cur-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.dsb-vh-cur-text b {
+  font-size: 1rem;
+  color: var(--b-text);
+}
+.dsb-vh-cur-text small {
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+
+.dsbi-tap.dsb-vh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.9167rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.12s, background 0.12s;
+}
+.dsbi-tap.dsb-vh-pill.tone-back {
+  background: #fde68a;
+  color: #92400e;
+}
+.dsbi-tap.dsb-vh-pill.tone-open {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.dsbi-tap.dsb-vh-pill.tone-danger {
+  background: #dc2626;
+  color: #fff;
+}
+.dsbi-tap.dsb-vh-pill.tone-plain {
+  background: #f1f5f9;
+  color: #475569;
+}
+.dsbi-tap.dsb-vh-pill:hover {
+  filter: brightness(0.95);
+}
+
+.dsb-vh-chip {
+  flex: none;
+  font-size: 0.8333rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.dsb-vh-chip.is-unsaved {
+  background: #fef3c7;
+  color: #b45309;
+}
+.dsb-vh-chip.is-viewing {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.dsb-vh-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2px 6px 6px;
+  scrollbar-width: thin;
+}
+.dsb-vh-day {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 4px 3px;
+  font-size: 0.8333rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--b-muted);
+  background: var(--b-surface);
+}
+
+/* One version. The left edge and the badge carry its kind's colour. */
+.dsb-vh-row {
+  --k: #2563eb;
+  --k-soft: #dbeafe;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px 5px 8px;
+  margin-bottom: 3px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+.dsb-vh-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--k);
+  opacity: 0.85;
+}
+.dsb-vh-row:hover,
+.dsb-vh-row:focus-visible {
+  background: var(--b-surface-2);
+  border-color: var(--b-border);
+  outline: none;
+}
+.dsb-vh-row.k-published {
+  --k: #16a34a;
+  --k-soft: #dcfce7;
+}
+.dsb-vh-row.k-restored {
+  --k: #7c3aed;
+  --k-soft: #ede9fe;
+}
+.dsb-vh-row.k-replaced {
+  --k: #64748b;
+  --k-soft: #f1f5f9;
+}
+.dsb-vh-row.k-auto {
+  --k: #0d9488;
+  --k-soft: #ccfbf1;
+}
+.dsb-vh-row.is-viewing {
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+.dsb-vh-row.is-busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.dsb-vh-badge {
+  flex: none;
+  min-width: 30px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--k-soft);
+  color: var(--k);
+  font-size: 0.9167rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.dsb-vh-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.dsb-vh-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-vh-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--b-text);
+}
+.dsb-vh-kind > svg {
+  color: var(--k);
+}
+.dsb-vh-note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+.dsb-vh-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+.dsb-vh-sep {
+  opacity: 0.5;
+}
+.dsb-vh-actions,
+.dsb-vh-confirm {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.dsb-vh-actions .dsb-vh-icon {
+  opacity: 0;
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
+}
+.dsb-vh-row:hover .dsb-vh-actions .dsb-vh-icon,
+.dsb-vh-row:focus-within .dsb-vh-actions .dsb-vh-icon,
+.dsb-vh-row.is-viewing .dsb-vh-actions .dsb-vh-icon {
+  opacity: 1;
+}
+.dsb-vh-confirm {
+  gap: 4px;
+  font-size: 0.9167rem;
+  font-weight: 600;
+  color: #b91c1c;
+  animation: dsb-vh-in 0.12s ease-out;
+}
+
+.dsb-vh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 22px 16px;
+  text-align: center;
+  color: var(--b-muted);
+  font-size: 0.9583rem;
+}
+.dsb-vh-empty > svg {
+  color: var(--b-accent);
+  opacity: 0.6;
+}
+.dsb-vh-empty b {
+  color: var(--b-text);
+  font-size: 1.0417rem;
+}
+.dsb-vh-empty.is-error > svg {
+  color: #dc2626;
+  opacity: 1;
+}
+.dsb-vh-skel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 2px;
+}
+.dsb-vh-skel span {
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: dsb-vh-shimmer 1.2s linear infinite;
+}
+@keyframes dsb-vh-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.dsb-vh-foot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+
+/* The strip under the toolbar while an old version is on the canvas. */
+.dsb-vbanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding: 4px 10px;
+  background: linear-gradient(90deg, #fffbeb, #fef3c7);
+  border-bottom: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 1rem;
+  animation: dsb-vh-in 0.18s ease-out;
+}
+.dsb-vbanner > svg {
+  flex: none;
+}
+.dsb-vbanner-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-vbanner-text b {
+  color: #78350f;
+}
+.dsbi-tap.dsb-vbanner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 0.9583rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.12s;
+}
+.dsbi-tap.dsb-vbanner-btn.tone-save {
+  background: var(--b-accent);
+  color: #fff;
+}
+.dsbi-tap.dsb-vbanner-btn.tone-back {
+  background: #fff;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+.dsbi-tap.dsb-vbanner-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* ===================================================================
+   Screen library — filed by module (role). Each module wears the colour
+   family the role picker gives it: --mod (accent), --mod-a / --mod-b
+   (its gradient), set inline per item from roleFamilies.
+   =================================================================== */
+.dsb-lib {
+  position: relative;
+}
+.dsb-lib.has-rail {
+  width: 95%;
+}
+.dsb-lib-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.dsb-lib-main > .dsb-lib-body {
+  min-width: 0;
+}
+.dsbi-tap.dsb-lib-search-x {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-lib-search-x:hover {
+  background: var(--b-surface-2);
+  color: var(--b-text);
+}
+
+/* -- rail -- */
+.dsb-mod-rail {
+  flex: 0 0 214px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 8px;
+  border-right: 1px solid var(--b-border);
+  background: var(--b-surface);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.dsb-mod-rail-title {
+  padding: 2px 8px 6px;
+  font-size: 0.8333rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--b-muted);
+}
+.dsb-mod-rail-sep {
+  height: 1px;
+  margin: 6px;
+  background: var(--b-border);
+}
+.dsb-mod-rail-hint {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--b-surface-2);
+  font-size: 0.8333rem;
+  line-height: 1.45;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-mod-item {
+  --mod: var(--b-accent);
+  --mod-a: #818cf8;
+  --mod-b: var(--b-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  font-size: 0.9583rem;
+  font-weight: 600;
+  color: var(--b-text);
+  white-space: nowrap;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.dsbi-tap.dsb-mod-item:hover {
+  background: color-mix(in srgb, var(--mod) 8%, transparent);
+}
+.dsbi-tap.dsb-mod-item.is-on {
+  background: color-mix(in srgb, var(--mod) 13%, #fff);
+  box-shadow: inset 3px 0 0 var(--mod);
+  color: color-mix(in srgb, var(--mod) 78%, #0f172a);
+}
+.dsb-mod-dot {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--mod-a), var(--mod-b));
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mod) 35%, transparent);
+}
+.dsb-mod-dot.is-all {
+  background: linear-gradient(135deg, #818cf8, #4f46e5);
+}
+.dsb-mod-dot.is-none {
+  background: #e2e8f0;
+  color: #64748b;
+  box-shadow: none;
+}
+.dsb-mod-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-mod-count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.8333rem;
+  font-weight: 800;
+  line-height: 17px;
+  color: var(--b-muted);
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+}
+.dsbi-tap.dsb-mod-item.is-on .dsb-mod-count {
+  color: #fff;
+  background: var(--mod);
+  border-color: var(--mod);
+}
+
+/* -- filter bar -- */
+.dsb-lib-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+.dsb-seg-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--b-surface);
+  border: 1px solid var(--b-border);
+}
+.dsb-lib-filters-l {
+  padding: 0 6px 0 4px;
+  font-size: 0.8333rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--b-muted);
+}
+.dsb-lib-filters-n {
+  margin-left: auto;
+  font-size: 0.9167rem;
+  font-weight: 600;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-chip {
+  padding: 4px 11px;
+  border-radius: 7px;
+  font-size: 0.9167rem;
+  font-weight: 700;
+  color: var(--b-muted);
+  transition: all 0.15s ease;
+}
+.dsbi-tap.dsb-chip:hover {
+  color: var(--b-text);
+  background: var(--b-surface-2);
+}
+.dsbi-tap.dsb-chip.is-on {
+  color: #fff;
+  background: var(--b-accent);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.28);
+}
+.dsbi-tap.dsb-chip.is-draft.is-on {
+  background: #d97706;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.28);
+}
+.dsbi-tap.dsb-chip.is-published.is-on {
+  background: #059669;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.28);
+}
+
+/* -- cards -- */
+.dsb-lib-card {
+  position: relative;
+}
+.dsb-lib-card.is-ghost {
+  height: 236px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: dsb-lib-shimmer 1.2s linear infinite;
+}
+@keyframes dsb-lib-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.dsb-lib-stripe {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+.dsb-lib-card.has-mod .dsb-lib-stripe {
+  background: linear-gradient(90deg, var(--mod-a), var(--mod-b));
+}
+.dsb-lib-card.has-mod:hover {
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--mod) 22%, transparent);
+  border-color: color-mix(in srgb, var(--mod) 35%, var(--b-border));
+}
+.dsb-lib-card.is-current {
+  outline: 2px solid color-mix(in srgb, var(--b-accent) 55%, transparent);
+  outline-offset: -1px;
+}
+.dsb-lib-meta strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-lib-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+.dsbi-tap.dsb-lib-modbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+  border-radius: 999px;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-lib-modbtn:hover .dsb-mod-badge {
+  filter: brightness(0.96);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mod, #64748b) 18%, transparent);
+}
+.dsb-lib-meta .dsb-mod-badge,
+.dsb-mod-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 150px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: box-shadow 0.15s ease;
+}
+.dsb-mod-badge > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: inherit;
+  color: inherit;
+}
+.dsb-lib-meta .dsb-mod-badge.is-sm,
+.dsb-mod-badge.is-sm {
+  font-size: 0.8333rem;
+  padding: 1px 7px;
+}
+.dsb-lib-meta .dsb-mod-badge.is-none,
+.dsb-mod-badge.is-none {
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+}
+.dsb-lib-meta em.dsb-lib-status {
+  margin-left: 0;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 0.7083rem;
+}
+.dsb-lib-meta em.dsb-lib-status.is-draft {
+  color: #b45309;
+  background: #fef3c7;
+}
+.dsb-lib-meta em.dsb-lib-status.is-published {
+  color: #047857;
+  background: #d1fae5;
+}
+.dsb-lib-meta em.dsb-lib-status.is-open {
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+}
+.dsb-lib-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dsb-lib-foot-cur {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+
+/* -- module picker sheet -- */
+.dsb-modpick-root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.32);
+  backdrop-filter: blur(2px);
+}
+.dsb-modpick {
+  width: min(640px, 92%);
+  max-height: 84%;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+  animation: dsb-pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-modpick > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--b-border);
+  background: linear-gradient(135deg, #eef2ff, #fff);
+}
+.dsb-modpick > header > div {
+  flex: 1;
+  min-width: 0;
+}
+.dsb-modpick > header strong {
+  display: block;
+  font-size: 1.125rem;
+}
+.dsb-modpick > header span {
+  display: block;
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsbi-tap.dsb-modpick-x {
+  display: inline-flex;
+  padding: 5px;
+  border-radius: 8px;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-modpick-x:hover {
+  background: var(--b-surface-2);
+  color: var(--b-text);
+}
+.dsb-modpick-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 14px 4px;
+  padding: 0 11px;
+  height: 34px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 9px;
+  color: var(--b-muted);
+}
+.dsb-modpick-search:focus-within {
+  border-color: var(--b-accent);
+  box-shadow: 0 0 0 3px var(--b-accent-soft);
+}
+.dsb-modpick-search input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 1.0417rem;
+  color: var(--b-text);
+}
+.dsb-modpick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 10px 14px 14px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.dsbi-tap.dsb-modpick-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 11px;
+  border: 1px solid var(--b-border);
+  background: #fff;
+  font-size: 0.9583rem;
+  font-weight: 700;
+  color: var(--b-text);
+  white-space: normal;
+  transition: transform 0.14s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.dsbi-tap.dsb-modpick-item:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--mod) 45%, var(--b-border));
+  background: color-mix(in srgb, var(--mod) 6%, #fff);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--mod) 20%, transparent);
+}
+.dsbi-tap.dsb-modpick-item.is-on {
+  border-color: var(--mod);
+  background: color-mix(in srgb, var(--mod) 11%, #fff);
+  color: color-mix(in srgb, var(--mod) 75%, #0f172a);
+}
+.dsb-modpick-ic {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--mod-a), var(--mod-b));
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--mod) 35%, transparent);
+}
+.dsb-modpick-name {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.dsb-modpick > footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+}
+.dsbi-tap.dsb-modpick-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  font-size: 0.9583rem;
+  font-weight: 700;
+  color: var(--b-danger);
+  border: 1px solid color-mix(in srgb, var(--b-danger) 30%, transparent);
+  background: #fff;
+}
+.dsbi-tap.dsb-modpick-clear:hover {
+  background: color-mix(in srgb, var(--b-danger) 7%, #fff);
+}
+
+/* -- several modules per screen -- */
+.dsb-lib-meta .dsb-mod-badge.is-more,
+.dsb-mod-badge.is-more {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  cursor: help;
+}
+.dsb-modpick-n {
+  flex: 0 0 auto;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--b-accent);
+  background: var(--b-accent-soft);
+}
+.dsb-modpick-tick {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--b-border-2);
+  background: #fff;
+  color: #fff;
+  transition: all 0.14s ease;
+}
+.dsb-modpick-tick.is-on {
+  border-color: var(--mod);
+  background: var(--mod);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mod) 35%, transparent);
+}
+.dsb-modpick > footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dsb-modpick-hint {
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+.dsbi-tap.dsb-modpick-cancel,
+.dsbi-tap.dsb-modpick-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.dsbi-tap.dsb-modpick-cancel {
+  color: var(--b-text);
+  background: #fff;
+  border: 1px solid var(--b-border-2);
+}
+.dsbi-tap.dsb-modpick-cancel:hover {
+  background: var(--b-surface-2);
+}
+.dsbi-tap.dsb-modpick-save {
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, var(--b-accent));
+  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
+}
+.dsbi-tap.dsb-modpick-save:hover {
+  filter: brightness(1.05);
+}
+
+/* "Remove obj key": a body key sent as its contents, not under its name. */
+.dsbi-tap.dsbi-param-x.dsbi-unwrap {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+.dsbi-tap.dsbi-param-x.dsbi-unwrap:hover {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+.dsbi-tap.dsbi-param-x.dsbi-unwrap.is-on {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #b45309;
+}
+.dsbi-param-unwrapped {
+  text-decoration: line-through;
+  text-decoration-color: #f59e0b;
+  opacity: 0.6;
+}
+
+/* ----------------------------------------------- library cards (print-builder look)
+   Same card as the Print Builder template list: a module band with the status
+   pill, name + id, a tag row, and a dashed footer — Open, copy link, then the
+   quiet icon acts on the right. --c / --cl / --cb are the module colour, its
+   light line and its wash, set per card. */
+.dsb-lib-grid {
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: 12px;
+}
+.dsb-lib-card.dsb-tc {
+  --c: #64748b;
+  --cl: #e2e8f0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--cl);
+  border-radius: 14px;
+  overflow: hidden;
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 1.0417rem;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 6px 16px -10px rgba(16, 24, 40, 0.12);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.dsb-lib-card.dsb-tc:hover,
+.dsb-lib-card.dsb-tc.has-mod:hover {
+  border-color: var(--cl);
+  box-shadow: 0 14px 26px -12px var(--cl), 0 2px 6px rgba(16, 24, 40, 0.05);
+  transform: translateY(-2px);
+}
+.dsb-lib-card.dsb-tc.is-current {
+  outline: 2px solid color-mix(in srgb, var(--c) 55%, transparent);
+  outline-offset: -1px;
+}
+.dsb-lib-card.dsb-tc.is-ghost {
+  height: 168px;
+  border-color: #e6e8ee;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+}
+
+/* band: module badge left, status right, a 3px colour line on top */
+.dsb-tc-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px 4px 12px;
+  box-shadow: inset 0 3px 0 var(--cl);
+}
+.dsb-tc-mods {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+.dsbi-tap.dsb-tc-mods {
+  padding: 2px;
+  margin: -2px;
+  border: 1px dashed transparent;
+  border-radius: 999px;
+  background: none;
+}
+.dsbi-tap.dsb-tc-mods:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--cl);
+}
+.dsb-tc-modedit {
+  flex: none;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: #6b7280;
+  display: inline-grid;
+  place-items: center;
+  transition: width 0.15s ease, opacity 0.15s ease;
+}
+.dsbi-tap.dsb-tc-mods:hover .dsb-tc-modedit,
+.dsbi-tap.dsb-tc-mods:focus-visible .dsb-tc-modedit {
+  width: 16px;
+  opacity: 1;
+}
+.dsb-tc .dsb-mod-badge,
+.dsb-tc .dsb-mod-badge.is-sm {
+  height: 22px;
+  gap: 5px;
+  padding: 0 9px 0 7px;
+  border-radius: 999px;
+  font-size: 0.9167rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.dsb-tc .dsb-mod-badge.is-none {
+  color: #475569;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.dsb-tc .dsb-mod-badge.is-more {
+  padding: 0 6px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-weight: 700;
+}
+.dsb-tc-pills {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.dsb-tc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid #eceef2;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 650;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+.dsb-tc-status.is-published {
+  background: #ecfdf3;
+  border-color: #bbf7d0;
+  color: #166534;
+  text-transform: none;
+}
+.dsb-tc-status.is-draft {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #854d0e;
+}
+.dsb-tc-status.is-open {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+.dsb-tc-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+
+/* body: name, then the id in the module colour */
+.dsb-tc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px 0;
+}
+.dsb-tc-body h3 {
+  margin: 0;
+  font-family: inherit;
+  font-size: 1.1667rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111827;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dsb-tc-body code {
+  padding: 0;
+  background: none;
+  font-family: "Roboto Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--c);
+  opacity: 0.75;
+  word-break: break-all;
+}
+
+.dsb-tc-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  min-width: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-tc-date > svg {
+  flex: none;
+  color: var(--c);
+  opacity: 0.8;
+}
+.dsb-tc-date em {
+  font-style: normal;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+/* tags */
+.dsb-tc-tags {
+  display: flex;
+  gap: 5px;
+  min-width: 0;
+  margin-top: auto;
+  padding: 9px 12px 0;
+}
+.dsb-tc-tag {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 21px;
+  padding: 0 7px;
+  border-radius: 6px;
+  border: 1px solid #eceef2;
+  background: rgba(255, 255, 255, 0.85);
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dsb-tc-tag.is-count {
+  background: #eef2ff;
+  border-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: 700;
+}
+.dsb-tc-tag.is-route {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: #6b7280;
+}
+.dsb-tc-tag.is-route > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* footer */
+.dsb-tc-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 8px 10px 9px 12px;
+  border-top: 1px dashed var(--cl);
+}
+.dsb-tc-fill {
+  flex: 1;
+}
+.dsbi-tap.dsb-tc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #d5d9e2;
+  background: #fff;
+  color: #374151;
+  font-size: 0.9583rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, opacity 0.15s;
+}
+.dsbi-tap.dsb-tc-btn:hover {
+  background: #f8f9fb;
+  border-color: #c4c9d4;
+}
+.dsbi-tap.dsb-tc-btn.is-icon {
+  width: 28px;
+  padding: 0;
+}
+.dsbi-tap.dsb-tc-btn.is-open {
+  background: #e5edff;
+  border-color: #b8cafa;
+  color: #2747b5;
+  font-weight: 650;
+}
+.dsbi-tap.dsb-tc-btn.is-open:hover {
+  background: #d6e2ff;
+  border-color: #2747b5;
+}
+.dsbi-tap.dsb-tc-btn.is-link {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+.dsbi-tap.dsb-tc-btn.is-link:hover {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+}
+.dsbi-tap.dsb-tc-btn.is-act {
+  opacity: 0.5;
+}
+.dsb-tc:hover .dsbi-tap.dsb-tc-btn.is-act,
+.dsbi-tap.dsb-tc-btn.is-act:focus-visible {
+  opacity: 1;
+}
+.dsbi-tap.dsb-tc-btn.is-del:hover,
+.dsbi-tap.dsb-tc-btn.is-armed {
+  color: #be123c;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+.dsbi-tap.dsb-tc-btn.is-armed {
+  border-color: #be123c;
+  font-weight: 650;
+}
+.dsb-lib-foot .dsbi-tap.dsbi-mini {
+  height: 28px;
+  border-radius: 8px;
+}
+
+/* -- library header: tabs · status · sort · count · search · close, one row -- */
+.dsb-lib .dsb-lib-head {
+  flex: none;
+  gap: 6px;
+  padding: 5px 8px 5px 10px;
+  flex-wrap: wrap;
+  background: linear-gradient(180deg, #fff, #fafbff);
+}
+.dsb-lib .dsb-lib-tabs {
+  gap: 2px;
+}
+.dsb-lib .dsb-lib-tabs button {
+  height: 26px;
+  margin: 0;
+  padding: 0 9px;
+  border-radius: 7px;
+  font-size: 0.9583rem;
+  line-height: 1;
+}
+.dsb-lib .dsb-lib-head .dsb-lib-search {
+  height: 26px;
+}
+.dsb-lib .dsb-lib-head .dsb-icon-btn {
+  width: 26px;
+  height: 26px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+.dsb-lib-filters.is-head {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  padding-left: 6px;
+  border-left: 1px solid var(--b-border);
+}
+.dsb-lib-filters.is-head .dsb-seg-chips {
+  gap: 2px;
+  padding: 2px;
+  border-radius: 9px;
+  background: #f6f7fb;
+  border-color: #eceef4;
+}
+.dsb-lib-filters.is-head .dsbi-tap.dsb-chip {
+  padding: 3px 9px;
+  border-radius: 7px;
+  font-size: 0.9167rem;
+  line-height: 1.2;
+}
+.dsb-lib-filters.is-head .dsb-lib-filters-l {
+  padding: 0 4px 0 6px;
+  font-size: 0.7917rem;
+}
+.dsb-lib-filters.is-head .dsb-lib-filters-n {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f3f1ff;
+  color: #5b4fd0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dsb-lib-filters.is-head ~ .dsb-lib-search {
+  margin-left: 0;
+}
+
+/* ------------------------------------------------- pastel filled buttons */
+/* The buttons that carry a fill, colour-coded in soft pastels. Prefixed with
+   the builder scope (0,2,0) so the host theme's `button` / `button:hover`
+   cannot repaint them, and border-color is !important because the theme sets
+   its own with !important. */
+:is(.dsb-root, .dsb-portal) :is(.dsb-preview-btn, .dsb-btn-primary, .dsb-btn-ghost, .dsbi-iconbtn, .dsbi-iconsugg-quick, .dsbi-add, .dsb-dock-btn, .dsbi-token, .dsbi-icontile) {
+  background-color: var(--pt-bg);
+  color: var(--pt-fg);
+  border-color: var(--pt-bd) !important;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:is(.dsb-root, .dsb-portal) :is(.dsb-preview-btn, .dsb-btn-primary, .dsb-btn-ghost, .dsbi-iconbtn, .dsbi-iconsugg-quick, .dsbi-add, .dsb-dock-btn, .dsbi-token, .dsbi-icontile):is(:hover, :focus-visible) {
+  background-color: var(--pt-bg-h);
+  color: var(--pt-fg);
+  border-color: var(--pt-bd-h) !important;
+  box-shadow: 0 4px 12px -4px var(--pt-sh);
+}
+:is(.dsb-root, .dsb-portal) :is(.dsb-preview-btn, .dsb-btn-primary, .dsb-btn-ghost, .dsbi-add):hover {
+  transform: translateY(-1px);
+}
+:is(.dsb-root, .dsb-portal) :is(.dsb-preview-btn, .dsb-btn-primary, .dsb-btn-ghost, .dsbi-add):active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+:is(.dsb-root, .dsb-portal) :is(.dsb-btn-primary, .dsb-btn-ghost):disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Preview — sky */
+:is(.dsb-root, .dsb-portal) .dsb-preview-btn {
+  --pt-bg: #e0f2fe;
+  --pt-bg-h: #cdeafd;
+  --pt-fg: #0369a1;
+  --pt-bd: #bae6fd;
+  --pt-bd-h: #7dd3fc;
+  --pt-sh: rgba(14, 165, 233, 0.35);
+}
+/* …and while previewing — lavender, so the mode reads at a glance */
+:is(.dsb-root, .dsb-portal) .dsb-preview-btn.is-on {
+  --pt-bg: #ede9fe;
+  --pt-bg-h: #e2dafe;
+  --pt-fg: #6d28d9;
+  --pt-bd: #ddd6fe;
+  --pt-bd-h: #c4b5fd;
+  --pt-sh: rgba(139, 92, 246, 0.35);
+}
+/* Save — periwinkle */
+:is(.dsb-root, .dsb-portal) .dsb-btn-primary {
+  --pt-bg: #e0e7ff;
+  --pt-bg-h: #d3dcff;
+  --pt-fg: #4338ca;
+  --pt-bd: #c7d2fe;
+  --pt-bd-h: #a5b4fc;
+  --pt-sh: rgba(99, 102, 241, 0.35);
+}
+/* Publish — mint */
+:is(.dsb-root, .dsb-portal) .dsb-btn-ghost {
+  --pt-bg: #dcfce7;
+  --pt-bg-h: #cbf7da;
+  --pt-fg: #15803d;
+  --pt-bd: #bbf7d0;
+  --pt-bd-h: #86efac;
+  --pt-sh: rgba(34, 197, 94, 0.32);
+}
+/* Icon picker trigger — soft lavender field */
+:is(.dsb-root, .dsb-portal) .dsbi-iconbtn {
+  --pt-bg: #f5f3ff;
+  --pt-bg-h: #ede9fe;
+  --pt-fg: #5b21b6;
+  --pt-bd: #ddd6fe;
+  --pt-bd-h: #c4b5fd;
+  --pt-sh: rgba(139, 92, 246, 0.22);
+}
+/* Suggested-icon quick add — peach */
+:is(.dsb-root, .dsb-portal) .dsbi-iconsugg-quick {
+  --pt-bg: #ffedd5;
+  --pt-bg-h: #fee2c2;
+  --pt-fg: #c2410c;
+  --pt-bd: #fed7aa;
+  --pt-bd-h: #fdba74;
+  --pt-sh: rgba(249, 115, 22, 0.28);
+}
+/* "+ Add …" — mint */
+:is(.dsb-root, .dsb-portal) .dsbi-add {
+  --pt-bg: #ecfdf5;
+  --pt-bg-h: #d1fae5;
+  --pt-fg: #047857;
+  --pt-bd: #a7f3d0;
+  --pt-bd-h: #6ee7b7;
+  --pt-sh: rgba(16, 185, 129, 0.28);
+}
+/* Panel collapse handles — sky */
+:is(.dsb-root, .dsb-portal) .dsb-dock-btn {
+  --pt-bg: #f0f9ff;
+  --pt-bg-h: #e0f2fe;
+  --pt-fg: #0284c7;
+  --pt-bd: #bae6fd;
+  --pt-bd-h: #7dd3fc;
+  --pt-sh: rgba(14, 165, 233, 0.3);
+}
+/* Binding tokens and icon tiles — neutral slate, lavender on hover */
+:is(.dsb-root, .dsb-portal) :is(.dsbi-token, .dsbi-icontile) {
+  --pt-bg: #f8fafc;
+  --pt-bg-h: #f5f3ff;
+  --pt-fg: inherit;
+  --pt-bd: #e2e8f0;
+  --pt-bd-h: #c4b5fd;
+  --pt-sh: rgba(139, 92, 246, 0.18);
+}
+:is(.dsb-root, .dsb-portal) .dsbi-icontile.is-sugg {
+  --pt-bg: #fff7ed;
+  --pt-fg: #c2410c;
+  --pt-bd: #fed7aa;
+}
+:is(.dsb-root, .dsb-portal) .dsbi-icontile.is-on {
+  --pt-bg: #ede9fe;
+  --pt-bg-h: #e2dafe;
+  --pt-fg: #6d28d9;
+  --pt-bd: #a78bfa;
+  --pt-bd-h: #8b5cf6;
+}
+/* Quiet buttons keep no fill, with a soft tint on hover. */
+:is(.dsb-root, .dsb-portal) :is(.dsb-icon-btn, .dsb-ctx-item):hover {
+  background-color: var(--b-surface-2);
+}
+:is(.dsb-root, .dsb-portal) .dsbi-x:hover {
+  background-color: #ffe4e6;
+  color: #be123c;
+}
+
+/* Screen library: over the whole window, centred, the same gap on every side.
+   (Inside the builder it was 95% wide × 86% tall of a box that starts under the
+   app header, so the gaps differed and a short window cut its foot off.) */
+.dsb-modal-root.is-lib {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  padding: 24px;
+}
+.dsb-modal-root.is-lib > .dsb-lib {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+@media (max-width: 640px) {
+  .dsb-modal-root.is-lib {
+    padding: 12px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Smooth open / close for the screen library, the module picker and (in
+   builder/screenAccess.css) the Access modal: the backdrop fades and blurs in,
+   the panel rises and settles on a soft ease-out, the library's cards follow in
+   a short stagger, and closing plays it back (builder/useSmoothClose.js holds
+   the unmount for EXIT_MS = 200ms).
+   --------------------------------------------------------------------------- */
+@keyframes dsbx-bg-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+}
+@keyframes dsbx-bg-out {
+  to {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+}
+@keyframes dsbx-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.965);
+  }
+}
+@keyframes dsbx-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+@keyframes dsbx-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.dsb-modal-root.is-lib,
+.dsb-modpick-root {
+  backdrop-filter: blur(4px);
+  animation: dsbx-bg-in 0.28s ease both;
+}
+.dsb-modal-root.is-lib > .dsb-lib,
+.dsb-modpick-root > .dsb-modpick {
+  animation: dsbx-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+.dsb-modal-root.is-lib.is-closing,
+.dsb-modpick-root.is-closing {
+  animation: dsbx-bg-out 0.2s ease forwards;
+  pointer-events: none;
+}
+.dsb-modal-root.is-lib.is-closing > .dsb-lib,
+.dsb-modpick-root.is-closing > .dsb-modpick {
+  animation: dsbx-out 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+/* cards: the first dozen arrive one after another, the rest with the last */
+.dsb-modal-root.is-lib .dsb-lib-card {
+  animation: dsbx-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.2s;
+}
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(1) { animation-delay: 0.08s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(2) { animation-delay: 0.1s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(3) { animation-delay: 0.12s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(4) { animation-delay: 0.14s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(5) { animation-delay: 0.15s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(6) { animation-delay: 0.16s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(7) { animation-delay: 0.17s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(8) { animation-delay: 0.18s; }
+.dsb-modal-root.is-lib .dsb-lib-card:nth-child(9) { animation-delay: 0.19s; }
+/* the module rail slides in beside them */
+.dsb-modal-root.is-lib .dsb-mod-rail {
+  animation: dsbx-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+}
+/* Reduced motion (also what Windows reports when its animation effects are
+   off): no rising or scaling, just the fade — still smooth, nothing moves. */
+@keyframes dsbx-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes dsbx-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-modal-root.is-lib > .dsb-lib,
+  .dsb-modpick-root > .dsb-modpick,
+  .dsb-modal-root.is-lib .dsb-lib-card,
+  .dsb-modal-root.is-lib .dsb-mod-rail {
+    animation-name: dsbx-fade-in;
+  }
+  .dsb-modal-root.is-lib.is-closing > .dsb-lib,
+  .dsb-modpick-root.is-closing > .dsb-modpick {
+    animation-name: dsbx-fade-out;
+  }
+}

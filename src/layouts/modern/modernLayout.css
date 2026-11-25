@@ -1,0 +1,1044 @@
+/* =========================================================================
+   Modern healthcare ERP shell — Phase 1 (master layout, header, sidebar).
+   Scoped under .modern-layout. NOTE: the app's global theme.css paints every
+   <button> (e.g. `.purple_theme button{background:#B48AF6}`), so interactive
+   rules here are deliberately high-specificity + use !important on
+   background/border to stay immune to the active colour theme.
+   ========================================================================= */
+
+.modern-layout {
+  --c-primary: #6d28d9;
+  --c-primary-2: #8b5cf6;
+  --c-primary-grad: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-2) 100%);
+  /* soft tints derived from the accent so per-theme overrides only set --c-primary */
+  --c-primary-soft: color-mix(in srgb, var(--c-primary) 9%, #ffffff);
+  --c-primary-soft-2: color-mix(in srgb, var(--c-primary) 15%, #ffffff);
+  --c-primary-bar: color-mix(in srgb, var(--c-primary), #000 12%);
+
+  --c-bg: #f4f6fb;
+  --c-surface: #ffffff;
+  --c-surface-2: #f6f8fc;
+  --c-border: #e7eaf1;
+  --c-text: #1f2937;
+  --c-text-muted: #5b6472;
+  --c-text-faint: #97a0b0;
+
+  --c-danger: #ef4444;
+  --c-warning: #f59e0b;
+  --c-success: #16a34a;
+
+  --ml-sidebar-w: 258px;
+  --ml-sidebar-cw: 74px;
+  --ml-header-h: 62px;
+  --ml-shadow-2: 0 12px 34px rgba(16, 24, 40, 0.14);
+
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: 13.5px;
+}
+
+.modern-layout.theme-dark {
+  --c-bg: #0f172a;
+  --c-surface: #1e293b;
+  --c-surface-2: #18233a;
+  --c-border: #2b3a52;
+  --c-text: #e5e9f0;
+  --c-text-muted: #9aa6b8;
+  --c-text-faint: #64748b;
+  --c-primary-soft: color-mix(in srgb, var(--c-primary) 22%, #1e293b);
+  --c-primary-soft-2: color-mix(in srgb, var(--c-primary) 30%, #1e293b);
+}
+
+/* ---- follow the app's selected colour theme (class lives on #root) ----
+   Only --c-primary/-2 need setting; soft tints + bar derive via color-mix. */
+.default_theme .modern-layout { --c-primary: #15c39a; --c-primary-2: #22d8a9; }
+.orange_theme .modern-layout { --c-primary: #f4730d; --c-primary-2: #ff8c2e; }
+.peach_theme .modern-layout { --c-primary: #bc8f3c; --c-primary-2: #d4a851; }
+.pale_pink_theme .modern-layout { --c-primary: #bc3c8b; --c-primary-2: #d452a0; }
+.red_theme .modern-layout { --c-primary: #8b2424; --c-primary-2: #b33333; }
+.sky_blue_theme .modern-layout { --c-primary: #03a0e7; --c-primary-2: #36b5ef; }
+.light_blue_theme .modern-layout { --c-primary: #5b7fd6; --c-primary-2: #7ea0ea; }
+.pink_theme .modern-layout { --c-primary: #e06a92; --c-primary-2: #ffa4c3; }
+.purple_theme .modern-layout { --c-primary: #9b6ef0; --c-primary-2: #b48af6; }
+.gray_theme .modern-layout { --c-primary: #5f615f; --c-primary-2: #7d807d; }
+.pastel_pink_theme .modern-layout { --c-primary: #e58aa0; --c-primary-2: #fcdede; }
+.light_peach_theme .modern-layout { --c-primary: #e09a6a; --c-primary-2: #ffe6d4; }
+.pale_peach_theme .modern-layout { --c-primary: #d9a857; --c-primary-2: #fff3da; }
+.pale_yellow_theme .modern-layout { --c-primary: #c9a23a; --c-primary-2: #fcfaca; }
+.pale_green_theme .modern-layout { --c-primary: #7fae33; --c-primary-2: #eaffb9; }
+.light_celadon_theme .modern-layout { --c-primary: #6fae4f; --c-primary-2: #ddffc3; }
+.pale_mint_theme .modern-layout { --c-primary: #45b27e; --c-primary-2: #e1ffee; }
+.pale_aqua_theme .modern-layout { --c-primary: #2eb6ad; --c-primary-2: #dafffc; }
+.pale_lavender_blue_theme .modern-layout { --c-primary: #6b78d6; --c-primary-2: #e1e6fe; }
+.pale_gray_theme .modern-layout { --c-primary: #7c7c9a; --c-primary-2: #dfdfef; }
+.pale_mauve_theme .modern-layout { --c-primary: #b06ad0; --c-primary-2: #f2d7fe; }
+.lavender_blush_theme .modern-layout { --c-primary: #c46ec8; --c-primary-2: #f7e0f8; }
+.pale_rose_theme .modern-layout { --c-primary: #e06ac0; --c-primary-2: #ffddf8; }
+.lite_pale_theme .modern-layout { --c-primary: #e06a92; --c-primary-2: #ffe9f0; }
+.blush_pink_theme .modern-layout { --c-primary: #e06a82; --c-primary-2: #ffdde6; }
+.light_pink_theme .modern-layout { --c-primary: #e07a7a; --c-primary-2: #fee5e5; }
+.dark_green_theme .modern-layout { --c-primary: #15803d; --c-primary-2: #1f9d4c; }
+.forest_green_theme .modern-layout { --c-primary: #1b571b; --c-primary-2: #2a7a2a; }
+.deep_teal_theme .modern-layout { --c-primary: #1c5254; --c-primary-2: #2a7477; }
+
+/* Guard: neutralise theme.css's purple button fills ONLY inside the shell
+   chrome (sidebar + topbar). MUST NOT touch page-content buttons (Save,
+   Search, etc.) — doing so hides them. Component rules with a fill use
+   background-image / higher specificity and still win. */
+.modern-layout .modern-sidebar button,
+.modern-layout .ml-topbar button {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+/* ============================== SIDEBAR ================================= */
+.modern-layout .modern-sidebar {
+  width: var(--ml-sidebar-w);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface);
+  border-right: 1px solid var(--c-border);
+  transition: width 0.2s ease;
+  z-index: 1040;
+}
+.modern-layout.ml-collapsed .modern-sidebar {
+  width: var(--ml-sidebar-cw);
+}
+
+.modern-layout .ml-brand {
+  height: var(--ml-header-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+.modern-layout .ml-brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+.modern-layout .ml-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+.modern-layout .ml-brand-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modern-layout .ml-brand-sub {
+  font-size: 11px;
+  color: var(--c-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modern-layout .ml-collapse-btn {
+  margin-left: auto;
+  color: var(--c-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.modern-layout .ml-collapse-btn:hover {
+  background-color: var(--c-surface-2) !important;
+  color: var(--c-primary);
+}
+.modern-layout.ml-collapsed .ml-collapse-btn {
+  margin-left: 0;
+}
+
+.modern-layout .ml-search {
+  position: relative;
+  margin: 12px 12px 6px;
+}
+.modern-layout .ml-search input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  padding: 0 30px 0 34px;
+  font-size: 13px;
+  outline: none;
+}
+.modern-layout .ml-search input:focus {
+  border-color: var(--c-primary-2);
+  box-shadow: 0 0 0 3px var(--c-primary-soft);
+}
+.modern-layout .ml-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--c-text-faint);
+}
+.modern-layout .ml-search-clear {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--c-text-faint);
+  cursor: pointer;
+}
+
+.modern-layout .ml-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px 14px;
+}
+.modern-layout .ml-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.modern-layout .ml-nav::-webkit-scrollbar-thumb {
+  background: var(--c-border);
+  border-radius: 6px;
+}
+
+.modern-layout .ml-group {
+  margin-bottom: 2px;
+}
+.modern-layout .ml-group-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--c-text-muted);
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.modern-layout .ml-group-head:hover {
+  background-color: var(--c-primary-soft) !important;
+  color: var(--c-primary);
+}
+.modern-layout .ml-group.active > .ml-group-head,
+.modern-layout .ml-group.active > .ml-group-head:hover {
+  background-image: var(--c-primary-grad);
+  background-color: transparent !important;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--c-primary) 32%, transparent);
+}
+.modern-layout .ml-group-icon-wrap {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.modern-layout .ml-group-icon {
+  font-size: 15px;
+}
+.modern-layout .ml-group-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modern-layout .ml-chevron {
+  font-size: 10px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.modern-layout .ml-sublist {
+  list-style: none;
+  margin: 2px 0 6px;
+  padding: 2px 0 2px 6px;
+  position: relative;
+}
+.modern-layout .ml-sublist::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 2px;
+  bottom: 8px;
+  width: 1.5px;
+  background: var(--c-border);
+}
+.modern-layout .ml-subitem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--c-text-muted);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12.8px;
+  text-align: left;
+}
+.modern-layout .ml-subitem:hover {
+  background-color: var(--c-surface-2) !important;
+  color: var(--c-text);
+}
+.modern-layout .ml-subitem.active {
+  background-color: var(--c-primary-soft-2) !important;
+  color: var(--c-primary);
+  font-weight: 600;
+}
+.modern-layout .ml-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 8px;
+  background: var(--c-text-faint);
+}
+.modern-layout .ml-subitem.active .ml-dot {
+  background: var(--c-primary);
+}
+.modern-layout .ml-sub-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modern-layout.ml-collapsed .ml-group-head {
+  justify-content: center;
+  padding: 12px 0;
+}
+/* collapsed rail brand: only the toggle (avoid logo+hamburger overlap in 74px) */
+.modern-layout.ml-collapsed .ml-brand {
+  justify-content: center;
+  padding: 0 8px;
+}
+.modern-layout.ml-collapsed .ml-brand-logo {
+  display: none;
+}
+.modern-layout.ml-collapsed .ml-collapse-btn {
+  margin: 0;
+}
+
+.modern-layout .ml-side-footer {
+  border-top: 1px solid var(--c-border);
+  padding: 10px;
+  flex-shrink: 0;
+}
+
+/* relocated header action icons (portaled from <Header/> in Modern mode) */
+.modern-layout .ml-side-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 6px 2px;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-surface-2);
+}
+.modern-layout .ml-side-actions:empty {
+  display: none;
+}
+.modern-layout .ml-side-actions > li,
+.modern-layout .ml-side-actions .nav-item {
+  list-style: none;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 4px;
+}
+.modern-layout .ml-side-actions i,
+.modern-layout .ml-side-actions svg,
+.modern-layout .ml-side-actions .nav-link,
+.modern-layout .ml-side-actions .text-white,
+.modern-layout .ml-side-actions label {
+  color: var(--c-text-muted) !important;
+}
+.modern-layout .ml-side-actions button {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.modern-layout .ml-side-actions .nav-item:hover i,
+.modern-layout .ml-side-actions .nav-item:hover svg {
+  color: var(--c-primary) !important;
+}
+/* keep the relocated Layout switch pill intact */
+.modern-layout .ml-side-actions .ml-switch .ml-switch-btn.active {
+  background-image: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-2) 100%) !important;
+  background-color: var(--c-primary) !important;
+  color: #fff !important;
+}
+.modern-layout .ml-side-actions .ml-switch .ml-switch-btn {
+  color: var(--c-text-muted) !important;
+}
+/* hide the action row in the collapsed icon rail (too cramped) */
+.modern-layout.ml-collapsed .ml-side-actions {
+  display: none;
+}
+.modern-layout .ml-qa-side-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-image: var(--c-primary-grad);
+  background-color: transparent !important;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--c-primary) 28%, transparent);
+}
+.modern-layout .ml-qa-side-btn:hover {
+  filter: brightness(1.06);
+}
+.modern-layout .ml-side-version {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--c-text-faint);
+}
+
+/* Hospital + Role selectors relocated into the sidebar (portaled) */
+.modern-layout .ml-side-selects {
+  list-style: none;
+  margin: 12px 12px 2px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.modern-layout .ml-side-selects:empty {
+  display: none;
+}
+.modern-layout.ml-collapsed .ml-side-selects {
+  display: none;
+}
+.modern-layout .ml-side-selects > li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.modern-layout .ml-side-selects .headerboxsize,
+.modern-layout .ml-side-selects .roll-off,
+.modern-layout .ml-side-selects .form-group {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+/* Change-Role + Set-Default quick buttons above the search box */
+.modern-layout .ml-side-topactions {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 8px 12px 0;
+  padding: 0;
+}
+.modern-layout .ml-side-topactions:empty {
+  display: none;
+}
+.modern-layout.ml-collapsed .ml-side-topactions {
+  display: none;
+}
+.modern-layout .ml-side-topactions > li,
+.modern-layout .ml-side-topactions .nav-item {
+  list-style: none;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-surface-2);
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.modern-layout .ml-side-topactions > li:hover {
+  background: var(--c-primary-soft);
+  border-color: var(--c-primary-2);
+}
+.modern-layout .ml-side-topactions button {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  /* fill the whole tile so the entire button area is clickable */
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.modern-layout .ml-side-topactions i,
+.modern-layout .ml-side-topactions svg {
+  color: var(--c-text-muted) !important;
+  font-size: 15px;
+}
+.modern-layout .ml-side-topactions > li:hover i,
+.modern-layout .ml-side-topactions > li:hover svg {
+  color: var(--c-primary) !important;
+}
+
+/* ============================== MAIN COLUMN ============================ */
+.modern-layout .ml-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================== TOPBAR ================================ */
+/* The topbar reuses the classic <Header/> for full feature parity and
+   restyles it (white surface, dark icons) so it can't be themed purple. */
+.modern-layout .ml-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  width: 100%;
+  box-sizing: border-box;
+  /* Desktop: NO visible header. <Header/> stays mounted only for its handlers,
+     modals and as the portal source; its controls (selects, action icons,
+     profile) live in the sidebar. Pages start flush at the very top. */
+  height: 0;
+  overflow: visible;
+}
+/* mobile/tablet: keep a slim bar so the hamburger (drawer toggle) is reachable */
+.modern-layout.ml-mobile .ml-topbar {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+}
+
+/* the reused header navbar: collapsed on desktop, slim bar on mobile */
+.modern-layout .ml-topbar .main-header,
+.modern-layout .ml-topbar .main-header.navbar {
+  flex: 1;
+  min-width: 0;
+  min-height: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
+.modern-layout.ml-mobile .ml-topbar .main-header,
+.modern-layout.ml-mobile .ml-topbar .main-header.navbar {
+  height: auto !important;
+  min-height: 52px !important;
+}
+/* sidebar already carries the brand → hide the header's logo */
+.modern-layout .ml-topbar .main-header .img-conatiner {
+  display: none !important;
+}
+/* recolour everything for a light surface (header was built for a dark bar) */
+.modern-layout .ml-topbar .main-header i,
+.modern-layout .ml-topbar .main-header svg,
+.modern-layout .ml-topbar .main-header .nav-link,
+.modern-layout .ml-topbar .main-header label,
+.modern-layout .ml-topbar .main-header .control-label,
+.modern-layout .ml-topbar .main-header .text-white {
+  color: var(--c-text-muted) !important;
+}
+/* neutralise the global theme's purple button fills inside the header */
+.modern-layout .ml-topbar .main-header button,
+.modern-layout .ml-topbar .main-header .nav-link {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.modern-layout .ml-topbar .main-header .nav-item {
+  display: flex;
+  align-items: center;
+}
+.modern-layout .ml-topbar .main-header .nav-item:hover i,
+.modern-layout .ml-topbar .main-header .nav-item:hover svg {
+  color: var(--c-primary) !important;
+}
+/* tidy the centre/role selects + left-align them (search was removed) */
+.modern-layout .ml-topbar .main-header .navbar-nav.ml-auto {
+  margin-left: 0 !important;
+  gap: 6px;
+}
+.modern-layout .ml-topbar .main-header .headerboxsize {
+  min-width: 180px;
+}
+.modern-layout .ml-topbar .main-header .form-group {
+  margin-bottom: 0 !important;
+}
+/* profile name */
+.modern-layout .ml-topbar .main-header .control-label {
+  font-weight: 600;
+}
+/* keep the Layout switch pill intact (the button-neutraliser above must not
+   strip the active segment's fill) */
+.modern-layout .ml-topbar .main-header .ml-switch .ml-switch-btn.active {
+  background-image: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%) !important;
+  background-color: #6d28d9 !important;
+  color: #fff !important;
+}
+.modern-layout .ml-topbar .main-header .ml-switch .ml-switch-btn {
+  color: #5b6472 !important;
+}
+
+/* global search */
+.modern-layout .ml-search-global {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: clamp(240px, 30vw, 520px);
+  height: 40px;
+  padding: 0 12px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+}
+.modern-layout .ml-search-global:focus-within {
+  border-color: var(--c-primary-2);
+  box-shadow: 0 0 0 3px var(--c-primary-soft);
+}
+.modern-layout .ml-search-global > i {
+  color: var(--c-text-faint);
+  font-size: 13px;
+}
+.modern-layout .ml-search-global input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--c-text);
+  min-width: 0;
+}
+.modern-layout .ml-kbd {
+  font-size: 10.5px;
+  color: var(--c-text-faint);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.modern-layout .ml-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  box-shadow: var(--ml-shadow-2);
+  padding: 6px;
+  z-index: 50;
+}
+.modern-layout .ml-search-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: transparent !important;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--c-text);
+  font-size: 13px;
+}
+.modern-layout .ml-search-item:hover {
+  background-color: var(--c-primary-soft) !important;
+}
+.modern-layout .ml-search-item i {
+  font-size: 11px;
+  color: var(--c-primary) !important;
+}
+.modern-layout .ml-search-item small {
+  margin-left: auto;
+  color: var(--c-text-faint);
+  font-size: 11px;
+}
+
+/* ============================== QUICK ACTIONS ========================== */
+.modern-layout .ml-qa {
+  position: relative;
+  display: inline-flex;
+}
+.modern-layout .ml-side-footer .ml-qa {
+  display: block;
+  width: 100%;
+}
+.modern-layout .ml-qa-pop {
+  position: absolute;
+  width: 300px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 16px;
+  box-shadow: var(--ml-shadow-2);
+  padding: 14px;
+  z-index: 1200;
+  display: none;
+}
+.modern-layout .ml-qa-pop.open {
+  display: block;
+  animation: ml-qa-in 0.14s ease;
+}
+@keyframes ml-qa-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modern-layout .ml-qa-right { top: calc(100% + 8px); right: 0; }
+/* sidebar Quick Actions: fly out to the RIGHT of the rail */
+.modern-layout .ml-qa-side { bottom: 0; left: calc(100% + 12px); }
+.modern-layout.ml-mobile .ml-qa-side {
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  width: auto;
+}
+.modern-layout .ml-qa-head {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-text-muted);
+  margin-bottom: 12px;
+}
+/* relocated header action icons, laid out as a tidy tile grid */
+.modern-layout .ml-qa-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.modern-layout .ml-qa-actions > li,
+.modern-layout .ml-qa-actions .nav-item {
+  list-style: none;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-surface-2);
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.modern-layout .ml-qa-actions > li:hover,
+.modern-layout .ml-qa-actions .nav-item:hover {
+  background: var(--c-primary-soft);
+  border-color: var(--c-primary-2);
+}
+.modern-layout .ml-qa-actions i,
+.modern-layout .ml-qa-actions svg,
+.modern-layout .ml-qa-actions .nav-link,
+.modern-layout .ml-qa-actions .text-white,
+.modern-layout .ml-qa-actions label {
+  color: var(--c-text-muted) !important;
+  font-size: 15px;
+}
+.modern-layout .ml-qa-actions > li:hover i,
+.modern-layout .ml-qa-actions > li:hover svg {
+  color: var(--c-primary) !important;
+}
+.modern-layout .ml-qa-actions button {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+/* hide the blank/dead tile (OverlayDropdown — its toggle is commented out;
+   only it carries the .colortheme-button class) */
+.modern-layout .ml-qa-actions > li:has(.colortheme-button) {
+  display: none !important;
+}
+
+/* FULL-TILE CLICK: the element that carries the handler (a <button>, a bare
+   <i onClick>, or a react-bootstrap dropdown toggle) must cover the whole tile.
+   Use direct-child combinators + toggle classes so dropdown-MENU contents
+   (e.g. the theme list buttons) are never affected. Excludes the switch. */
+.modern-layout .ml-qa-actions > li:not(:has(.ml-switch)) {
+  align-items: stretch;
+}
+.modern-layout .ml-qa-actions > li:not(:has(.ml-switch)) > *:not(style):not(script):not(pf-dropdown),
+.modern-layout .ml-qa-actions > li:not(:has(.ml-switch)) > * > *:not(style):not(script):not([slot]):not(.dropdown-menu):not(.font-size-dropdown):not(.notification-dropdown-body):not(.ru-bell-panel) {
+  width: 100% !important;
+  min-height: 46px;
+  height: 100%;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+/* Language is a @profabric <pf-dropdown> web component — let it render with its
+   own styling, just center it in the tile and lift its menu above the tiles. */
+.modern-layout .ml-qa-actions > li:has(pf-dropdown) {
+  position: relative;
+  z-index: 5;
+}
+.modern-layout .ml-qa-actions pf-dropdown {
+  margin: 0 auto;
+}
+/* belt-and-suspenders: never let an injected <style> become visible */
+.modern-layout .ml-qa-actions style {
+  display: none !important;
+}
+/* CLASSIC / MODERN — premium segmented control that matches the icon tiles */
+.modern-layout .ml-qa-actions > li:has(.ml-switch) {
+  grid-column: 1 / -1;
+  background: transparent !important;
+  border: 0 !important;
+  min-height: 0;
+  padding: 2px 0 4px;
+}
+.modern-layout .ml-qa-actions .ml-switch {
+  width: 100%;
+  display: flex;
+  gap: 4px;
+  height: 46px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--c-surface-2) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 100%;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--c-text-muted) !important;
+  background: transparent !important;
+  transition: color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 12px;
+  line-height: 1;
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn:first-child::before {
+  content: "\f108"; /* desktop */
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn:last-child::before {
+  content: "\f135"; /* rocket */
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn:hover {
+  color: var(--c-text) !important;
+  background: var(--c-surface) !important;
+}
+.modern-layout .ml-qa-actions .ml-switch .ml-switch-btn.active {
+  background-image: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-2) 100%) !important;
+  background-color: var(--c-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--c-primary) 35%, transparent);
+}
+
+/* ===== sidebar profile option (portaled from <Header/>) ===== */
+.modern-layout .ml-side-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-surface-2);
+}
+.modern-layout .ml-side-profile:empty { display: none; }
+.modern-layout .ml-side-profile > li,
+.modern-layout .ml-side-profile .nav-item {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.modern-layout .ml-side-profile > li:first-child { flex: 1; min-width: 0; }
+.modern-layout .ml-side-profile button {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+}
+.modern-layout .ml-side-profile img {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.modern-layout .ml-side-profile .control-label,
+.modern-layout .ml-side-profile .text-white {
+  color: var(--c-text) !important;
+  font-size: 13px;
+  font-weight: 600;
+  display: block !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+.modern-layout .ml-side-profile .fa-sign-out-alt {
+  color: var(--c-text-muted) !important;
+  font-size: 16px;
+  cursor: pointer;
+}
+.modern-layout .ml-side-profile .fa-sign-out-alt:hover {
+  color: var(--c-danger) !important;
+}
+/* the profile card flies out to the right of the sidebar */
+.modern-layout .ml-side-profile .manage_usermodel {
+  left: calc(100% + 12px) !important;
+  right: auto !important;
+  bottom: 0 !important;
+  top: auto !important;
+}
+.modern-layout.ml-collapsed .ml-side-profile .control-label {
+  display: none !important;
+}
+/* collapsed rail: stack avatar + logout vertically so they don't overlap */
+.modern-layout.ml-collapsed .ml-side-profile {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+}
+.modern-layout.ml-collapsed .ml-side-profile > li {
+  flex: 0 0 auto;
+  width: auto;
+  justify-content: center;
+}
+.modern-layout.ml-collapsed .ml-side-profile button {
+  width: auto;
+  justify-content: center;
+}
+
+/* ============================== CONTENT =============================== */
+/* pages start flush at the top, right after the sticky topbar (#3) */
+.modern-layout .ml-content {
+  flex: 1;
+  padding: 0;
+  min-width: 0;
+  overflow-x: auto;
+}
+/* Many pages hardcode `position:sticky; top:80px` (and similar) to clear the
+   CLASSIC fixed header. The Modern shell has NO top header, so that offset
+   leaves a gap that scrolled content shows through (overlap). Pin such bars to
+   the very top instead. */
+.modern-layout .ml-content [style*="sticky"] {
+  top: 0 !important;
+}
+
+/* ============================== MOBILE / TABLET ======================= */
+.modern-layout.ml-mobile .modern-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  transform: translateX(-100%);
+  transition: transform 0.24s ease;
+  width: var(--ml-sidebar-w);
+  box-shadow: var(--ml-shadow-2);
+}
+.modern-layout.ml-mobile.ml-drawer-open .modern-sidebar {
+  transform: translateX(0);
+}
+.modern-layout.ml-mobile .ml-main {
+  width: 100%;
+}
+.modern-layout .ml-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1035;
+}
+
+@media (max-width: 1199px) {
+  .modern-layout .ml-select {
+    min-width: 150px;
+  }
+}
+@media (max-width: 991px) {
+  .modern-layout .ml-selects {
+    display: none;
+  }
+}
+@media (max-width: 575.98px) {
+  .modern-layout .ml-content {
+    padding: 10px;
+  }
+  .modern-layout .ml-kbd {
+    display: none;
+  }
+  .modern-layout .ml-profile-meta {
+    display: none;
+  }
+}
+
+/* OPD "Last Visit" notification cards are position:fixed at left:20px (correct
+   for the classic shell, which has no fixed left rail). The modern sidebar
+   occupies that region and hides them, so offset the cards past the sidebar.
+   Classic view is untouched — these rules require a .modern-layout ancestor. */
+.modern-layout .notification-card {
+  left: calc(var(--ml-sidebar-w) + 20px);
+}
+.modern-layout.ml-collapsed .notification-card {
+  left: calc(var(--ml-sidebar-cw) + 20px);
+}
+.modern-layout.ml-mobile .notification-card {
+  /* Sidebar is an off-canvas drawer on mobile, so the default edge is fine. */
+  left: 20px;
+}

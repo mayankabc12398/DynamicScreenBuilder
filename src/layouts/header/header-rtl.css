@@ -1,0 +1,88 @@
+/*
+ * Header + menu bar, right to left.
+ *
+ * layouts/index.jsx (and LegacyLayout) set `dir="rtl"` on #main-header while
+ * the app's language is written right to left (hooks/useRtlDir). `dir` alone
+ * mirrors the flex rows — logo, selects, icons, menu, tabs all swap sides.
+ * These rules only fix what the header draws with physical sides: the
+ * absolutely placed logo card, the search icon, and Bootstrap 4's
+ * left/right utilities. Every rule is scoped to [dir="rtl"], so the
+ * left-to-right header is untouched.
+ */
+
+/* The white logo card hangs from the top-right corner instead. */
+#main-header[dir="rtl"] .img-conatiner {
+  left: auto;
+  right: 0;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 15px !important;
+}
+
+/* Menu search: magnifier on the left, typed text from the right. */
+#main-header[dir="rtl"] .search_icon {
+  right: auto;
+  left: 1rem;
+}
+#main-header[dir="rtl"] .custom-magic-search input {
+  text-align: right;
+}
+#main-header[dir="rtl"] input[style*="text-align: left"] {
+  text-align: right !important;
+}
+
+/* Settings (gear) panel. Left to right it hangs from the gear's right edge
+   and opens leftward; mirrored the gear sits near the left edge of the
+   screen, so it hangs from the gear's left edge and opens rightward — and
+   the arrow pointing at the gear moves with it. */
+#main-header[dir="rtl"] .header-settings-group .header-settings-panel {
+  right: auto;
+  left: -6px;
+  transform-origin: top left;
+}
+#main-header[dir="rtl"] .header-settings-group .header-settings-panel::before {
+  right: auto;
+  left: 14px;
+}
+
+/* Sub-menu caret in a menu item. */
+#main-header[dir="rtl"] .nav-sidebar .nav-link > .right,
+#main-header[dir="rtl"] .nav-sidebar .nav-link > p > .right {
+  right: auto !important;
+  left: 0 !important;
+}
+
+/* Bootstrap 4 spacing / float / alignment utilities used in the header. */
+#main-header[dir="rtl"] .ml-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+#main-header[dir="rtl"] .ml-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+#main-header[dir="rtl"] .ml-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+#main-header[dir="rtl"] .ml-4 { margin-left: 0 !important; margin-right: 1.5rem !important; }
+#main-header[dir="rtl"] .mr-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+#main-header[dir="rtl"] .mr-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+#main-header[dir="rtl"] .mr-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+#main-header[dir="rtl"] .mr-4 { margin-right: 0 !important; margin-left: 1.5rem !important; }
+#main-header[dir="rtl"] .ml-auto { margin-left: 0 !important; margin-right: auto !important; }
+#main-header[dir="rtl"] .mr-auto { margin-right: 0 !important; margin-left: auto !important; }
+#main-header[dir="rtl"] .pl-2 { padding-left: 0 !important; padding-right: 0.5rem !important; }
+#main-header[dir="rtl"] .pr-2 { padding-right: 0 !important; padding-left: 0.5rem !important; }
+#main-header[dir="rtl"] .float-left { float: right !important; }
+#main-header[dir="rtl"] .float-right { float: left !important; }
+#main-header[dir="rtl"] .text-left { text-align: right !important; }
+#main-header[dir="rtl"] .text-right { text-align: left !important; }
+
+/* Arrows point along the line, so they turn round: the menu's « » scroll
+   buttons, carets, and the logout arrow (which leaves toward the end). */
+#main-header[dir="rtl"] .fa-angle-double-left,
+#main-header[dir="rtl"] .fa-angle-double-right,
+#main-header[dir="rtl"] .fa-angle-left,
+#main-header[dir="rtl"] .fa-angle-right,
+#main-header[dir="rtl"] .fa-chevron-left,
+#main-header[dir="rtl"] .fa-chevron-right,
+#main-header[dir="rtl"] .fa-arrow-left,
+#main-header[dir="rtl"] .fa-arrow-right,
+#main-header[dir="rtl"] .fa-sign-out-alt,
+#main-header[dir="rtl"] .fa-sign-in-alt,
+#main-header[dir="rtl"] .lucide-log-out,
+#main-header[dir="rtl"] .lucide-chevron-left,
+#main-header[dir="rtl"] .lucide-chevron-right {
+  transform: scaleX(-1);
+}

@@ -1,0 +1,110 @@
+/* Modern skin — make legacy bootstrap tables (NestedRowTable / NewTables, any
+   <Table className="mainTable"> + nested <Table className="nestedTable">) look
+   like the modern <Tables/> "modernCompact" skin (customTable/index.jsx).
+   CHROME ONLY — header gradient + compact clean rows + hover. Row background /
+   color-coding (inline tr bg + getRowClass) is left untouched so all
+   functionality is preserved. Excludes .modernCompact (the real modern table
+   already styles itself inline). Activates only when html[data-design="modern"]. */
+
+:root[data-design="modern"] .mainTable:not(.modernCompact),
+:root[data-design="modern"] .nestedTable {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-size: 13px;
+  color: #334155;
+}
+
+/* Header: blue-grey gradient (mirrors modernCompact thead th) */
+:root[data-design="modern"] .mainTable:not(.modernCompact) thead th,
+:root[data-design="modern"] .nestedTable thead th {
+  padding: 4px 9px !important;
+  background: linear-gradient(180deg, #f7faff, #edf3fb) !important;
+  background-image: linear-gradient(180deg, #f7faff, #edf3fb) !important;
+  color: #41557a !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: none !important;
+  border-bottom: 2px solid #dbe6f5 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+}
+
+:root[data-design="modern"] .mainTable:not(.modernCompact) thead th:hover,
+:root[data-design="modern"] .nestedTable thead th:hover {
+  color: #1f3a6b !important;
+  background: linear-gradient(180deg, #eef5ff, #e4eefb) !important;
+}
+
+/* Body cells: compact, light grid lines (mirrors modernCompact tbody td) */
+:root[data-design="modern"] .mainTable:not(.modernCompact) tbody td,
+:root[data-design="modern"] .nestedTable tbody td {
+  padding: 3px 9px !important;
+  border-bottom: 1px solid #f1f3f7 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  font-weight: 400 !important;
+  font-size: 12.5px;
+  vertical-align: middle !important;
+}
+
+/* Row hover — soft blue, only when the row has no color-coding background */
+:root[data-design="modern"] .mainTable:not(.modernCompact) tbody tr:hover > td,
+:root[data-design="modern"] .nestedTable tbody tr:hover > td {
+  background: #EEF4FF;
+}
+
+/* Nested sub-table: rounded, slightly inset so it reads as a child */
+:root[data-design="modern"] .nestedTable {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e6ecf4 !important;
+  margin: 4px 0 !important;
+}
+
+:root[data-design="modern"] .nestedTableTD {
+  background: #f8fafc !important;
+  padding: 4px 8px !important;
+}
+
+/* ---- Dark mode: keep text readable (light header/cells would hide the
+   light theme text). Mirrors the table.css dark treatment. ---- */
+:root[data-design="modern"][data-theme="dark"] .mainTable:not(.modernCompact),
+:root[data-design="modern"][data-theme="dark"] .nestedTable {
+  color: #E2E8F0;
+}
+
+:root[data-design="modern"][data-theme="dark"] .mainTable:not(.modernCompact) thead th,
+:root[data-design="modern"][data-theme="dark"] .nestedTable thead th {
+  background: linear-gradient(180deg, #1e293b, #172033) !important;
+  background-image: linear-gradient(180deg, #1e293b, #172033) !important;
+  color: #cbd5e1 !important;
+  border-bottom: 2px solid #334155 !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .mainTable:not(.modernCompact) thead th:hover,
+:root[data-design="modern"][data-theme="dark"] .nestedTable thead th:hover {
+  background: linear-gradient(180deg, #243044, #1b2436) !important;
+  color: #e2e8f0 !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .mainTable:not(.modernCompact) tbody td,
+:root[data-design="modern"][data-theme="dark"] .nestedTable tbody td {
+  color: #E2E8F0;
+  border-bottom: 1px solid #1f2a3a !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .mainTable:not(.modernCompact) tbody tr:hover > td,
+:root[data-design="modern"][data-theme="dark"] .nestedTable tbody tr:hover > td {
+  background: #1e293b;
+}
+
+:root[data-design="modern"][data-theme="dark"] .nestedTable {
+  border-color: #334155 !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .nestedTableTD {
+  background: #0f172a !important;
+}

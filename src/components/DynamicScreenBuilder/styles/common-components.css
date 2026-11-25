@@ -1,0 +1,757 @@
+/**
+ * Common components — the palette's fifth section, the canvas right-click menu
+ * and the save dialog. Kept beside builder.css rather than inside it because it
+ * is one feature's chrome; the tokens it uses are builder.css's own.
+ */
+
+/* ----------------------------------------------------------------- palette */
+
+.dsb-pal-common {
+  padding: 1px 2px 6px;
+}
+.dsb-pal-sub + .dsb-pal-sub {
+  margin-top: 3px;
+}
+.dsb-pal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 2px 1px 4px;
+}
+/* A category heading (IPD, OPD…) that folds its rows away. A Tap span, not a
+   <button>, so the host theme cannot paint it solid. */
+.dsbi-tap.dsb-pal-sub-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--dsb-cat, #16a34a) 62%, #64748b);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.dsbi-tap.dsb-pal-sub-head:hover {
+  background: color-mix(in srgb, var(--dsb-cat, #16a34a) 9%, transparent);
+  color: var(--dsb-cat, #16a34a);
+}
+.dsb-pal-sub-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-pal-sub-n {
+  flex: none;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 0.7917rem;
+  line-height: 15px;
+  text-align: center;
+  letter-spacing: 0;
+  background: color-mix(in srgb, var(--dsb-cat, #16a34a) 12%, transparent);
+  color: var(--dsb-cat, #16a34a);
+}
+.dsb-pal-sub-chev {
+  flex: none;
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dsb-pal-sub.is-shut .dsb-pal-sub-chev {
+  transform: rotate(-90deg);
+}
+/* Height animates through the grid row: 1fr open, 0fr shut — no measuring,
+   whatever the number of rows. */
+.dsb-pal-sub-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 260ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease;
+}
+.dsb-pal-sub-body > .dsb-pal-rows {
+  min-height: 0;
+  overflow: hidden;
+  transition: padding 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* A 0fr row still keeps its padding; it folds with the rest. */
+.dsb-pal-sub.is-shut > .dsb-pal-sub-body > .dsb-pal-rows {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.dsb-pal-sub.is-shut > .dsb-pal-sub-body {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-pal-sub-body,
+  .dsb-pal-sub-chev {
+    transition: none;
+  }
+}
+/* One row per component — icon, name, badges — so ten of them are still ten
+   readable lines rather than five screens of tiles. */
+.dsb-pal-item.is-common {
+  display: flex;
+  /* Both of these belong to the two-column tile the registry sections use, and
+     both have to be undone by name — inheriting `column` here put the delete
+     button on a line of its own and centred the row. */
+  flex-direction: row;
+  gap: 0;
+  align-items: center;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+/* Transparent so the tile around it supplies the pastel — and !important
+   because assets/css/theme.css repaints every <button> with the theme colour
+   (see the note in builder.css beside .dsb-pal-cat-head). */
+.dsb-pal-item-main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 3px 7px;
+  min-height: 27px;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--b-text);
+  text-align: left;
+  cursor: grab;
+}
+.dsb-pal-item.is-common .dsb-pal-ic {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+.dsb-pal-item.is-common .dsb-pal-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9583rem;
+}
+/* Static in a row — the absolute corner position belongs to the tile layout. */
+.dsb-pal-item.is-common .dsb-pal-flag {
+  position: static;
+  flex: none;
+  padding: 1px 5px;
+}
+.dsb-pal-item-main:active {
+  cursor: grabbing;
+}
+/* Always on show, not hover-revealed: a control nobody can see until they
+   happen to be over the row is a control they go looking for. */
+.dsb-pal-item-del {
+  flex: none;
+  display: inline-flex;
+  margin-right: 5px;
+  padding: 3px;
+  border: 0 !important;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--b-danger) 8%, #fff) !important;
+  color: color-mix(in srgb, var(--b-danger) 62%, #94a3b8);
+  cursor: pointer;
+  transition: background 0.13s ease, color 0.13s ease;
+}
+.dsb-pal-item-del:hover,
+.dsb-pal-item-del:focus-visible {
+  background: color-mix(in srgb, var(--b-danger) 18%, #fff) !important;
+  color: var(--b-danger);
+}
+/* Pastel, like everything else here: a solid green chip on a white tile reads
+   as a status alarm rather than as "this one brings its endpoint with it". */
+.dsb-pal-flag.is-api {
+  color: color-mix(in srgb, var(--b-ok) 80%, #0f172a);
+  background: color-mix(in srgb, var(--b-ok) 16%, #fff);
+}
+.dsb-pal-hint {
+  display: flex;
+  gap: 7px;
+  margin: 2px 2px 6px;
+  padding: 9px 10px;
+  border: 1px dashed var(--b-border-2);
+  border-radius: 9px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--b-muted);
+  background: var(--b-surface-2);
+}
+.dsb-pal-hint svg {
+  flex: none;
+  margin-top: 1px;
+}
+.dsb-layer-common {
+  display: inline-flex;
+  margin-left: 5px;
+  color: var(--b-ok);
+  vertical-align: -1px;
+}
+
+/* -------------------------------------------------------- right-click menu */
+
+.dsb-ctx {
+  position: fixed;
+  z-index: 200;
+  padding: 6px;
+  border: 1px solid var(--b-border);
+  border-radius: 12px;
+  /* Opaque on purpose. It floats over a canvas full of components, and a menu
+     you can read the screen through is a menu you cannot read. */
+  background: var(--b-surface);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08);
+  animation: dsb-ctx-in 0.13s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: top left;
+  user-select: none;
+}
+
+@keyframes dsb-ctx-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dsb-ctx-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px 8px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--b-border);
+  font-size: 0.9167rem;
+  font-weight: 800;
+  color: var(--b-text);
+}
+.dsb-ctx-head > svg {
+  flex: none;
+  color: var(--b-accent);
+}
+.dsb-ctx-head span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-ctx-head > span:first-of-type {
+  flex: 1;
+}
+.dsb-ctx-type {
+  flex: none;
+  font-size: 0.7917rem;
+  font-weight: 600;
+  color: var(--b-muted);
+}
+
+/* The ancestors of the clicked component. A right-click lands on the innermost
+   thing under the pointer; this is how you get at the panel around it. */
+.dsb-ctx-up {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px 6px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--b-border);
+  color: var(--b-muted);
+}
+.dsb-ctx-up > svg {
+  flex: none;
+}
+.dsb-ctx-up button {
+  max-width: 100%;
+  padding: 2px 7px;
+  border: 1px solid var(--b-border);
+  border-radius: 999px;
+  background: var(--b-surface-2);
+  color: var(--b-muted);
+  font-size: 0.8333rem;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.dsb-ctx-up button:hover {
+  border-color: var(--b-accent);
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-ctx-head em {
+  margin-left: auto;
+  flex: none;
+  padding: 1.5px 6px;
+  border-radius: 999px;
+  font-size: 0.7083rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--b-ok);
+}
+.dsb-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 32px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--b-text);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.dsb-ctx-item > svg {
+  flex: none;
+  color: var(--b-muted);
+  transition: color 0.12s ease;
+}
+.dsb-ctx-item > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-ctx-item:hover:not(:disabled) {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-ctx-item:hover:not(:disabled) > svg {
+  color: var(--b-accent);
+}
+.dsb-ctx-item:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+/* The reason the menu exists — it reads as the primary action, not as the
+   first of twelve equals. */
+.dsb-ctx-item.is-accent {
+  margin-bottom: 2px;
+  color: var(--b-ok);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--b-ok) 8%, transparent);
+}
+.dsb-ctx-item.is-accent > svg {
+  color: var(--b-ok);
+}
+.dsb-ctx-item.is-accent:hover:not(:disabled),
+.dsb-ctx-item.is-accent:hover:not(:disabled) > svg {
+  color: #fff;
+}
+.dsb-ctx-item.is-accent:hover:not(:disabled) {
+  background: var(--b-ok);
+}
+.dsb-ctx-item.is-danger:hover:not(:disabled),
+.dsb-ctx-item.is-danger:hover:not(:disabled) > svg {
+  color: var(--b-danger);
+}
+.dsb-ctx-item.is-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--b-danger) 10%, transparent);
+}
+.dsb-ctx-item em {
+  flex: none;
+  padding: 1.5px 5px;
+  border: 1px solid var(--b-border);
+  border-radius: 5px;
+  background: var(--b-surface-2);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--b-muted);
+}
+.dsb-ctx-item:hover:not(:disabled) em {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.65);
+}
+.dsb-ctx-sep {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--b-border);
+}
+
+/* --------------------------------------------------------- the save dialog */
+
+.dsb-cc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(2px);
+  animation: dsb-fade 0.16s ease;
+}
+.dsb-cc-dlg {
+  width: min(640px, 94vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: var(--b-surface);
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  animation: dsb-pop 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-cc-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-cc-head-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--b-ok);
+  background: color-mix(in srgb, var(--b-ok) 12%, transparent);
+}
+.dsb-cc-head > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dsb-cc-head strong {
+  font-size: 1.0833rem;
+}
+.dsb-cc-head > div span {
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+.dsb-cc-head > button {
+  margin-left: auto;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--b-muted);
+  cursor: pointer;
+}
+.dsb-cc-body {
+  flex: 1;
+  overflow: auto;
+  padding: 12px 14px;
+  scrollbar-width: thin;
+}
+.dsb-cc-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+.dsb-cc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.dsb-cc-field.is-wide {
+  grid-column: 1 / -1;
+}
+.dsb-cc-field > span {
+  font-size: 0.8333rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--b-muted);
+}
+.dsb-cc-field input {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 7px;
+  background: #fff;
+  font-size: 1rem;
+  color: var(--b-text);
+  outline: none;
+}
+.dsb-cc-field input:focus {
+  border-color: var(--b-accent);
+}
+.dsb-cc-sec {
+  margin-top: 12px;
+  padding: 10px 11px;
+  border: 1px solid var(--b-border);
+  border-radius: 10px;
+  background: var(--b-surface-2);
+}
+.dsb-cc-sec.is-warn {
+  border-color: color-mix(in srgb, var(--b-danger) 35%, var(--b-border));
+  background: color-mix(in srgb, var(--b-danger) 5%, transparent);
+}
+.dsb-cc-sec h5 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 0.8333rem;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  color: var(--b-muted);
+}
+.dsb-cc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.dsb-cc-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid var(--b-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+.dsb-cc-stat strong {
+  font-size: 1rem;
+  color: var(--b-text);
+}
+.dsb-cc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dsb-cc-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9167rem;
+}
+.dsb-cc-list code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--b-text);
+}
+.dsb-cc-list span {
+  margin-left: auto;
+  padding-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-cc-verb {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--b-muted);
+}
+.dsb-cc-verb.is-get {
+  background: var(--b-ok);
+}
+.dsb-cc-verb.is-post {
+  background: var(--b-accent);
+}
+.dsb-cc-verb.is-put,
+.dsb-cc-verb.is-patch {
+  background: #f59e0b;
+}
+.dsb-cc-verb.is-delete {
+  background: var(--b-danger);
+}
+.dsb-cc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.dsb-cc-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-cc-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 9px 11px;
+  border: 1px dashed var(--b-border-2);
+  border-radius: 10px;
+  font-size: 0.9167rem;
+  line-height: 1.5;
+  color: var(--b-muted);
+}
+.dsb-cc-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface);
+}
+.dsb-cc-foot > span {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--b-muted);
+}
+/* Same theme repaint as the palette: without this, Cancel and Save come out as
+   two shades of the theme colour and neither reads as the primary action. */
+.dsb-cc-foot .dsbi-mini {
+  height: 28px;
+  padding: 0 12px;
+  background: #fff !important;
+  border: 1px solid var(--b-border-2) !important;
+  color: var(--b-text);
+}
+.dsb-cc-foot .dsbi-mini:hover {
+  border-color: var(--b-border-2) !important;
+  background: var(--b-surface-2) !important;
+}
+.dsb-cc-foot .dsbi-mini.is-primary {
+  background: var(--b-ok) !important;
+  border-color: var(--b-ok) !important;
+  color: #fff;
+}
+.dsb-cc-foot .dsbi-mini.is-primary:hover {
+  background: color-mix(in srgb, var(--b-ok) 88%, #000) !important;
+  border-color: color-mix(in srgb, var(--b-ok) 88%, #000) !important;
+}
+.dsb-cc-foot .dsbi-mini:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ------------------------------------------------------- the delete confirm */
+
+.dsb-cc-confirm {
+  width: min(420px, 92vw);
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: var(--b-surface);
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  animation: dsb-pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-cc-confirm-body {
+  display: flex;
+  gap: 12px;
+  padding: 16px 16px 14px;
+}
+.dsb-cc-confirm-ic {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--b-danger);
+  background: color-mix(in srgb, var(--b-danger) 11%, #fff);
+}
+.dsb-cc-confirm-body > div {
+  min-width: 0;
+}
+.dsb-cc-confirm strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1.125rem;
+  color: var(--b-text);
+}
+.dsb-cc-confirm p {
+  margin: 0;
+  font-size: 0.9583rem;
+  line-height: 1.55;
+  color: var(--b-muted);
+}
+.dsb-cc-confirm-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px !important;
+  font-size: 0.875rem !important;
+}
+/* Solid red, because this button does the thing the dialog is warning about. */
+.dsb-cc-foot .dsbi-mini.is-danger-solid {
+  background: var(--b-danger) !important;
+  border-color: var(--b-danger) !important;
+  color: #fff;
+}
+.dsb-cc-foot .dsbi-mini.is-danger-solid:hover {
+  background: color-mix(in srgb, var(--b-danger) 88%, #000) !important;
+  border-color: color-mix(in srgb, var(--b-danger) 88%, #000) !important;
+}
+
+/* ------------------------------------------------------- restricted boxes */
+/* "Restrict access" (right-click): shown at runtime only to granted users.  */
+
+.dsb-canvas.is-design .dsb-dnode.is-restricted::after {
+  border: 1.5px dashed #f59e0b;
+}
+.dsb-dnode-restricted {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 11;
+  display: none;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+  background: #f59e0b;
+  pointer-events: none;
+}
+.dsb-canvas.is-design .dsb-dnode-restricted {
+  display: inline-flex;
+}
+.dsb-layer-restricted {
+  display: inline-flex;
+  margin-left: 5px;
+  color: #f59e0b;
+  vertical-align: -1px;
+}
+.dsb-ctx-head em.is-restricted {
+  background: #f59e0b;
+}
+.dsb-ctx-head em + em.is-restricted {
+  margin-left: 4px;
+}

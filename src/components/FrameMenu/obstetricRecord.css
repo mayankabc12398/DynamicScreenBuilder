@@ -1,0 +1,16 @@
+.checklist-table {
+  font-size: 12px;
+}
+
+.section-title {
+  font-weight: bold;
+  background-color: #f8f9fa;
+}
+
+.check-label {
+  white-space: nowrap;
+}
+
+input[type="checkbox"] {
+  transform: scale(0.9);
+}

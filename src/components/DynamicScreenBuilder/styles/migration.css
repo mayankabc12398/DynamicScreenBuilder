@@ -1,0 +1,435 @@
+/**
+ * Migration console.
+ *
+ * Reuses the builder's tokens (--b-*) so the panel belongs to the same app it
+ * opens from. Kept in its own file because the console is a development tool:
+ * it can be dropped without touching builder.css.
+ */
+
+.dsb-mig {
+  width: min(1180px, 96%);
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  background: var(--b-surface);
+  border: 1px solid var(--b-border);
+  border-radius: var(--b-radius);
+  box-shadow: var(--b-shadow-lg);
+  overflow: hidden;
+  font-size: 1rem;
+  color: var(--b-text);
+}
+
+/* ------------------------------------------------------------------ head */
+
+.dsb-mig-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+}
+.dsb-mig-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--b-accent);
+}
+.dsb-mig-title b {
+  color: var(--b-text);
+  font-size: 1.0833rem;
+}
+.dsb-mig-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 200px;
+  min-width: 120px;
+  padding: 4px 8px;
+  border: 1px solid var(--b-border);
+  border-radius: 7px;
+  background: var(--b-surface);
+  color: var(--b-muted);
+}
+.dsb-mig-search input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--b-text);
+}
+.dsb-mig-head select {
+  height: 26px;
+  border: 1px solid var(--b-border);
+  border-radius: 7px;
+  background: var(--b-surface);
+  font-size: 0.9167rem;
+  color: var(--b-text);
+  padding: 0 6px;
+  max-width: 150px;
+}
+
+/* --------------------------------------------------------------- offline */
+
+.dsb-mig-offline {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--b-border);
+  background: #fff8ed;
+  color: #92400e;
+}
+.dsb-mig-offline.is-checking {
+  background: var(--b-accent-soft);
+  color: var(--b-accent);
+}
+.dsb-mig-offline p {
+  margin: 4px 0;
+  color: #7c2d12;
+}
+.dsb-mig-cmd {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #e5e7eb;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9167rem;
+  user-select: all;
+}
+.dsb-mig-offline-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.dsb-mig-offline-actions input {
+  width: 200px;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--b-border-2);
+  border-radius: 6px;
+  font-size: 0.9167rem;
+}
+
+/* ------------------------------------------------------------------ body */
+
+.dsb-mig-body {
+  display: grid;
+  grid-template-columns: minmax(300px, 40%) 1fr;
+  min-height: 0;
+  flex: 1;
+}
+@media (max-width: 860px) {
+  .dsb-mig-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dsb-mig-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--b-border);
+}
+.dsb-mig-listhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  color: var(--b-muted);
+  font-size: 0.9167rem;
+  border-bottom: 1px solid var(--b-border);
+}
+.dsb-mig-rows {
+  overflow: auto;
+  flex: 1;
+  min-height: 220px;
+}
+
+.dsb-mig-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--b-surface-2);
+  cursor: pointer;
+}
+.dsb-mig-row:hover {
+  background: var(--b-surface-2);
+}
+.dsb-mig-row.is-on {
+  background: var(--b-accent-soft);
+}
+.dsb-mig-rowmain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dsb-mig-rowmain strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.dsb-mig-rowmain span {
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-mig-chips {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.dsb-mig-chips em {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--b-surface-2);
+  border: 1px solid var(--b-border);
+  font-style: normal;
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-mig-chips em.r-draft {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+.dsb-mig-chips em.r-wrapper {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #b45309;
+}
+
+.dsb-mig-batchbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+}
+.dsb-mig-batchsum {
+  font-size: 0.9167rem;
+  color: var(--b-muted);
+}
+
+/* ---------------------------------------------------------------- detail */
+
+.dsb-mig-detailpane {
+  overflow: auto;
+  min-height: 0;
+  padding: 10px 12px;
+}
+.dsb-mig-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  min-height: 180px;
+  color: var(--b-muted);
+  text-align: center;
+  padding: 16px;
+}
+.dsb-mig-empty p {
+  margin: 0;
+  max-width: 420px;
+}
+
+.dsb-mig-verdict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--b-border);
+  background: var(--b-surface-2);
+}
+.dsb-mig-verdict > div:first-of-type {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.dsb-mig-verdict strong {
+  font-size: 1.0833rem;
+}
+.dsb-mig-verdict span {
+  font-size: 0.8333rem;
+  color: var(--b-muted);
+}
+.dsb-mig-verdict.v-pass {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+.dsb-mig-verdict.v-review {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.dsb-mig-verdict.v-fail,
+.dsb-mig-verdict.v-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+.dsb-mig-verdict-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dsb-mig-hard {
+  margin-top: 8px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dsb-mig-hard div {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.dsb-mig-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.dsb-mig-checks section {
+  border: 1px solid var(--b-border);
+  border-radius: 8px;
+  padding: 8px 9px;
+  background: var(--b-surface);
+}
+.dsb-mig-checks h5 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 6px;
+  font-size: 0.9167rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--b-muted);
+}
+
+.dsb-mig-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9167rem;
+}
+.dsb-mig-detail b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.dsb-mig-detail.ok {
+  color: var(--b-ok);
+}
+.dsb-mig-detail.warn {
+  color: #b45309;
+}
+.dsb-mig-detail.bad {
+  color: var(--b-danger);
+}
+
+.dsb-mig-problem {
+  margin-top: 4px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-word;
+}
+.dsb-mig-note {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  color: var(--b-muted);
+  line-height: 1.45;
+}
+
+.dsb-mig-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--b-border);
+  color: var(--b-muted);
+  font-size: 0.9167rem;
+}
+.dsb-mig-foot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ----------------------------------------------------------------- batch */
+
+.dsb-mig-batch {
+  margin-top: 12px;
+  border-top: 1px solid var(--b-border);
+  padding-top: 8px;
+}
+.dsb-mig-batch h4 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 6px;
+  font-size: 0.9167rem;
+  text-transform: uppercase;
+  color: var(--b-muted);
+}
+.dsb-mig-batchrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.9167rem;
+}
+.dsb-mig-batchrow span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-mig-batchrow.v-pass {
+  color: #065f46;
+  background: #ecfdf5;
+}
+.dsb-mig-batchrow.v-review {
+  color: #92400e;
+  background: #fffbeb;
+}
+.dsb-mig-batchrow.v-fail,
+.dsb-mig-batchrow.v-error {
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+/* The toolbar's own entry point, tinted so it reads as a tool rather than
+   another document action. */
+.dsb-toolbar .dsb-tb-migrate {
+  color: var(--b-accent);
+}
+.dsb-toolbar .dsb-tb-migrate:hover {
+  background: var(--b-accent-soft);
+}

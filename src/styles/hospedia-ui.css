@@ -1,0 +1,4149 @@
+/* ===========================================================================
+   HOSPEDIA MODERN UI — MASTER DESIGN SYSTEM
+   ---------------------------------------------------------------------------
+   Reusable tokens + classes for modern screens across the app.
+   Prefix: hx-   (hospedia experience)
+
+   Usage rules
+   -----------
+   1. NEVER hardcode a colour/spacing in a feature stylesheet. Use the tokens
+      below so every screen re-themes together.
+   2. Panel headers reuse the app's existing `card card_background` +
+      `card-header` classes, so the active *_theme (purple, sky_blue, …) from
+      assets/css/theme.css keeps working automatically.
+   3. New shared patterns belong HERE, not in a page-level .css file.
+   =========================================================================== */
+
+:root {
+  /* --- brand / accent ------------------------------------------------- */
+  --hx-accent: #6d28d9;
+  --hx-accent-strong: #5b21b6;
+  --hx-accent-soft: #ede9fe;
+  --hx-accent-border: #ddd0f5;
+
+  /* --- semantic ------------------------------------------------------- */
+  --hx-success: #16a34a;
+  --hx-success-soft: #dcfce7;
+  --hx-warn: #d97706;
+  --hx-warn-soft: #fef3c7;
+  --hx-danger: #dc2626;
+  --hx-danger-soft: #fee2e2;
+  --hx-info: #2563eb;
+  --hx-info-soft: #dbeafe;
+
+  /* --- surfaces ------------------------------------------------------- */
+  --hx-surface: #ffffff;
+  --hx-surface-sunken: #f6f5fb;
+  --hx-surface-muted: #faf9fd;
+  --hx-surface-inverse: #101014;
+  --hx-border: #e6e3ef;
+  --hx-border-strong: #d4cfe3;
+
+  /* --- text ----------------------------------------------------------- */
+  --hx-text: #2f2b3f;
+  --hx-text-muted: #7a7490;
+  --hx-text-faint: #a9a3ba;
+  --hx-text-on-accent: #ffffff;
+
+  /* --- geometry ------------------------------------------------------- */
+  --hx-radius-sm: 4px;
+  --hx-radius: 7px;
+  --hx-radius-lg: 10px;
+  --hx-gap-xs: 4px;
+  --hx-gap-sm: 6px;
+  --hx-gap: 10px;
+  --hx-gap-lg: 14px;
+
+  /* --- type ----------------------------------------------------------- */
+  --hx-font-xs: 10px;
+  --hx-font-sm: 11px;
+  --hx-font: 12px;
+  --hx-font-md: 13px;
+  --hx-font-lg: 15px;
+
+  /* --- elevation ------------------------------------------------------ */
+  --hx-shadow-sm: 0 1px 2px rgba(24, 20, 45, 0.06);
+  --hx-shadow: 0 2px 8px rgba(24, 20, 45, 0.08);
+  --hx-shadow-lg: 0 8px 24px rgba(24, 20, 45, 0.14);
+}
+
+/* Dark theme overrides — the app puts `dark` on themed containers. */
+.dark,
+.dark :root {
+  --hx-surface: #22222f;
+  --hx-surface-sunken: #1b1b26;
+  --hx-surface-muted: #262633;
+  --hx-border: #383548;
+  --hx-border-strong: #454158;
+  --hx-text: #e9e6f2;
+  --hx-text-muted: #a49dbb;
+  --hx-text-faint: #7d7695;
+  --hx-accent-soft: #2e2646;
+  --hx-accent-border: #453a68;
+}
+
+/* ===========================================================================
+   1. PANEL — the standard titled container
+   =========================================================================== */
+
+.hx-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--hx-surface);
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  box-shadow: var(--hx-shadow-sm);
+  overflow: hidden;
+}
+
+/* Header reuses .card-header so the active *_theme gradient applies. */
+.hx-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap);
+  padding: 5px 10px !important;
+  min-height: 30px;
+  border-bottom: 1px solid var(--hx-border);
+}
+
+.hx-panel__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--hx-font-md);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--hx-text);
+  white-space: nowrap;
+}
+
+.hx-panel__title svg {
+  color: var(--hx-accent);
+}
+
+.hx-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-gap-sm);
+  flex-wrap: wrap;
+}
+
+.hx-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--hx-gap);
+  overflow: auto;
+}
+
+.hx-panel__body--flush {
+  padding: 0;
+}
+
+/* For panels whose body is a self-managing viewer (image stage, editor). */
+.hx-panel__body--stage {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hx-panel__foot {
+  border-top: 1px solid var(--hx-border);
+  padding: 6px 10px;
+  background: var(--hx-surface-muted);
+}
+
+/* ===========================================================================
+   2. WORKSPACE — multi-column screen shell
+   =========================================================================== */
+
+.hx-workspace {
+  display: grid;
+  gap: var(--hx-gap);
+  align-items: stretch;
+  padding: var(--hx-gap);
+}
+
+.hx-workspace--3 {
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, 1.35fr) minmax(320px, 1.5fr);
+}
+
+.hx-workspace--2 {
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, 2fr);
+}
+
+.hx-workspace__full {
+  grid-column: 1 / -1;
+}
+
+/* Fixed-height work area so the columns line up and scroll internally.
+   Full-width panels (e.g. a bottom assistant) keep their natural height. */
+.hx-workspace--fixed > .hx-panel:not(.hx-workspace__full) {
+  height: var(--hx-work-height, 62vh);
+  min-height: 340px;
+}
+
+@media (max-width: 1399px) {
+  .hx-workspace--3 {
+    grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.4fr);
+  }
+  .hx-workspace--3 > .hx-workspace__span {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 991px) {
+  .hx-workspace--3,
+  .hx-workspace--2 {
+    grid-template-columns: 1fr;
+  }
+  .hx-workspace--fixed > .hx-panel:not(.hx-workspace__full) {
+    height: auto;
+    max-height: 75vh;
+  }
+}
+
+/* ===========================================================================
+   3. TOOLBAR — icon + label action strip
+   =========================================================================== */
+
+.hx-toolbar {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px 6px;
+  background: var(--hx-surface-muted);
+  border-bottom: 1px solid var(--hx-border);
+}
+
+.hx-toolbar--plain {
+  background: transparent;
+  border-bottom: none;
+}
+
+.hx-tool-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 46px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--hx-radius-sm);
+  background: transparent;
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-xs);
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.hx-tool-btn svg {
+  font-size: 14px;
+}
+
+.hx-tool-btn:hover:not(:disabled) {
+  background: var(--hx-accent-soft);
+  color: var(--hx-accent);
+  border-color: var(--hx-accent-border);
+}
+
+.hx-tool-btn.is-active {
+  background: var(--hx-accent-soft);
+  color: var(--hx-accent-strong);
+  border-color: var(--hx-accent);
+}
+
+.hx-tool-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hx-toolbar__sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background: var(--hx-border);
+}
+
+.hx-toolbar__spacer {
+  flex: 1 1 auto;
+}
+
+/* ===========================================================================
+   4. BUTTONS — action buttons used outside the toolbar
+   =========================================================================== */
+
+.hx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--hx-border-strong);
+  border-radius: var(--hx-radius-sm);
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  font-size: var(--hx-font);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.hx-btn:hover:not(:disabled) {
+  border-color: var(--hx-accent);
+  box-shadow: var(--hx-shadow-sm);
+}
+
+.hx-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hx-btn--primary {
+  background: var(--hx-accent-soft);
+  border-color: var(--hx-accent);
+  color: var(--hx-accent-strong);
+}
+
+.hx-btn--solid {
+  background: var(--hx-accent);
+  border-color: var(--hx-accent);
+  color: var(--hx-text-on-accent);
+}
+
+.hx-btn--success {
+  background: var(--hx-success);
+  border-color: var(--hx-success);
+  color: #fff;
+}
+
+.hx-btn--danger {
+  background: var(--hx-danger-soft);
+  border-color: var(--hx-danger);
+  color: var(--hx-danger);
+}
+
+.hx-btn--block {
+  width: 100%;
+}
+
+.hx-btn--sm {
+  padding: 3px 9px;
+  font-size: var(--hx-font-sm);
+}
+
+/* ===========================================================================
+   5. BADGES
+   =========================================================================== */
+
+.hx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--hx-surface-sunken);
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.hx-badge--accent {
+  background: var(--hx-accent-soft);
+  color: var(--hx-accent-strong);
+}
+.hx-badge--success {
+  background: var(--hx-success-soft);
+  color: var(--hx-success);
+}
+.hx-badge--warn {
+  background: var(--hx-warn-soft);
+  color: var(--hx-warn);
+}
+.hx-badge--danger {
+  background: var(--hx-danger);
+  color: #fff;
+}
+.hx-badge--info {
+  background: var(--hx-info-soft);
+  color: var(--hx-info);
+}
+
+/* ===========================================================================
+   6. LISTS — check list & ranked list
+   =========================================================================== */
+
+.hx-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.hx-check-item {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: var(--hx-font);
+  color: var(--hx-text);
+  line-height: 1.45;
+}
+
+.hx-check-item__icon {
+  margin-top: 1px;
+  font-size: 13px;
+  color: var(--hx-success);
+}
+
+.hx-check-item--warn .hx-check-item__icon {
+  color: var(--hx-warn);
+}
+.hx-check-item--danger .hx-check-item__icon {
+  color: var(--hx-danger);
+}
+.hx-check-item--danger .hx-check-item__text {
+  font-weight: 600;
+  color: var(--hx-danger);
+}
+
+.hx-rank-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hx-rank-item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: var(--hx-font);
+  color: var(--hx-text);
+}
+
+.hx-rank-item__no {
+  color: var(--hx-text-faint);
+  font-weight: 700;
+}
+
+.hx-rank-item__value {
+  font-weight: 700;
+  color: var(--hx-success);
+  font-variant-numeric: tabular-nums;
+}
+
+.hx-rank-item__bar {
+  grid-column: 2 / -1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hx-surface-sunken);
+  overflow: hidden;
+}
+
+.hx-rank-item__bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--hx-accent);
+}
+
+/* ===========================================================================
+   7. FORM BITS
+   =========================================================================== */
+
+.hx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: var(--hx-gap-sm);
+  min-width: 0;
+}
+
+.hx-field__label {
+  font-size: var(--hx-font-sm);
+  font-weight: 600;
+  color: var(--hx-text-muted);
+}
+
+.hx-input,
+.hx-select,
+.hx-textarea {
+  width: 100%;
+  border: 1px solid var(--hx-border-strong);
+  border-radius: var(--hx-radius-sm);
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  font-size: var(--hx-font);
+  padding: 5px 8px;
+  line-height: 1.35;
+}
+
+.hx-textarea {
+  resize: vertical;
+}
+
+.hx-input:focus,
+.hx-select:focus,
+.hx-textarea:focus {
+  outline: none;
+  border-color: var(--hx-accent);
+  box-shadow: 0 0 0 2px var(--hx-accent-soft);
+}
+
+.hx-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hx-range input[type="range"] {
+  flex: 1 1 auto;
+  accent-color: var(--hx-accent);
+  height: 4px;
+  min-width: 0;
+}
+
+.hx-range__value {
+  font-size: var(--hx-font);
+  font-weight: 700;
+  color: var(--hx-text-muted);
+  min-width: 34px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===========================================================================
+   8. META STRIP — compact label/value pairs
+   =========================================================================== */
+
+.hx-meta-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--hx-gap-sm);
+}
+
+.hx-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  padding: 4px 8px;
+  border-left: 3px solid var(--hx-accent-border);
+  background: var(--hx-surface-muted);
+  border-radius: 0 var(--hx-radius-sm) var(--hx-radius-sm) 0;
+}
+
+.hx-meta-item__label {
+  font-size: var(--hx-font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--hx-text-faint);
+}
+
+.hx-meta-item__value {
+  font-size: var(--hx-font);
+  font-weight: 700;
+  color: var(--hx-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===========================================================================
+   9. SECTION LABEL — small underlined section title inside a panel
+   =========================================================================== */
+
+.hx-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap-sm);
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--hx-accent);
+  padding-bottom: 3px;
+  margin-bottom: 8px;
+  border-bottom: 2px solid var(--hx-accent-border);
+}
+
+/* ===========================================================================
+   10. EMPTY STATE / LOADING
+   =========================================================================== */
+
+.hx-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 140px;
+  padding: 16px;
+  text-align: center;
+  color: var(--hx-text-faint);
+  font-size: var(--hx-font);
+}
+
+.hx-empty__icon {
+  font-size: 30px;
+  color: var(--hx-accent-border);
+}
+
+.hx-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--hx-accent-soft);
+  border-top-color: var(--hx-accent);
+  border-radius: 50%;
+  animation: hx-spin 0.8s linear infinite;
+}
+
+.hx-spinner--sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+
+@keyframes hx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================================================================
+   11. MEDIA STAGE — image/DICOM viewing surface with overlays
+   Reusable by any screen that shows clinical imagery (PACS, scanned docs,
+   wound photos, ECG strips …).
+   =========================================================================== */
+
+.hx-stage {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #0c0c10;
+}
+
+.hx-thumb-rail {
+  flex: 0 0 auto;
+  width: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+  overflow-y: auto;
+  background: #17171e;
+  border-right: 1px solid #2a2a35;
+}
+
+.hx-thumb {
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: var(--hx-radius-sm);
+  background: #000;
+  cursor: pointer;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.hx-thumb img {
+  display: block;
+  width: 100%;
+  height: 56px;
+  object-fit: contain;
+}
+
+.hx-thumb.is-active {
+  border-color: var(--hx-accent);
+}
+
+.hx-thumb__no {
+  position: absolute;
+  bottom: 1px;
+  right: 3px;
+  font-size: 9px;
+  color: #cfc8e6;
+  text-shadow: 0 0 3px #000;
+}
+
+.hx-thumb__remove {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  border: none;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ff8a8a;
+  font-size: 9px;
+  line-height: 1;
+  padding: 3px 4px;
+  cursor: pointer;
+}
+
+.hx-stage__viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 220px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #0c0c10;
+}
+
+.hx-stage__viewport.is-panning {
+  cursor: grabbing;
+}
+.hx-stage__viewport.tool-pan {
+  cursor: grab;
+}
+.hx-stage__viewport.tool-highlight {
+  cursor: crosshair;
+}
+
+.hx-stage__frame {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.hx-stage__img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hx-stage__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* AI region-of-interest box */
+/* Zoom percentage sitting between the -/+ buttons. */
+.hx-zoom-readout {
+  min-width: 46px;
+  padding: 0 2px;
+  text-align: center;
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--hx-text-muted);
+}
+
+/* Radiologist-drawn highlight. Lives inside the transformed frame, so it stays
+   glued to the anatomy through zoom and pan. */
+.hx-mark {
+  position: absolute;
+  border: 2px solid #38bdf8;
+  border-radius: 3px;
+  background: rgba(56, 189, 248, 0.14);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4) inset;
+}
+
+.hx-mark--draft {
+  border-style: dashed;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.hx-mark__tag {
+  position: absolute;
+  top: -18px;
+  left: -2px;
+  transform-origin: bottom left;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 4px 1px 6px;
+  border-radius: 3px;
+  background: rgba(3, 105, 161, 0.92);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hx-mark__del {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: #bae6fd;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.hx-mark__del:hover {
+  color: #fff;
+}
+
+/* Counter-scaled tags need the same origin treatment as the mark tag. */
+.hx-roi__tag {
+  transform-origin: bottom left;
+}
+
+.hx-stage__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #e2e8f0;
+  font-size: var(--hx-font-sm);
+  pointer-events: none;
+}
+
+.hx-roi {
+  position: absolute;
+  border: 2px solid #ff5a5a;
+  border-radius: 3px;
+  background: rgba(255, 60, 60, 0.16);
+  box-shadow: 0 0 12px rgba(255, 60, 60, 0.45) inset;
+}
+
+.hx-roi--soft {
+  border-color: #ffc14d;
+  background: rgba(255, 193, 77, 0.14);
+  box-shadow: 0 0 12px rgba(255, 193, 77, 0.35) inset;
+}
+
+.hx-roi__tag {
+  position: absolute;
+  top: -18px;
+  left: -2px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hx-roi__tag > em {
+  font-style: normal;
+  color: #6ee7a8;
+  margin-left: 4px;
+}
+
+/* Callout card anchored to the stage corner */
+.hx-stage__callout {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 210px;
+  padding: 6px 9px;
+  border-radius: var(--hx-radius-sm);
+  background: rgba(255, 255, 255, 0.94);
+  color: #1c1a24;
+  font-size: var(--hx-font-sm);
+  line-height: 1.4;
+  box-shadow: var(--hx-shadow);
+  pointer-events: none;
+}
+
+.hx-stage__callout strong {
+  display: block;
+  font-size: var(--hx-font);
+}
+
+.hx-stage__callout em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--hx-success);
+}
+
+/* Orientation / info markers burned into the corners */
+.hx-stage__corner {
+  position: absolute;
+  color: #d9d4ea;
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hx-stage__corner--tl {
+  top: 8px;
+  left: 10px;
+}
+.hx-stage__corner--tr {
+  top: 8px;
+  right: 10px;
+}
+.hx-stage__corner--bl {
+  bottom: 26px;
+  left: 10px;
+}
+.hx-stage__corner--br {
+  bottom: 26px;
+  right: 10px;
+  text-align: right;
+}
+
+.hx-stage__pager {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 3px 0;
+  background: rgba(0, 0, 0, 0.55);
+  color: #e4e0f0;
+  font-size: var(--hx-font-sm);
+  z-index: 2;
+}
+
+.hx-stage__pager button {
+  border: none;
+  background: transparent;
+  color: #cfc8e6;
+  padding: 0 6px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.hx-stage__pager button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Drop target shown when the stage has no image yet */
+.hx-stage__drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  padding: 20px;
+  color: #8f88a8;
+  font-size: var(--hx-font);
+  text-align: center;
+  border: 2px dashed #3a3547;
+  border-radius: var(--hx-radius);
+  margin: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.hx-stage__drop:hover,
+.hx-stage__drop.is-dragging {
+  border-color: var(--hx-accent);
+  background: rgba(109, 40, 217, 0.08);
+  color: #c9c1e4;
+}
+
+.hx-stage__drop-icon {
+  font-size: 26px;
+  color: var(--hx-accent);
+}
+
+/* Contact-sheet layout (Layout tool) */
+/* Heatmap preview — image plus radial hot spots */
+.hx-heatmap {
+  position: relative;
+  display: block;
+  width: 100%;
+  background: #0c0c10;
+  border-radius: var(--hx-radius-sm);
+  overflow: hidden;
+}
+
+.hx-heatmap img {
+  display: block;
+  width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.05);
+}
+
+.hx-heatmap__spot {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.hx-heatmap__scale {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  bottom: 8px;
+  width: 9px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to top,
+    #2b2bff 0%,
+    #00c2ff 25%,
+    #22c55e 50%,
+    #eab308 72%,
+    #ef4444 100%
+  );
+}
+
+.hx-heatmap__scale-label {
+  position: absolute;
+  right: 18px;
+  font-size: 9px;
+  color: #d7d2e6;
+  text-shadow: 0 0 3px #000;
+}
+
+/* ===========================================================================
+   12. ASSISTANT LAYOUT — settings rail + result cards
+   Generic shell for any "configure on the left, results on the right" panel
+   (AI assistants, batch tools, report builders).
+   =========================================================================== */
+
+.hx-assistant {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: var(--hx-gap);
+  align-items: start;
+}
+
+.hx-assistant__settings {
+  display: flex;
+  flex-direction: column;
+  padding-right: var(--hx-gap);
+  border-right: 1px solid var(--hx-border);
+}
+
+.hx-assistant__results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--hx-gap);
+  align-items: start;
+  min-width: 0;
+}
+
+.hx-assistant__card {
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+  padding: 9px 11px;
+  min-width: 0;
+}
+
+.hx-plain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: var(--hx-font);
+  color: var(--hx-text);
+  line-height: 1.45;
+}
+
+.hx-plain-list--bullet {
+  list-style: disc;
+  padding-left: 16px;
+}
+
+@media (max-width: 991px) {
+  .hx-assistant {
+    grid-template-columns: 1fr;
+  }
+  .hx-assistant__settings {
+    border-right: none;
+    border-bottom: 1px solid var(--hx-border);
+    padding-right: 0;
+    padding-bottom: var(--hx-gap);
+  }
+}
+
+/* ===========================================================================
+   12b. RADIOLOGY WORKSPACE — controls rail | reading stack | AI rail
+   Used by the Radiology Result Entry screen. The centre column stacks the
+   PACS viewer over the report editor; the outer columns scroll internally so
+   the three rails always line up.
+   =========================================================================== */
+
+.hx-workspace--radiology {
+  /* Fill what is left of the viewport under the breadcrumb + patient strip so
+     the three rails read as one screen with no page scroll. */
+  --hx-rad-height: calc(100vh - 138px);
+  grid-template-columns:
+    minmax(195px, 0.6fr)
+    minmax(440px, 2.15fr)
+    minmax(285px, 0.95fr);
+  align-items: start;
+  padding: var(--hx-gap-sm) var(--hx-gap);
+}
+
+/* Every direct child rail gets the same working height. */
+.hx-workspace--radiology > .hx-panel,
+.hx-workspace--radiology > .hx-rad-stack {
+  height: var(--hx-rad-height);
+  min-height: 500px;
+}
+
+.hx-rad-stack {
+  display: grid;
+  /* Image on top; the report is the working surface, so it takes the larger
+     share and the viewer keeps a usable floor. */
+  grid-template-rows: minmax(210px, 0.78fr) minmax(320px, 1.22fr);
+  gap: var(--hx-gap);
+  min-width: 0;
+}
+
+.hx-rad-stack > .hx-panel {
+  min-height: 0;
+}
+
+/* The image viewer and the AI rail are folded away by default; whichever is
+   closed gives its space back to the report editor rather than leaving a gap. */
+.hx-workspace--radiology.hx-workspace--no-ai {
+  grid-template-columns: minmax(195px, 0.6fr) minmax(440px, 3fr);
+}
+
+.hx-workspace--radiology.hx-workspace--no-pacs > .hx-rad-stack {
+  grid-template-rows: 1fr;
+}
+
+@media (max-height: 780px) {
+  .hx-workspace--radiology {
+    --hx-rad-height: 640px;
+  }
+}
+
+@media (max-width: 1599px) {
+  .hx-workspace--radiology {
+    grid-template-columns: minmax(215px, 0.85fr) minmax(360px, 1.9fr) minmax(255px, 1fr);
+  }
+  .hx-workspace--radiology.hx-workspace--no-ai {
+    grid-template-columns: minmax(215px, 0.85fr) minmax(360px, 3fr);
+  }
+}
+
+@media (max-width: 1199px) {
+  .hx-workspace--radiology {
+    grid-template-columns: minmax(220px, 1fr) minmax(320px, 1.7fr);
+  }
+  .hx-workspace--radiology > .hx-rad-rail {
+    grid-column: 1 / -1;
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 991px) {
+  .hx-workspace--radiology {
+    grid-template-columns: 1fr;
+  }
+  .hx-workspace--radiology > .hx-panel,
+  .hx-workspace--radiology > .hx-rad-stack {
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+  .hx-ai-rail__head {
+    position: static;
+    margin: 0;
+    padding: 0 0 var(--hx-gap-sm);
+  }
+  .hx-ai-rail--wide {
+    grid-template-columns: 1fr;
+  }
+  .hx-ai-rail--wide .hx-ai-rail__head {
+    border-right: 0;
+    border-bottom: 1px solid var(--hx-border);
+    padding: 0 0 var(--hx-gap-sm);
+  }
+  .hx-ai-rail--wide .hx-span-rest {
+    grid-column: 1 / -1;
+  }
+  .hx-rad-rail--wide .hx-ai-rail__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hx-rad-stack {
+    grid-template-rows: auto auto;
+  }
+  .hx-rad-stack > .hx-panel {
+    min-height: 340px;
+  }
+}
+
+/* --- PACS viewer + AI rail chhupe hon (default) -------------------------
+   Sirf do column: controls | report. Report editor poori unchai leta hai.
+   Do class wala selector upar ke media query waale column ko override karta hai. */
+.hx-workspace--radiology.hx-rad--compact {
+  grid-template-columns: minmax(195px, 0.6fr) minmax(440px, 3.1fr);
+}
+.hx-workspace--radiology.hx-rad--compact > .hx-rad-stack {
+  grid-template-rows: minmax(320px, 1fr);
+}
+@media (max-width: 991px) {
+  .hx-workspace--radiology.hx-rad--compact {
+    grid-template-columns: 1fr;
+  }
+  .hx-workspace--radiology.hx-rad--compact > .hx-rad-stack {
+    grid-template-rows: auto;
+  }
+}
+
+/* --- report editor panel ------------------------------------------------ */
+
+.hx-rad-editor {
+  min-height: 0;
+}
+
+.hx-rad-editor .hx-panel__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* CKEditor ships a fixed pixel height; stretch its chrome so the writing area
+   grows with the panel instead of scrolling inside a short box. */
+/* `div:has(.cke)` reaches every wrapper CKEditor's React binding puts between
+   the panel body and the chrome, whatever the nesting depth. The editor's
+   `height` prop stays as the fallback where :has() is unsupported. */
+.hx-rad-editor .hx-editor-fill,
+.hx-rad-editor .hx-editor-fill div:has(.cke),
+.hx-rad-editor .cke,
+.hx-rad-editor .cke_chrome,
+.hx-rad-editor .cke_inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0 !important;
+}
+
+.hx-rad-editor .cke,
+.hx-rad-editor .cke_chrome {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.hx-rad-editor .cke_top,
+.hx-rad-editor .cke_bottom {
+  flex: 0 0 auto;
+}
+
+.hx-rad-editor .cke_contents {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 120px;
+}
+
+/* Basic-toolbar chrome: one tidy strip on the panel's own surface rather than
+   CKEditor's stock grey slab. */
+.hx-rad-editor .cke_top {
+  padding: 3px 4px !important;
+  background: var(--hx-surface-sunken) !important;
+  border-bottom: 1px solid var(--hx-border) !important;
+  box-shadow: none !important;
+}
+
+.hx-rad-editor .cke_bottom {
+  padding: 2px 6px !important;
+  background: var(--hx-surface-sunken) !important;
+  border-top: 1px solid var(--hx-border) !important;
+}
+
+.hx-rad-editor .cke_toolgroup,
+.hx-rad-editor .cke_combo_button {
+  margin: 1px 3px 1px 0 !important;
+  border-radius: var(--hx-radius-sm) !important;
+}
+
+/* The editing surface should read like paper against the panel. */
+.hx-rad-editor .cke_contents {
+  background: var(--hx-surface);
+}
+
+.hx-rad-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-gap-sm);
+}
+
+/* Two-up action grid used by the controls rail footer. */
+.hx-rad-actions--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hx-rad-actions--grid .hx-btn {
+  width: 100%;
+}
+
+.hx-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* --- controls rail ------------------------------------------------------ */
+
+/* The rail carries a long form; tighten the stock bootstrap rhythm so it all
+   lands above the fold. */
+.hx-rad-controls .hx-panel__body {
+  padding: var(--hx-gap-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap-sm);
+}
+
+.hx-rad-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 8px;
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+}
+
+/* Pushed to the foot of the rail so the form and the status book-end the
+   column instead of leaving a hole above the actions. */
+.hx-rad-progress {
+  margin-top: auto;
+  padding-top: var(--hx-gap-sm);
+  border-top: 1px solid var(--hx-border);
+}
+
+.hx-rad-progress .hx-check-list {
+  gap: 5px;
+}
+
+@media (max-width: 991px) {
+  .hx-rad-progress {
+    margin-top: var(--hx-gap-sm);
+  }
+}
+
+.hx-rad-controls .form-group {
+  margin-bottom: 5px;
+}
+
+.hx-rad-controls .row > .mt-1,
+.hx-rad-controls .row > .mt-2 {
+  margin-top: 2px !important;
+}
+
+.hx-rad-controls .row {
+  margin-left: -3px;
+  margin-right: -3px;
+}
+
+.hx-rad-controls .row > [class*="col-"] {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+/* --- AI assistant rail -------------------------------------------------- */
+
+.hx-ai-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap);
+}
+
+/* Analysis header stays pinned while the findings scroll under it. */
+.hx-ai-rail__head {
+  position: sticky;
+  top: calc(var(--hx-gap) * -1);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap-sm);
+  padding: var(--hx-gap) var(--hx-gap) var(--hx-gap-sm);
+  margin: calc(var(--hx-gap) * -1) calc(var(--hx-gap) * -1) 0;
+  background: var(--hx-surface);
+  border-bottom: 1px solid var(--hx-border);
+}
+
+.hx-ai-rail__study {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--hx-font-sm);
+  font-weight: 600;
+  color: var(--hx-text-muted);
+  min-width: 0;
+}
+
+.hx-ai-rail__study svg {
+  flex: 0 0 auto;
+  color: var(--hx-accent);
+}
+
+.hx-ai-block {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wide layout — the assistant sits under the image, so the header, findings
+   and differential run side by side instead of stacking. */
+.hx-ai-rail--wide {
+  display: grid;
+  grid-template-columns: minmax(190px, 235px) minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--hx-gap);
+  align-items: start;
+}
+
+.hx-ai-rail--wide .hx-ai-rail__head {
+  position: static;
+  align-self: stretch;
+  margin: 0;
+  padding: 0 var(--hx-gap) 0 0;
+  border-bottom: 0;
+  border-right: 1px solid var(--hx-border);
+}
+
+.hx-ai-rail__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap);
+  min-width: 0;
+}
+
+/* In the vertical rail the two column groups are just stacked sections. */
+.hx-ai-rail:not(.hx-ai-rail--wide) > .hx-ai-rail__col {
+  gap: var(--hx-gap);
+}
+
+.hx-rad-rail .hx-rank-item {
+  font-size: var(--hx-font);
+}
+
+.hx-span-all {
+  grid-column: 1 / -1;
+}
+
+.hx-ai-rail--wide .hx-span-rest {
+  grid-column: 2 / -1;
+}
+
+/* Footer reads as one line when the panel is wide. */
+.hx-rad-rail--wide .hx-ai-rail__foot {
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap);
+}
+
+.hx-rad-rail--wide .hx-ai-rail__foot .hx-rad-actions .hx-btn {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1199px) {
+  .hx-ai-rail--wide {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  }
+  .hx-ai-rail--wide .hx-span-rest {
+    grid-column: 2 / -1;
+  }
+}
+
+/* --- chips + counters --------------------------------------------------- */
+
+.hx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.hx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid var(--hx-border);
+  border-radius: 20px;
+  background: var(--hx-surface-sunken);
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hx-chip svg {
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+.hx-chip--danger {
+  border-color: var(--hx-danger);
+  background: var(--hx-danger-soft);
+  color: var(--hx-danger);
+}
+
+.hx-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 15px;
+  margin-left: 5px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--hx-accent-soft);
+  color: var(--hx-accent-strong);
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+}
+
+.hx-count--danger {
+  background: var(--hx-danger-soft);
+  color: var(--hx-danger);
+}
+
+/* --- collapsible block -------------------------------------------------- */
+
+.hx-collapse {
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+  overflow: hidden;
+}
+
+.hx-collapse.is-open {
+  border-color: var(--hx-accent-border);
+}
+
+.hx-collapse__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap-sm);
+  padding: 6px 9px;
+  border: 0;
+  background: transparent;
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.hx-collapse__head:hover {
+  color: var(--hx-accent);
+}
+
+.hx-collapse__head svg {
+  font-size: 10px;
+}
+
+.hx-collapse__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hx-collapse__body {
+  padding: 0 9px 8px;
+}
+
+.hx-ai-draft-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap-sm);
+}
+
+/* Confidence meter */
+.hx-meter {
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+  padding: 7px 10px;
+}
+
+.hx-meter__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap-sm);
+  font-size: var(--hx-font);
+  color: var(--hx-text-muted);
+}
+
+.hx-meter__value {
+  font-weight: 700;
+  color: var(--hx-success);
+}
+
+.hx-meter__value--warn {
+  color: var(--hx-warn);
+}
+
+.hx-meter__track {
+  margin-top: 6px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--hx-border);
+  overflow: hidden;
+}
+
+.hx-meter__fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--hx-info), var(--hx-success));
+  transition: width 0.35s ease;
+}
+
+.hx-meter__fill--warn {
+  background: linear-gradient(90deg, #f59e0b, var(--hx-warn));
+}
+
+/* Detected finding rows */
+.hx-ai-findings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap-sm);
+}
+
+.hx-ai-finding {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hx-gap-sm);
+  border: 1px solid var(--hx-border);
+  border-left: 3px solid var(--hx-success);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+  padding: 6px 9px;
+  font-size: var(--hx-font);
+  line-height: 1.4;
+  color: var(--hx-text);
+  cursor: default;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.hx-ai-finding--abnormal {
+  border-left-color: var(--hx-warn);
+}
+
+.hx-ai-finding--abnormal .hx-ai-finding__dot {
+  background: var(--hx-warn);
+}
+
+.hx-ai-finding--critical {
+  border-left-color: var(--hx-danger);
+  background: var(--hx-danger-soft);
+}
+
+.hx-ai-finding--critical .hx-ai-finding__dot {
+  background: var(--hx-danger);
+}
+
+.hx-ai-finding.is-clickable {
+  cursor: pointer;
+}
+
+.hx-ai-finding.is-clickable:hover,
+.hx-ai-finding.is-active {
+  border-color: var(--hx-accent);
+  background: var(--hx-accent-soft);
+}
+
+.hx-ai-finding__dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--hx-success);
+}
+
+.hx-ai-finding__dot--warn {
+  background: var(--hx-warn);
+}
+
+.hx-ai-finding__dot--danger {
+  background: var(--hx-danger);
+}
+
+.hx-ai-finding__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hx-ai-finding__region {
+  font-weight: 700;
+}
+
+.hx-ai-finding__score {
+  flex: 0 0 auto;
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  color: var(--hx-text-muted);
+}
+
+/* AI draft preview */
+.hx-ai-draft {
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius);
+  background: var(--hx-surface-muted);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hx-ai-draft__label {
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hx-text-muted);
+}
+
+.hx-ai-draft__body {
+  font-size: var(--hx-font);
+  line-height: 1.5;
+  color: var(--hx-text);
+  white-space: pre-line;
+}
+
+.hx-ai-rail__foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-gap-sm);
+}
+
+/* The two rail actions share the footer width evenly. */
+.hx-ai-rail__foot .hx-rad-actions .hx-btn {
+  flex: 1 1 40%;
+}
+
+.hx-ai-rail__disclaimer {
+  font-size: var(--hx-font-xs);
+  color: var(--hx-text-faint);
+  line-height: 1.4;
+}
+
+.hx-ai-settings {
+  border: 1px dashed var(--hx-border-strong);
+  border-radius: var(--hx-radius);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  background: var(--hx-surface);
+}
+
+/* ===========================================================================
+   12c. STATUS LEGEND — click-to-filter swatches above a worklist
+   =========================================================================== */
+
+.hx-legend {
+  align-items: center;
+}
+
+.hx-legend--clickable {
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 1px 4px;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.hx-legend--clickable:hover,
+.hx-legend--clickable:focus-visible {
+  background: rgba(15, 23, 42, 0.06);
+  outline: none;
+}
+
+.hx-legend--clickable:hover .hx-legend__dot {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.hx-legend__dot {
+  flex: 0 0 auto;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ===========================================================================
+   12d. AMENDMENT BADGE — "this result was amended", opens the history
+   =========================================================================== */
+
+.hx-amend {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 2px 5px 2px 8px;
+  border: 1px solid #f59e0b;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  line-height: 1.7;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.hx-amend:hover,
+.hx-amend:focus-visible {
+  background: #fde68a;
+  box-shadow: 0 1px 5px rgba(146, 64, 14, 0.28);
+  outline: none;
+}
+
+.hx-amend:active {
+  transform: translateY(1px);
+}
+
+.hx-amend > svg {
+  flex: 0 0 auto;
+  font-size: 9px;
+  opacity: 0.75;
+}
+
+.hx-amend__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hx-amend__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #b45309;
+  color: #fff;
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+}
+
+/* Cramped grids keep the icon and the count and drop the word. */
+@media (max-width: 1400px) {
+  .hx-amend__label {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   12e. COLUMN CONFIGURATOR — per-user column order + visibility
+   Lives in the grid's Settings dropdown; only rendered when the grid is given
+   a storageKey.
+   =========================================================================== */
+
+/* Settings gear for grids that have no heading of their own.
+   The strip is deliberately zero-height and its child is taken out of flow, so
+   the gear overlays the top-right of the header row instead of pushing the
+   table down by a whole strip. */
+.hx-colcfg__bar {
+  position: relative;
+  height: 0;
+  z-index: 30;
+}
+
+.hx-colcfg__bar > * {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+}
+
+/* Sits on top of the coloured header row, so it needs its own ground.
+   `.theme-class` on the toggle declares `background: none !important` and
+   `border: 0 !important`, so these have to be !important to land. */
+.hx-colcfg__bar .custom-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid var(--hx-border-strong) !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(24, 20, 45, 0.18) !important;
+  cursor: pointer;
+}
+
+.hx-colcfg__bar .custom-toggle:hover {
+  border-color: var(--hx-accent) !important;
+  background: var(--hx-accent-soft) !important;
+}
+
+/* react-bootstrap's toggle draws a caret triangle; the icon is the affordance. */
+.hx-colcfg__bar .custom-toggle::after {
+  display: none !important;
+}
+
+/* The click handler sits on the icon, not the button, so let the icon fill the
+   chip — otherwise the ring around it looks clickable but is not. */
+.hx-colcfg__bar .custom-toggle svg {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  color: var(--hx-accent-strong) !important;
+  cursor: pointer;
+}
+
+.hx-colcfg__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-gap-sm);
+  padding: 4px 10px 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--hx-border);
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hx-text-muted);
+}
+
+.hx-colcfg__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border: 1px solid var(--hx-border-strong);
+  border-radius: 999px;
+  background: var(--hx-surface);
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.hx-colcfg__reset:hover {
+  border-color: var(--hx-accent);
+  color: var(--hx-accent);
+}
+
+.hx-colcfg__row {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px !important;
+  border-radius: var(--hx-radius-sm);
+}
+
+.hx-colcfg__row:hover {
+  background: var(--hx-accent-soft) !important;
+}
+
+/* The row is the drag source, so the whole thing shows the grab cursor. */
+.hx-colcfg__row[draggable="true"] {
+  cursor: grab;
+}
+
+.hx-colcfg__row[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.hx-colcfg__grip {
+  flex: 0 0 auto;
+  color: var(--hx-text-faint);
+}
+
+/* Let the checkbox take the slack so the arrows sit hard right. */
+.hx-colcfg__row > *:nth-child(2) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hx-colcfg__move {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.hx-colcfg__move button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--hx-border);
+  border-radius: var(--hx-radius-sm);
+  background: var(--hx-surface);
+  color: var(--hx-text-muted);
+  cursor: pointer;
+}
+
+.hx-colcfg__move button:hover:not(:disabled) {
+  border-color: var(--hx-accent);
+  color: var(--hx-accent);
+}
+
+.hx-colcfg__move button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   13. UTILITIES
+   =========================================================================== */
+
+.hx-scroll {
+  overflow: auto;
+  min-height: 0;
+}
+
+.hx-scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.hx-scroll::-webkit-scrollbar-thumb {
+  background: var(--hx-border-strong);
+  border-radius: 4px;
+}
+.hx-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hx-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hx-gap-sm);
+}
+
+.hx-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--hx-gap);
+}
+
+.hx-row {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-gap-sm);
+  flex-wrap: wrap;
+}
+
+.hx-muted {
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-sm);
+}
+
+.hx-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hx-divider {
+  height: 1px;
+  background: var(--hx-border);
+  margin: var(--hx-gap-sm) 0;
+}
+
+.hx-note {
+  border-left: 3px solid var(--hx-accent);
+  background: var(--hx-accent-soft);
+  color: var(--hx-text);
+  border-radius: 0 var(--hx-radius-sm) var(--hx-radius-sm) 0;
+  padding: 6px 9px;
+  font-size: var(--hx-font-sm);
+}
+
+.hx-note--danger {
+  border-left-color: var(--hx-danger);
+  background: var(--hx-danger-soft);
+  color: var(--hx-danger);
+}
+
+.hx-note--warn {
+  border-left-color: var(--hx-warn);
+  background: var(--hx-warn-soft);
+  color: var(--hx-warn);
+}
+
+/* ===========================================================================
+   DOCUMENT EDITOR WINDOW (hx-word / hx-rb)
+   ---------------------------------------------------------------------------
+   The legacy desktop "Main" report window: Windows title bar, patient strip,
+   the old tool rail, and a Word style ribbon over a sheet of paper.
+   Deliberately NOT themed with the hx- tokens - it is meant to read as the
+   desktop program the radiologists already use, so the greys are fixed.
+
+   Rendered in a portal on <body> at z-index 9000, which keeps it above the
+   workspace and below the CKEditor dialogs and drop panels (10000+).
+   =========================================================================== */
+
+.hx-word {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: Segoe UI, Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  color: #1a1a1a;
+}
+
+.hx-word__frame {
+  display: flex;
+  flex-direction: column;
+  width: 94vw;
+  height: 92vh;
+  background: #f4f4f4;
+  border: 1px solid #6d6d6d;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.hx-word.is-max .hx-word__frame {
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+}
+
+/* ---------- title bar ---------- */
+
+.hx-word__titlebar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding-left: 6px;
+  background: linear-gradient(#fdfdfd, #e4e7ec);
+  border-bottom: 1px solid #b9bcc2;
+}
+
+.hx-word__appicon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  background: #2b579a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.hx-word__title {
+  flex: 1 1 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hx-word__winbtns {
+  display: flex;
+  height: 100%;
+}
+
+.hx-word__winbtns button {
+  width: 42px;
+  border: 0;
+  background: transparent;
+  color: #2a2a2a;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hx-word__winbtns button:hover {
+  background: #d8dbe0;
+}
+
+.hx-word__winbtns .hx-word__close:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+.hx-word__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ---------- buttons shared by the print preview bar ---------- */
+
+.hx-word__btn {
+  min-height: 24px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  color: #000;
+  background: linear-gradient(#fdfdfd, #e3e3e3);
+  border: 1px solid #8f8f8f;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.hx-word__btn:hover:not(:disabled) {
+  background: linear-gradient(#f2f9ff, #cfe6fb);
+  border-color: #3c7fb1;
+}
+
+.hx-word__btn:active:not(:disabled) {
+  background: linear-gradient(#d0e4f5, #b5d5f0);
+}
+
+.hx-word__btn:disabled {
+  color: #8a8a8a;
+  background: #efefef;
+  cursor: not-allowed;
+}
+
+/* ---------- ribbon + paper column ---------- */
+
+.hx-word__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* The ruler sits on the canvas grey and is centred over the paper, so it is
+   given the canvas's own side padding and centring. */
+.hx-word__rulerbar {
+  display: flex;
+  justify-content: center;
+  padding: 6px 12px 0;
+  background: #8b8d90;
+  overflow: hidden;
+}
+
+/* The bar itself is the paper's width. Its background is the margin zone; the
+   white strip inside it is the column the text actually runs in. */
+.hx-word__ruler {
+  position: relative;
+  height: 20px;
+  max-width: 100%;
+  background: #b9bbbe;
+  border: 1px solid #6f7174;
+  border-bottom: 0;
+  color: #3d3d3d;
+  font-size: 8px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.hx-word__ruler-text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #fff;
+}
+
+.hx-word__ruler-mark {
+  position: absolute;
+  top: 0;
+  height: 20px;
+  padding: 0 2px;
+  line-height: 21px;
+  transform: translateX(-50%);
+}
+
+/* The tick the number sits under. */
+.hx-word__ruler-mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  height: 4px;
+  border-left: 1px solid #6f7174;
+}
+
+/* ---------- indent markers ----------
+   The marker itself is a CSS triangle, which cannot take padding, so each one
+   is drawn in ::before inside a wider transparent box. That box is the grab
+   area: 13px is what makes these catchable with a mouse. */
+
+.hx-word__ruler-ind {
+  position: absolute;
+  width: 13px;
+  height: 9px;
+  margin-left: -6px;
+  z-index: 2;
+  cursor: ew-resize;
+}
+
+.hx-word__ruler-ind::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+}
+
+.hx-word__ruler-ind:hover::before {
+  border-top-color: #1e3f72;
+  border-bottom-color: #1e3f72;
+  background: #1e3f72;
+}
+
+/* First line only - points down from the top edge. */
+.hx-word__ruler-ind--first {
+  top: 0;
+}
+
+.hx-word__ruler-ind--first::before {
+  top: 0;
+  border-top: 7px solid #3b5f95;
+}
+
+/* Every line but the first, and the right hand edge - both point up. */
+.hx-word__ruler-ind--hang,
+.hx-word__ruler-ind--right {
+  bottom: 6px;
+}
+
+.hx-word__ruler-ind--hang::before,
+.hx-word__ruler-ind--right::before {
+  bottom: 0;
+  border-bottom: 7px solid #3b5f95;
+}
+
+/* The whole paragraph - the square under the hanging triangle. */
+.hx-word__ruler-ind--left {
+  bottom: 0;
+  height: 6px;
+}
+
+.hx-word__ruler-ind--left::before {
+  bottom: 0;
+  width: 9px;
+  height: 5px;
+  border: 0;
+  background: #3b5f95;
+}
+
+.hx-word__canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 10px 12px 0;
+  background: #8b8d90;
+  overflow: hidden;
+}
+
+/* The sheet of paper. It is the editor box, not the document inside it, so it
+   always runs the full height of the canvas and the text scrolls within. */
+.hx-word__paper {
+  max-width: 100%;
+  height: 100%;
+  background: #fff;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hx-word__paper > div {
+  margin: 0 !important;
+  height: 100%;
+}
+
+/* The ribbon replaces the stock toolbar, so the CKEditor chrome goes away. */
+.hx-word__paper .cke_top {
+  display: none !important;
+}
+
+.hx-word__paper .cke,
+.hx-word__paper .cke_chrome,
+.hx-word__paper .cke_inner,
+.hx-word__paper .cke_contents {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #fff !important;
+}
+
+.hx-word__status {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 22px;
+  padding: 0 10px;
+  background: #2b579a;
+  color: #fff;
+  font-size: 11px;
+}
+
+.hx-word__status-right {
+  margin-left: auto;
+}
+
+/* ---------- print preview ---------- */
+
+.hx-word__preview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #8b8d90;
+}
+
+.hx-word__preview-bar {
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #b9bcc2;
+}
+
+.hx-word__preview-scroll {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 14px 0;
+}
+
+.hx-word__sheet {
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: #000;
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.45);
+  font-family: Garamond, "Times New Roman", serif;
+  font-size: 12pt;
+  box-sizing: border-box;
+}
+
+.hx-word__sheet-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 10pt;
+  border-bottom: 1px solid #000;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.hx-word__sheet-body {
+  line-height: 1.3;
+}
+
+.hx-word__sheet-body img {
+  max-width: 100%;
+}
+
+/* ---------- minimised ---------- */
+
+.hx-word-min {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 9000;
+}
+
+.hx-word-min__bar {
+  padding: 6px 16px;
+  background: linear-gradient(#fdfdfd, #e4e7ec);
+  border: 1px solid #b9bcc2;
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===========================================================================
+   THE RIBBON (hx-rb)
+   =========================================================================== */
+
+.hx-rb {
+  background: #fff;
+  border-bottom: 1px solid #d4d4d4;
+  user-select: none;
+}
+
+.hx-rb-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 25px;
+  padding-left: 2px;
+  background: #2b579a;
+}
+
+.hx-rb-tab {
+  height: 25px;
+  padding: 0 13px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hx-rb-tab:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.hx-rb-tab.is-active {
+  background: #fff;
+  color: #2b579a;
+  font-weight: 600;
+}
+
+.hx-rb-tab--file {
+  background: #1e3f72;
+  font-weight: 600;
+}
+
+.hx-rb-body {
+  display: flex;
+  align-items: stretch;
+  min-height: 92px;
+  padding: 3px 4px 0;
+  background: #fff;
+  overflow-x: auto;
+}
+
+.hx-rb-body--file {
+  min-height: 0;
+  padding: 8px;
+  background: #f4f6fa;
+}
+
+.hx-rb-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 7px 0;
+  border-right: 1px solid #e2e2e2;
+}
+
+.hx-rb-group__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+  flex: 1 1 auto;
+  padding-bottom: 3px;
+}
+
+.hx-rb-group__name {
+  padding: 1px 0 3px;
+  text-align: center;
+  font-size: 10px;
+  color: #7a7a7a;
+}
+
+.hx-rb-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hx-rb-row,
+.hx-rb-stack {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.hx-rb-stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.hx-rb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hx-rb-btn:hover:not(:disabled),
+.hx-rb-popwrap:hover > span > .hx-rb-btn {
+  background: #d2e4f7;
+  border-color: #a7c8e8;
+}
+
+.hx-rb-btn.is-active {
+  background: #cfe3f7;
+  border-color: #7aa7d4;
+}
+
+.hx-rb-btn:disabled {
+  color: #9a9a9a;
+  cursor: not-allowed;
+}
+
+.hx-rb-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  font-size: 13px;
+}
+
+.hx-rb-btn--big {
+  flex-direction: column;
+  gap: 2px;
+  min-width: 52px;
+  height: 62px;
+  justify-content: center;
+}
+
+.hx-rb-btn--big .hx-rb-btn__icon {
+  font-size: 22px;
+}
+
+.hx-rb-select {
+  height: 22px;
+  padding: 0 2px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #000;
+  background: #fff;
+  border: 1px solid #abadb3;
+  border-radius: 0;
+}
+
+.hx-rb-label {
+  font-size: 11px;
+  color: #555;
+  padding: 0 2px;
+}
+
+.hx-rb-zoom {
+  min-width: 42px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.hx-rb-count {
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* ---------- styles gallery ---------- */
+
+.hx-rb-group--styles .hx-rb-group__body {
+  gap: 2px;
+}
+
+.hx-rb-style {
+  width: 62px;
+  height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 2px;
+  background: #fff;
+  border: 1px solid #d4d4d4;
+  cursor: pointer;
+}
+
+.hx-rb-style:hover {
+  border-color: #7aa7d4;
+  background: #eef5fc;
+}
+
+.hx-rb-style__sample {
+  font-family: Cambria, Georgia, serif;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.hx-rb-style__name {
+  font-size: 9px;
+  color: #666;
+}
+
+.hx-rb-style--heading1 .hx-rb-style__sample {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2b579a;
+}
+
+.hx-rb-style--strong .hx-rb-style__sample {
+  font-weight: 700;
+}
+
+.hx-rb-style--emphasis .hx-rb-style__sample {
+  font-style: italic;
+}
+
+.hx-rb-style--subtitle .hx-rb-style__sample {
+  color: #5a5a5a;
+  font-style: italic;
+}
+
+.hx-rb-style--normal {
+  border-color: #f0a44a;
+}
+
+/* ---------- popups ---------- */
+
+.hx-rb-popwrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.hx-rb-pop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 40;
+  min-width: 158px;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #a6a6a6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.hx-rb-pop__item {
+  display: block;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hx-rb-pop__item:hover {
+  background: #d2e4f7;
+}
+
+.hx-rb-pop__sep {
+  height: 1px;
+  margin: 3px 0;
+  background: #e0e0e0;
+}
+
+.hx-rb-pop__title {
+  padding: 3px 6px 5px;
+  font-size: 11px;
+  color: #5f5f5f;
+}
+
+/* ---------- Bullet / Numbering libraries ---------- */
+
+/* The caret half of a split button: the marker gallery hangs off this, while
+   the button to its left still does the plain Word toggle. */
+.hx-rb-btn--caret {
+  min-width: 0;
+  padding: 0 3px;
+}
+
+.hx-rb-pop--gallery {
+  min-width: 0;
+}
+
+.hx-rb-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 42px);
+  gap: 3px;
+}
+
+.hx-rb-gallery--wide {
+  grid-template-columns: repeat(3, 62px);
+}
+
+.hx-rb-gallery__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.hx-rb-gallery__cell:hover {
+  background: #d2e4f7;
+  border-color: #2b579a;
+}
+
+.hx-rb-gallery__glyph {
+  font-size: 17px;
+  line-height: 1;
+  color: #1a1a1a;
+}
+
+.hx-rb-gallery__label {
+  font-size: 11px;
+  color: #1a1a1a;
+}
+
+.hx-rb-gallery__none {
+  font-size: 11px;
+  color: #6b6b6b;
+}
+
+/* ---------- Paragraph dialog (Line Spacing Options...) ---------- */
+
+/* 9500 puts it over the editor window (9000) and under CKEditor's own
+   dialogs (10000+), which is the order the rest of this window keeps. */
+.hx-word-dlg {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  font-family: Segoe UI, Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  color: #1a1a1a;
+}
+
+.hx-word-dlg__box {
+  width: 430px;
+  max-width: 94vw;
+  background: #f4f4f4;
+  border: 1px solid #6d6d6d;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.hx-word-dlg__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  padding: 0 4px 0 9px;
+  background: linear-gradient(#fdfdfd, #e4e7ec);
+  border-bottom: 1px solid #b9bcc2;
+  font-weight: 600;
+}
+
+.hx-word-dlg__x {
+  width: 26px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.hx-word-dlg__x:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+.hx-word-dlg__body {
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.hx-word-dlg__section {
+  margin: 8px 0 5px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #e4e4e4;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2b579a;
+}
+
+.hx-word-dlg__section:first-child {
+  margin-top: 0;
+}
+
+.hx-word-dlg__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.hx-word-dlg__lbl {
+  min-width: 78px;
+  font-size: 11px;
+  color: #444;
+}
+
+.hx-word-dlg__row .hx-rb-input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.hx-word-dlg__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid #dcdcdc;
+}
+
+.hx-word-dlg__btn {
+  min-width: 78px;
+  padding: 5px 12px;
+  background: #fff;
+  border: 1px solid #abadb3;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hx-word-dlg__btn:hover {
+  background: #e6eefa;
+  border-color: #2b579a;
+}
+
+.hx-word-dlg__btn--primary {
+  background: #2b579a;
+  border-color: #2b579a;
+  color: #fff;
+}
+
+.hx-word-dlg__btn--primary:hover {
+  background: #1e3f72;
+  color: #fff;
+}
+
+.hx-rb-swatches {
+  display: grid;
+  grid-template-columns: repeat(7, 18px);
+  gap: 3px;
+  padding: 3px;
+}
+
+.hx-rb-swatch {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #9a9a9a;
+  cursor: pointer;
+}
+
+.hx-rb-symbols {
+  display: grid;
+  grid-template-columns: repeat(7, 26px);
+  gap: 2px;
+}
+
+.hx-rb-symbol {
+  width: 26px;
+  height: 26px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.hx-rb-symbol:hover {
+  background: #d2e4f7;
+  border-color: #a7c8e8;
+}
+
+/* ---------- File tab ---------- */
+
+.hx-rb-file {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hx-rb-file__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 180px;
+  padding: 9px 14px;
+  background: #fff;
+  border: 1px solid #ccd3df;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hx-rb-file__item:hover {
+  background: #e6eefa;
+  border-color: #2b579a;
+}
+
+.hx-rb-file__item--primary {
+  background: #2b579a;
+  border-color: #2b579a;
+  color: #fff;
+}
+
+.hx-rb-file__item--primary:hover {
+  background: #1e3f72;
+  color: #fff;
+}
+
+.hx-word button:focus,
+.hx-word select:focus {
+  outline: none;
+  border-color: #7aa7d4 !important;
+}
+
+.hx-word .hx-word__btn,
+.hx-word .hx-rb-btn,
+.hx-word .hx-rb-style,
+.hx-word .hx-rb-file__item {
+  border-radius: 3px !important;
+}
+
+.hx-word .hx-rb-btn {
+  background: transparent;
+  color: #1a1a1a;
+}
+
+.hx-word .hx-rb-btn:hover:not(:disabled) {
+  background: #d2e4f7;
+}
+
+.hx-word-min__bar {
+  border-radius: 3px 3px 0 0 !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Quick access toolbar + the Report tab controls.
+
+   The tool rail is gone, so the actions it held sit in two places: the handful
+   used constantly live on the title bar, the rest on the Report tab.
+   --------------------------------------------------------------------------- */
+
+.hx-word__qat {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.hx-word__qat button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #2a2a2a;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hx-word__qat button:hover:not(:disabled) {
+  background: #d2e4f7;
+  border-color: #a7c8e8;
+}
+
+.hx-word__qat button:disabled {
+  color: #a8a8a8;
+  cursor: not-allowed;
+}
+
+.hx-word__qat-sep {
+  width: 1px;
+  height: 14px;
+  margin: 0 3px;
+  background: #c4c7cc;
+}
+
+.hx-rb-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hx-rb-check input {
+  margin: 0;
+}
+
+.hx-rb-input {
+  height: 22px;
+  width: 100%;
+  min-width: 180px;
+  padding: 1px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #000;
+  background: #fff;
+  border: 1px solid #abadb3;
+}
+
+.hx-rb-readout {
+  max-width: 220px;
+  padding: 4px 6px;
+  background: #fff;
+  border: 1px solid #abadb3;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* The Report tab is the one place a group holds full width controls. */
+.hx-rb-group .hx-rb-rows .hx-rb-row {
+  flex-wrap: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Action bar - Save Document / Save & Approve / Cancel.
+
+   Sits directly above the status bar so the action the window exists for is
+   never more than one click away, whichever ribbon tab is showing.
+   --------------------------------------------------------------------------- */
+
+.hx-word__actionbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #eef1f6;
+  border-top: 1px solid #c9cdd5;
+}
+
+.hx-word__actionbar-hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  color: #5b6172;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hx-word__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: linear-gradient(#fdfdfd, #e3e3e3);
+  border: 1px solid #8f8f8f;
+  cursor: pointer;
+}
+
+.hx-word__action:hover:not(:disabled) {
+  background: linear-gradient(#f2f9ff, #cfe6fb);
+  border-color: #3c7fb1;
+}
+
+.hx-word__action:disabled {
+  color: #8a8a8a;
+  background: #efefef;
+  cursor: not-allowed;
+}
+
+.hx-word__action--save {
+  min-width: 156px;
+  justify-content: center;
+  color: #fff;
+  background: #2b579a;
+  border-color: #2b579a;
+}
+
+.hx-word__action--save:hover:not(:disabled) {
+  color: #fff;
+  background: #1e3f72;
+  border-color: #1e3f72;
+}
+
+.hx-word__action--approve {
+  color: #fff;
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.hx-word__action--approve:hover:not(:disabled) {
+  color: #fff;
+  background: #12813c;
+  border-color: #12813c;
+}
+
+.hx-word__action--save:disabled,
+.hx-word__action--approve:disabled {
+  color: #8a8a8a;
+  background: #efefef;
+  border-color: #bdbdbd;
+}
+
+@media (max-width: 820px) {
+  .hx-word__actionbar-hint {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   12. THEME ACCENTS — the active *_theme (assets/css/theme.css) drives the
+       hx accent, so modern screens re-colour with the theme picker like the
+       classic ones. Strong themes become the accent; pale themes keep a
+       readable accent from the same family.
+   =========================================================================== */
+.default_theme        { --hx-accent: #14b58c; --hx-accent-strong: #0e8f6e; --hx-accent-soft: #d9f7ee; --hx-accent-border: #a9e9d3; }
+.pale_pink_theme      { --hx-accent: #bc3c8b; --hx-accent-strong: #8f2c69; --hx-accent-soft: #f9e3f0; --hx-accent-border: #efc2dc; }
+.red_theme            { --hx-accent: #8b2424; --hx-accent-strong: #6a1b1b; --hx-accent-soft: #f6e0e0; --hx-accent-border: #e8bcbc; }
+.sky_blue_theme       { --hx-accent: #03a0e7; --hx-accent-strong: #027ab0; --hx-accent-soft: #dcf2fc; --hx-accent-border: #a8dff6; }
+.light_blue_theme     { --hx-accent: #4f7fd8; --hx-accent-strong: #3a62ad; --hx-accent-soft: #e3ecfb; --hx-accent-border: #bcd0f3; }
+.pink_theme           { --hx-accent: #e0578b; --hx-accent-strong: #b23f6c; --hx-accent-soft: #fde6ee; --hx-accent-border: #f8bfd3; }
+.purple_theme         { --hx-accent: #8b5cf6; --hx-accent-strong: #6d3fd6; --hx-accent-soft: #eee8fd; --hx-accent-border: #d5c6fa; }
+.gray_theme           { --hx-accent: #4b5563; --hx-accent-strong: #374151; --hx-accent-soft: #e9ebef; --hx-accent-border: #cfd4dc; }
+.pastel_pink_theme, .light_pink_theme, .blush_pink_theme, .lite_pale_theme, .pale_rose_theme
+                      { --hx-accent: #d0416f; --hx-accent-strong: #a32f55; --hx-accent-soft: #fde8ee; --hx-accent-border: #f7c3d3; }
+.light_peach_theme, .pale_peach_theme, .peach_theme, .orange_theme
+                      { --hx-accent: #ea7a1b; --hx-accent-strong: #b95d10; --hx-accent-soft: #fff0e2; --hx-accent-border: #fbd3ad; }
+.pale_yellow_theme    { --hx-accent: #b7950b; --hx-accent-strong: #8a7008; --hx-accent-soft: #fbf7d6; --hx-accent-border: #efe49a; }
+.pale_green_theme, .light_celadon_theme, .pale_mint_theme
+                      { --hx-accent: #2f9e5b; --hx-accent-strong: #227a45; --hx-accent-soft: #e2f7ea; --hx-accent-border: #b6e8c8; }
+.pale_aqua_theme      { --hx-accent: #0e9aa7; --hx-accent-strong: #0a747e; --hx-accent-soft: #dcf6f8; --hx-accent-border: #a8e5ea; }
+.pale_lavender_blue_theme, .pale_gray_theme, .pale_mauve_theme, .lavender_blush_theme
+                      { --hx-accent: #6d5fd6; --hx-accent-strong: #5346ad; --hx-accent-soft: #ebe8fb; --hx-accent-border: #cdc6f3; }
+
+/* ===========================================================================
+   13. MODERN LIST PAGE — the reference design ("Patient appointments" mock):
+       crimson accent, white rounded panels, label above field, tinted table
+       header, compact 44px rows, soft icon squares, outline / solid buttons,
+       a horizontal date track under an expanded row, and patient cards +
+       pill tabs on the phone.  Density is the reference's: 12-13px type,
+       34px controls, 26px row buttons.
+   =========================================================================== */
+/* the app Modern shell takes the reference crimson unless a colour theme is chosen */
+
+.hx-modern-table {
+  --hx-accent-strong: color-mix(in srgb, var(--hx-accent) 80%, #000);
+  --hx-accent-soft: color-mix(in srgb, var(--hx-accent) 10%, #fff);
+  --hx-accent-border: color-mix(in srgb, var(--hx-accent) 32%, #fff);
+  --hx-surface: #ffffff;
+  --hx-surface-sunken: #f7f7fa;
+  --hx-border: #e8eaf0;
+  --hx-border-strong: #d8dbe4;
+  --hx-text: #1f2937;
+  --hx-text-muted: #6b7280;
+  --hx-text-faint: #9ca3af;
+  --hx-green: #16a34a;
+  --hx-green-soft: #dcfce7;
+  --hx-radius: 12px;
+  --hx-shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 6px rgba(17, 24, 39, 0.05);
+  padding: 0;
+  color: var(--hx-text);
+  font-size: 13px;
+}
+.modern-layout .hx-modern-table {
+  --hx-surface: var(--c-surface);
+  --hx-surface-sunken: var(--c-surface-2);
+  --hx-border: var(--c-border);
+  --hx-border-strong: var(--c-border);
+  --hx-text: var(--c-text);
+  --hx-text-muted: var(--c-text-muted);
+  --hx-text-faint: var(--c-text-faint);
+}
+.hx-modern-table * { box-sizing: border-box; }
+.hx-modern-table .hx-panel { background: var(--hx-surface); border: 1px solid var(--hx-border); border-radius: var(--hx-radius); box-shadow: var(--hx-shadow-sm); overflow: hidden; margin-bottom: 10px; }
+.hx-modern-table .hx-panel__head { background: var(--hx-surface) !important; background-image: none !important; border-bottom: 1px solid var(--hx-border); padding: 8px 14px !important; min-height: 38px; }
+.hx-modern-table .hx-panel__title { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 800; color: var(--hx-text) !important; }
+.hx-modern-table .hx-panel__body { padding: 0; overflow: visible; }
+.hx-modern-table .hx-panel--soft .hx-panel__head { display: none; }
+.hx-modern-table .hx-panel__meta { font-size: 12px; color: var(--hx-text-muted); font-weight: 600; }
+
+/* page header */
+.hx-page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 0 2px 8px; }
+.hx-page-head__crumb { font-size: 12px; color: var(--hx-text-muted); margin-bottom: 1px; display: flex; align-items: center; gap: 6px; }
+.hx-page-head__title { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; color: var(--hx-text); line-height: 1.2; }
+.hx-page-head__sub { margin: 2px 0 0; font-size: 12.5px; color: var(--hx-text-muted); }
+.hx-page-head__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* segmented switch (Classic | Modern) */
+.hx-seg { display: inline-flex; align-items: center; padding: 2px; border: 1px solid var(--hx-border-strong); border-radius: 999px; background: #fff; }
+.hx-seg__btn { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border: none; border-radius: 999px; background: transparent !important; color: var(--hx-text-muted) !important; font-size: 12px; font-weight: 700; line-height: 1.4; cursor: pointer; white-space: nowrap; }
+.hx-seg__btn--on { background: var(--hx-accent) !important; color: #fff !important; }
+
+/* panel head icon + count */
+.hx-head-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--hx-accent-soft); color: var(--hx-accent); font-size: 12px; margin-right: 2px; }
+.hx-head-icon--success { background: var(--hx-green-soft); color: var(--hx-green); }
+.hx-count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 20px; padding: 0 7px; border-radius: 999px; background: var(--hx-accent-soft); color: var(--hx-accent); font-size: 12px; font-weight: 800; margin-left: 8px; }
+.hx-count-pill--success { background: var(--hx-green-soft); color: var(--hx-green); }
+
+/* filter bar: label above field, 34px controls */
+.hx-filter { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 14px; padding: 12px 14px 14px; }
+.hx-filter__field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hx-filter__label { font-size: 12px; font-weight: 700; color: var(--hx-text); line-height: 1.2; }
+.hx-filter__actions { display: flex; align-items: flex-end; gap: 8px; }
+.hx-filter .hx-input { height: 34px; border: 1px solid var(--hx-border-strong); border-radius: 8px; padding: 5px 11px; font-size: 13px; background: var(--hx-surface); color: var(--hx-text); width: 100%; }
+.hx-filter .hx-input::placeholder { color: var(--hx-text-faint); }
+.hx-filter .hx-input:focus { outline: none; border-color: var(--hx-accent); box-shadow: 0 0 0 3px var(--hx-accent-soft); }
+/* project selects / date pickers inside a field: same 34px height, their floating labels hidden,
+   the date picker button flattened into the input */
+.hx-filter__field .form-group { margin-bottom: 0 !important; }
+.hx-filter__field .form-group > label, .hx-filter__field .lable, .hx-filter__field label.label { display: none !important; }
+.hx-filter__field .form-control, .hx-filter__field .custom-calendar, .hx-filter__field .p-inputtext,
+.hx-filter__field .p-calendar, .hx-filter__field .p-dropdown, .hx-filter__field [class*="control"] {
+  min-height: 34px !important; height: 34px !important; border-radius: 8px !important; font-size: 13px; border-color: var(--hx-border-strong) !important; box-shadow: none !important;
+}
+.hx-filter__field .custom-calendar { width: 100%; }
+.hx-filter__field .input-group { flex-wrap: nowrap; }
+.hx-filter__field .input-group .form-control, .hx-filter__field .p-calendar .p-inputtext { border-radius: 8px 0 0 8px !important; }
+.hx-filter__field .p-calendar { width: 100%; display: flex; }
+.hx-filter__field .p-datepicker-trigger, .hx-filter__field .p-calendar .p-button, .hx-filter__field .input-group .btn, .hx-filter__field .input-group button, .hx-filter__field .input-group-append .btn {
+  height: 34px !important; background: var(--hx-surface) !important; background-image: none !important; border: 1px solid var(--hx-border-strong) !important; border-left: none !important; border-radius: 0 8px 8px 0 !important; color: var(--hx-accent) !important; padding: 0 10px !important;
+}
+.hx-modern-table .hx-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; padding: 0 16px; border-radius: 8px; font-size: 13px; font-weight: 700; line-height: 1; cursor: pointer; white-space: nowrap; }
+.hx-modern-table .hx-btn { opacity: 1 !important; filter: none !important; }
+.hx-modern-table .hx-btn--solid { background: color-mix(in srgb, var(--hx-accent) 88%, #000) !important; background-image: none !important; border: 1px solid color-mix(in srgb, var(--hx-accent) 88%, #000) !important; color: #fff !important; }
+.hx-modern-table .hx-btn--solid:hover { background: var(--hx-accent-strong) !important; }
+.hx-modern-table .hx-btn--outline { background: var(--hx-surface) !important; background-image: none !important; border: 1px solid var(--hx-border-strong) !important; color: var(--hx-text) !important; }
+.hx-modern-table .hx-btn--outline:hover { background: var(--hx-surface-sunken) !important; }
+.hx-modern-table .hx-btn--primary { background: var(--hx-surface) !important; background-image: none !important; border: 1px solid var(--hx-accent) !important; color: var(--hx-accent) !important; }
+.hx-modern-table .hx-btn--primary:hover { background: var(--hx-accent-soft) !important; }
+.hx-modern-table .hx-btn--success { background: var(--hx-green) !important; background-image: none !important; border: 1px solid var(--hx-green) !important; color: #fff !important; }
+.hx-modern-table .hx-btn--success-soft { background: var(--hx-green-soft) !important; background-image: none !important; border: 1px solid #bbf7d0 !important; color: #15803d !important; }
+.hx-modern-table .hx-btn--muted { background: #e5e7eb !important; background-image: none !important; border: 1px solid #d1d5db !important; color: #374151 !important; }
+.hx-modern-table .hx-btn--sm { height: 26px; padding: 0 11px; border-radius: 7px; font-size: 12px; }
+.hx-modern-table .hx-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+@media (max-width: 1199px) { .hx-filter { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 767px)  { .hx-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; padding: 10px 12px; } .hx-filter__actions { grid-column: 1 / -1; } .hx-filter__actions .hx-btn { flex: 1 1 0; } }
+
+/* legend (soft dot with a coloured ring) + status pill */
+.hx-legend-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding: 7px 18px; }
+.hx-legend-bar .hx-pill { background: transparent; padding: 0; font-size: 13px; font-weight: 700; color: var(--hx-text); gap: 9px; }
+.hx-legend-bar .hx-pill__dot { width: 18px; height: 18px; background: var(--hx-pill-bg); border: 1.5px solid var(--hx-pill-dot); }
+.hx-pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--hx-text); background: var(--hx-pill-bg, var(--hx-surface-sunken)); white-space: nowrap; line-height: 1.5; }
+.hx-pill__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hx-pill-dot, var(--hx-text-faint)); flex: 0 0 auto; }
+
+/* data table: 44px rows, tinted header */
+.hx-table-wrap { width: 100%; overflow-x: auto; }
+.hx-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; table-layout: fixed; }
+.hx-table th:first-child, .hx-table td:first-child { padding-left: 14px; }
+.hx-table th:last-child, .hx-table td:last-child { padding-right: 14px; }
+.hx-table td > * { vertical-align: middle; }
+.hx-table__center .hx-table__actions { justify-content: center; }
+.hx-table th { position: sticky; top: 0; z-index: 1; padding: 7px 10px; background: var(--hx-accent-soft); color: var(--hx-text-muted); font-size: 12px; font-weight: 700; text-align: left; white-space: nowrap; }
+.hx-table td { padding: 5px 10px; height: 44px; border-bottom: 1px solid #edeff4; vertical-align: middle; color: var(--hx-text); overflow: hidden; text-overflow: ellipsis; }
+.hx-table th { border-bottom: 1px solid #e6e9f0; }
+.hx-table tbody tr:last-child td { border-bottom: none; }
+.hx-table tbody tr:hover td { background: var(--hx-surface-sunken); }
+.hx-table tbody tr.hx-table__row--selected td { background: var(--hx-accent-soft); }
+.hx-table tbody tr.hx-table__row--selected td:first-child { box-shadow: inset 3px 0 0 var(--hx-accent); }
+.hx-table__detail td { background: var(--hx-surface); padding: 6px 14px 10px; height: auto; }
+.hx-table__detail .hx-track { background: #f5f5f8; border: 1px solid #ebedf2; border-radius: 10px; padding: 10px 16px 10px 12px; }
+.hx-table__num { color: var(--hx-text-muted); width: 34px; }
+.hx-table__actions { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.hx-table__primary { font-weight: 800; color: var(--hx-text); font-size: 13px; line-height: 1.25; }
+.hx-table__secondary { font-size: 11.5px; color: var(--hx-text-muted); margin-top: 1px; line-height: 1.25; }
+.hx-table__right { text-align: right; }
+.hx-table__center { text-align: center; }
+.hx-table__fit { width: 1%; white-space: nowrap; }
+.hx-table__expander { border: none; background: transparent !important; color: var(--hx-text-muted) !important; padding: 2px 6px; cursor: pointer; font-size: 11px; }
+.hx-table__foot { display: flex; justify-content: flex-end; padding: 6px 12px; font-size: 11.5px; color: var(--hx-text-muted); }
+
+.hx-iconbtn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid var(--hx-accent-border) !important; border-radius: 7px; background: var(--hx-accent-soft) !important; background-image: none !important; color: var(--hx-accent) !important; cursor: pointer; padding: 0; transition: transform 0.12s ease; }
+.hx-iconbtn:hover { transform: translateY(-1px); }
+.hx-iconbtn svg, .hx-iconbtn i { font-size: 12px; }
+
+.hx-token { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--hx-green); color: #fff; font-weight: 800; font-size: 12px; flex: 0 0 auto; }
+.hx-token--sm { width: 24px; height: 24px; font-size: 11px; }
+.hx-token--none { background: #e5e7eb; color: #6b7280; }
+.hx-token-col { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; }
+.hx-token-col__visit { font-size: 12px; font-weight: 600; color: var(--hx-text); white-space: nowrap; }
+.hx-token-wrap { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.hx-token-wrap__text { display: flex; flex-direction: column; line-height: 1.2; }
+.hx-token-wrap__text small { font-size: 11px; color: var(--hx-text-muted); }
+.hx-token-wrap__text span { font-size: 12.5px; font-weight: 600; }
+
+/* horizontal date track under an expanded row */
+.hx-track { display: flex; align-items: flex-start; }
+.hx-track__item { position: relative; flex: 1 1 0; padding: 0 8px 0 20px; min-width: 0; }
+.hx-track__label { position: relative; z-index: 1; display: inline-block; background: #f5f5f8; padding-right: 10px; }
+.hx-track__item::before { content: ""; position: absolute; left: 0; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #8b8f9a; z-index: 1; }
+.hx-track__item::after { content: ""; position: absolute; left: 10px; right: 0; top: 8.5px; height: 1px; background: #cfd3dc; }
+.hx-track__item:last-child::after { display: none; }
+.hx-track__label { font-size: 12px; color: var(--hx-text); font-weight: 600; line-height: 1.3; }
+.hx-track__item::after { top: 8px; }
+.hx-track__value { font-size: 12px; font-weight: 500; color: var(--hx-text-muted); margin-top: 2px; }
+
+/* pill tabs (phone) */
+.hx-tabs { display: flex; gap: 8px; }
+.hx-tab { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--hx-border-strong) !important; border-radius: 10px; background: var(--hx-surface) !important; background-image: none !important; color: var(--hx-text) !important; font-weight: 800; font-size: 13px; cursor: pointer; }
+.hx-tab--on { background: var(--hx-accent) !important; border-color: var(--hx-accent) !important; color: #fff !important; }
+.hx-tab .hx-count-pill { margin-left: 4px; background: #fff; color: var(--hx-accent); height: 20px; min-width: 22px; }
+.hx-tab:not(.hx-tab--on) .hx-count-pill { background: var(--hx-surface-sunken); color: var(--hx-text); }
+
+/* phone search row */
+.hx-msearch { display: flex; gap: 8px; align-items: center; }
+.hx-msearch__box { position: relative; flex: 1 1 auto; }
+.hx-msearch__box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--hx-text-faint); }
+.hx-msearch__box .hx-input { height: 40px; width: 100%; padding: 6px 12px 6px 34px; border: 1px solid var(--hx-border-strong); border-radius: 10px; font-size: 13px; }
+.hx-mdate { display: inline-flex; align-items: center; gap: 8px; margin: 8px 0; padding: 7px 12px; border: 1px solid var(--hx-border-strong); border-radius: 10px; background: var(--hx-surface); font-size: 13px; font-weight: 600; }
+.hx-mlegend { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.hx-mlegend .hx-pill { background: var(--hx-surface); border: 1px solid var(--hx-border); font-weight: 700; }
+.hx-mlegend .hx-pill__dot { width: 12px; height: 12px; background: var(--hx-pill-bg); border: 1.5px solid var(--hx-pill-dot); }
+
+/* patient card (phone) */
+.hx-rec { border: 1px solid var(--hx-border); border-radius: 14px; background: var(--hx-surface); box-shadow: var(--hx-shadow-sm); padding: 12px 14px; margin-bottom: 10px; }
+.hx-rec--open { border-color: var(--hx-accent); box-shadow: inset 3px 0 0 var(--hx-accent), var(--hx-shadow-sm); }
+.hx-rec__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.hx-rec__name { font-size: 15px; font-weight: 800; color: var(--hx-text); }
+.hx-rec__meta { font-size: 12px; color: var(--hx-text-muted); line-height: 1.5; }
+.hx-rec__right { text-align: right; font-size: 12px; color: var(--hx-text); }
+.hx-rec__right b { display: block; }
+.hx-rec__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.hx-rec__row .hx-btn { flex: 1 1 0; }
+.hx-rec__track { margin-top: 12px; padding-left: 4px; display: flex; flex-direction: column; gap: 6px; }
+.hx-rec__track div { display: grid; grid-template-columns: 14px 90px 1fr; align-items: center; font-size: 12px; color: var(--hx-text-muted); }
+.hx-rec__track div::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; }
+.hx-rec__track div b { color: var(--hx-text); font-weight: 600; }
+.hx-rec__more { border: none; background: transparent !important; color: var(--hx-text-muted) !important; padding: 0 4px; cursor: pointer; }
+
+.hx-only-mobile { display: none !important; }
+@media (max-width: 767px) {
+  .hx-only-mobile { display: flex !important; }
+  .hx-only-mobile.hx-block { display: block !important; }
+  .hx-hide-mobile { display: none !important; }
+  .hx-modern-table { padding: 6px 6px 12px; }
+  .hx-page-head__title { font-size: 19px; }
+}
+
+/* Table | Modern switch on list cards - the Appointment Confirmation Table | Calendar look */
+.hx-seg--square { border-radius: 8px; padding: 0; overflow: hidden; background: #fff; border: 1px solid #d1d5db; }
+.hx-seg--square .hx-seg__btn { border-radius: 0; padding: 5px 13px; font-size: 12.5px; font-weight: 600; color: #374151 !important; background: #fff !important; }
+.hx-seg--square .hx-seg__btn--on { background: var(--hx-accent, #2563eb) !important; color: #fff !important; box-shadow: none; }
+.card-header .hx-seg--square { margin-left: auto; }
+
+/* search box above a modern list (AppointmentModernTables) */
+.hx-listbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #edeff4; }
+.hx-listbar__search { position: relative; display: flex; align-items: center; flex: 0 1 380px; min-width: 200px; margin: 0; }
+.hx-listbar__search svg { position: absolute; left: 10px; color: #9ca3af; font-size: 12px; pointer-events: none; }
+.hx-listbar__search input { width: 100%; height: 32px; padding: 4px 28px 4px 30px; border: 1px solid #d8dbe4; border-radius: 8px; font-size: 12.5px; background: #fff; color: #1f2937; }
+.hx-listbar__search input:focus { outline: none; border-color: var(--hx-accent); box-shadow: 0 0 0 3px var(--hx-accent-soft); }
+.hx-listbar__clear { position: absolute; right: 6px; width: 20px; height: 20px; border: none !important; border-radius: 50%; background: #eef0f4 !important; color: #6b7280 !important; font-size: 14px; line-height: 1; cursor: pointer; padding: 0; }
+.hx-listbar__count { font-size: 12px; color: #6b7280; white-space: nowrap; }
+@media (max-width: 767px) { .hx-listbar__search { flex: 1 1 auto; } }
+
+/* ===========================================================================
+   14. ENTRY GRID — a form that is a table: one record per row, every cell a
+       control, the active row driving a preview strip and a sticky action bar
+       underneath (Purchase > Quotation Master is the reference screen).
+       Lives beside section 13 and inherits its tokens through .hx-modern-table.
+   =========================================================================== */
+
+.hx-qm { padding-bottom: 4px; }
+.hx-qm .hx-panel { margin-bottom: 12px; }
+
+/* required-field marker, shared by the header labels and the column captions */
+.hx-qm__req { color: var(--hx-danger); font-style: normal; font-weight: 700; }
+
+/* header card: the filter grid without a panel head */
+.hx-qm-head .hx-filter { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.hx-qm-head .hx-filter__field .hx-muted { font-weight: 500; }
+.hx-qm__remarks { grid-column: span 1; }
+
+/* items panel ------------------------------------------------------------- */
+.hx-qm-items__head .hx-panel__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hx-qm-items__head .hx-badge { margin-left: 8px; font-weight: 700; }
+.hx-qm-items__sub { padding: 0 14px 8px; font-size: 12px; color: var(--hx-text-muted); }
+
+.hx-qm__wrap { width: 100%; overflow-x: auto; }
+
+.hx-qm-table { width: 100%; min-width: 1320px; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
+.hx-qm-table th { position: sticky; top: 0; z-index: 2; padding: 7px 8px; background: var(--hx-surface-sunken); border-top: 1px solid var(--hx-border); border-bottom: 1px solid var(--hx-border); text-align: left; vertical-align: top; }
+.hx-qm-table th:first-child, .hx-qm-table td:first-child { padding-left: 14px; }
+.hx-qm-table th:last-child, .hx-qm-table td:last-child { padding-right: 14px; }
+.hx-qm-table td { padding: 6px 8px; border-bottom: 1px solid #edeff4; vertical-align: middle; }
+.hx-qm-table tbody tr:last-child td { border-bottom: 1px solid var(--hx-border); }
+
+.hx-qm__th { display: block; font-size: 12px; font-weight: 700; color: var(--hx-text); line-height: 1.2; }
+.hx-qm__hint { display: block; margin-top: 1px; font-size: 11px; font-weight: 500; color: var(--hx-text-faint); line-height: 1.2; }
+.hx-qm__no { font-size: 12px; font-weight: 700; color: var(--hx-text-muted); font-variant-numeric: tabular-nums; }
+
+/* the row being quoted: accent rail on the left, as on the design */
+.hx-qm-table tbody tr.hx-qm-row--active td { background: color-mix(in srgb, var(--hx-accent) 5%, #fff); }
+.hx-qm-table tbody tr.hx-qm-row--active td:first-child { box-shadow: inset 3px 0 0 var(--hx-accent); }
+
+/* controls inside the grid: one height, no form-group spacing */
+.hx-qm-table .hx-input,
+.hx-qm-table .hx-select { height: 32px; border-radius: 8px; padding: 4px 9px; font-size: 12.5px; }
+.hx-qm-table .hx-select { padding-right: 24px; }
+.hx-qm__num { text-align: right; font-variant-numeric: tabular-nums; }
+.hx-qm-table input[type="number"]::-webkit-outer-spin-button,
+.hx-qm-table input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.hx-qm-table input[type="number"] { -moz-appearance: textfield; }
+
+/* primereact autocomplete, flattened into the cell */
+.hx-qm__ac { width: 100%; }
+.hx-qm__ac .p-autocomplete-input { width: 100%; }
+/* search-and-select cells (dose, sub generic, manufacturer, supplier): the chevron is
+   flattened onto the 32px input so a picker cell lines up with a plain one */
+.hx-qm__ac.p-autocomplete-dd, .hx-qm__ac .p-autocomplete-dd { display: flex; width: 100%; }
+.hx-qm__ac .p-autocomplete-dd-input, .hx-qm__ac.p-autocomplete-dd .hx-input { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.hx-qm__ac .p-autocomplete-dropdown {
+  width: 26px; min-width: 26px; height: 32px; padding: 0; flex: 0 0 26px;
+  background: var(--hx-surface) !important; background-image: none !important;
+  border: 1px solid var(--hx-border-strong) !important; border-left: none !important;
+  border-radius: 0 8px 8px 0; color: var(--hx-text-muted) !important;
+}
+.hx-qm__ac .p-autocomplete-dropdown:hover { background: var(--hx-surface-sunken) !important; color: var(--hx-accent) !important; }
+.hx-qm__ac .p-autocomplete-dropdown .p-button-icon { font-size: 10px; }
+.hx-qm__ac-panel .p-autocomplete-item { padding: 5px 10px; font-size: 12.5px; }
+.hx-qm__ac-item { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.hx-qm__ac-item small { color: var(--hx-text-faint); font-size: 11px; }
+/* generic picker: the sub generic on top, its ATC chain beneath, so two same-named
+   generics can be told apart before one is chosen */
+.hx-qm__ac-item--stack { flex-direction: column; align-items: flex-start; gap: 1px; }
+.hx-qm__ac-item--stack small { font-size: 10.5px; }
+.hx-qm__flag { display: block; margin-top: 2px; font-size: 11px; color: var(--hx-warn); }
+.hx-qm__flag--bad { color: var(--hx-danger); font-weight: 700; }
+.hx-qm__num--bad { border-color: var(--hx-danger) !important; background: var(--hx-danger-soft); }
+.hx-qm-preview__val--bad { color: var(--hx-danger) !important; }
+
+.hx-qm__actions { display: inline-flex; align-items: center; gap: 6px; }
+.hx-iconbtn--danger { border-color: #f3c7c7 !important; background: var(--hx-danger-soft) !important; color: var(--hx-danger) !important; }
+.hx-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* panel footer: add-another, the shortcut, the counts */
+.hx-qm-items__foot { display: flex; align-items: center; gap: 12px; padding: 10px 14px; flex-wrap: wrap; }
+.hx-qm__add { display: inline-flex; align-items: center; gap: 7px; border: none; background: transparent !important; color: var(--hx-accent) !important; font-size: 13px; font-weight: 700; padding: 0; cursor: pointer; }
+.hx-qm-items__counts { margin-left: auto; font-size: 12px; color: var(--hx-text-muted); white-space: nowrap; }
+.hx-kbd { display: inline-block; min-width: 20px; padding: 1px 6px; border: 1px solid var(--hx-border-strong); border-bottom-width: 2px; border-radius: 5px; background: var(--hx-surface); color: var(--hx-text-muted); font-size: 11px; font-weight: 700; line-height: 1.5; text-align: center; }
+
+/* preview strip ----------------------------------------------------------- */
+.hx-qm-preview { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 12px 16px; background: var(--hx-surface-sunken); }
+.hx-qm-preview__label { display: flex; flex-direction: column; gap: 2px; min-width: 190px; }
+.hx-qm-preview__title { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; color: var(--hx-text); }
+.hx-qm-preview__title small { font-weight: 600; color: var(--hx-text-muted); }
+.hx-qm-preview__cells { display: grid; grid-template-columns: repeat(5, minmax(110px, 1fr)); gap: 10px 22px; flex: 1 1 480px; }
+.hx-qm-preview__cells > div { display: flex; flex-direction: column; gap: 2px; }
+.hx-qm-preview__cap { font-size: 12px; color: var(--hx-text-muted); }
+.hx-qm-preview__val { font-size: 15px; font-weight: 700; color: var(--hx-text); font-variant-numeric: tabular-nums; }
+.hx-qm-preview__net { padding-left: 18px; border-left: 1px solid var(--hx-border); }
+.hx-qm-preview__net .hx-qm-preview__val { font-size: 22px; font-weight: 800; color: var(--hx-accent); }
+
+/* sticky action bar ------------------------------------------------------- */
+.hx-qm-bar { position: sticky; bottom: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 14px; border: 1px solid var(--hx-border); border-radius: var(--hx-radius); background: var(--hx-surface); box-shadow: 0 -2px 10px rgba(17, 24, 39, 0.06); }
+.hx-qm-bar__status { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--hx-text-muted); }
+.hx-qm-bar__actions { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* manage-dropdowns dialog ------------------------------------------------- */
+.hx-qm-dd__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--hx-border); }
+.hx-qm-dd__row:last-of-type { border-bottom: none; }
+
+@media (max-width: 1199px) {
+  .hx-qm-head .hx-filter { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hx-qm-preview__cells { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+  .hx-qm-preview__net { padding-left: 0; border-left: none; }
+}
+
+@media (max-width: 767px) {
+  .hx-qm-head .hx-filter { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .hx-qm-items__head .hx-panel__actions { width: 100%; }
+  .hx-qm-items__counts { margin-left: 0; }
+  .hx-qm-bar { position: static; }
+  .hx-qm-bar__actions { width: 100%; }
+  .hx-qm-bar__actions .hx-btn { flex: 1 1 0; }
+}
+
+/* ===========================================================================
+   15. ANALYSIS DASHBOARD — filter bar, KPI tiles, chart pair and a line table
+       reading top to bottom as one argument (Purchase > Quotation Chart).
+   =========================================================================== */
+
+.hx-qc { padding-bottom: 4px; }
+.hx-qc .hx-panel { margin-bottom: 12px; }
+.hx-qc-filter { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.hx-qc-filter .hx-filter__actions { grid-column: span 1; }
+
+/* KPI row — figures, not charts: a handful of headline numbers belongs here */
+.hx-qc-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.hx-qc-tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border: 1px solid var(--hx-border); border-radius: var(--hx-radius); background: var(--hx-surface); box-shadow: var(--hx-shadow-sm); }
+.hx-qc-tile__cap { font-size: 11.5px; color: var(--hx-text-muted); }
+.hx-qc-tile__val { font-size: 19px; font-weight: 800; color: var(--hx-text); font-variant-numeric: tabular-nums; line-height: 1.2; }
+
+/* the one finding worth stating in words, above the charts */
+.hx-qc-note { margin-bottom: 12px; font-size: 12.5px; }
+
+/* the chart pair: side by side on a desk, stacked on anything narrower */
+.hx-qc-charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+.hx-qc-charts .hx-panel { margin-bottom: 0; }
+.hx-qc-chart { position: relative; height: 320px; padding: 10px 12px 6px; overflow: hidden; }
+.hx-qc-chart canvas { max-width: 100%; }
+
+.hx-qc-lines td { font-variant-numeric: tabular-nums; }
+.hx-qc-loss { color: var(--hx-danger); font-weight: 700; }
+
+@media (max-width: 1399px) {
+  .hx-qc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1199px) {
+  .hx-qc-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hx-qc-charts { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  .hx-qc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hx-qc-filter { grid-template-columns: minmax(0, 1fr); }
+  .hx-qc-chart { height: 280px; }
+}
+
+/* ===========================================================================
+   16. VENDOR ITEM MAPPING — the entry grid of section 14 plus a hover card that
+       carries a supplier's own quotations alongside the row being agreed.
+   =========================================================================== */
+
+.hx-vim { padding-bottom: 4px; }
+.hx-vim .hx-panel { margin-bottom: 12px; }
+.hx-vim-filter { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+.hx-vim-table { min-width: 1240px; }
+
+/* a row the user has touched: a quiet accent rail, so what will be saved is obvious */
+.hx-vim-table tbody tr.hx-vim-row--dirty td:first-child { box-shadow: inset 3px 0 0 var(--hx-accent); }
+.hx-vim-table tbody tr.hx-vim-row--dirty td { background: color-mix(in srgb, var(--hx-accent) 4%, #fff); }
+
+.hx-vim__generic { display: flex; flex-direction: column; gap: 1px; position: relative; }
+
+/* the hover trigger: an info dot with the number of quotations behind it */
+.hx-vim__hint {
+  position: relative; display: inline-flex; align-items: center; gap: 3px;
+  margin-top: 2px; padding: 1px 7px 1px 5px; border-radius: 999px;
+  background: var(--hx-accent-soft); color: var(--hx-accent);
+  font-size: 10.5px; font-weight: 700; cursor: help; width: fit-content;
+}
+.hx-vim__hint:focus-visible { outline: 2px solid var(--hx-accent); outline-offset: 1px; }
+.hx-vim__hint-count { line-height: 1.4; }
+
+/* the card itself - wide, so a quotation line is readable without wrapping */
+.hx-vim__card {
+  position: absolute; z-index: 60; top: calc(100% + 6px); left: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  min-width: 520px; max-width: 760px; padding: 10px 12px;
+  border: 1px solid var(--hx-border-strong); border-radius: var(--hx-radius);
+  background: var(--hx-surface); box-shadow: var(--hx-shadow-lg);
+  color: var(--hx-text); font-weight: 400; cursor: default; white-space: normal;
+}
+.hx-vim__card-head { font-size: 12px; color: var(--hx-text-muted); }
+.hx-vim__card-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.hx-vim__card-table th {
+  text-align: left; font-weight: 700; color: var(--hx-text-muted);
+  padding: 3px 6px; border-bottom: 1px solid var(--hx-border);
+}
+.hx-vim__card-table td { padding: 3px 6px; border-bottom: 1px solid #f1f2f6; white-space: nowrap; }
+.hx-vim__card-table tr:last-child td { border-bottom: none; }
+.hx-vim__card-foot { font-size: 11px; color: var(--hx-text-muted); border-top: 1px dashed var(--hx-border); padding-top: 5px; }
+
+/* near the right edge the card would overflow the grid, so flip it */
+.hx-vim-table td:nth-last-child(-n + 4) .hx-vim__card { left: auto; right: 0; }
+
+@media (max-width: 1199px) {
+  .hx-vim-filter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hx-vim__card { min-width: 320px; max-width: 86vw; }
+}
+@media (max-width: 767px) {
+  .hx-vim-filter { grid-template-columns: minmax(0, 1fr); }
+  .hx-vim-filter .hx-filter__actions { grid-column: 1 / -1; }
+  .hx-vim__card { position: fixed; left: 8px; right: 8px; top: auto; min-width: 0; max-width: none; }
+}
+
+/* by-item mode: the header carries the item and its generic, the rows carry vendors */
+.hx-vim__readout {
+  display: flex; align-items: center; gap: 6px; min-height: 34px;
+  padding: 5px 11px; border: 1px dashed var(--hx-border-strong); border-radius: 8px;
+  background: var(--hx-surface-sunken); color: var(--hx-text);
+  font-size: 12.5px; font-weight: 600;
+}
+.hx-vim-filter .hx-span-2 { grid-column: span 2; }
+.hx-vim-table .hx-table__secondary { display: block; }
+
+/* ===========================================================================
+   STEPS - numbered tab strip for a setup flow (Menu Setup: menu > page > roles)
+   Buttons are scoped (`.hx-steps button.hx-step`) because every *_theme in
+   assets/css/theme.css paints all buttons (`.x_theme button`, border !important).
+   The active colour comes from the theme via .background-theme-color.
+   =========================================================================== */
+
+.hx-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  padding: 10px 10px 4px;
+}
+.hx-steps button.hx-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--hx-border) !important;
+  border-radius: 10px;
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  box-shadow: var(--hx-shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.hx-steps button.hx-step:hover { transform: translateY(-1px); box-shadow: var(--hx-shadow); }
+.hx-steps button.hx-step.hx-step--on {
+  border-color: transparent !important;
+  color: #fff;
+  box-shadow: var(--hx-shadow-lg);
+}
+.hx-step__num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--hx-surface-sunken);
+  color: var(--hx-text-muted);
+  font-weight: 800;
+  font-size: var(--hx-font-lg);
+}
+.hx-step--on .hx-step__num { background: #fff; color: var(--hx-text); box-shadow: var(--hx-shadow); }
+.hx-step__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.hx-step__label { font-size: var(--hx-font-md); font-weight: 700; color: var(--hx-text); }
+.hx-step__label i { margin-right: 4px; color: var(--hx-text-muted); }
+.hx-step__hint { font-size: var(--hx-font-sm); color: var(--hx-text-muted); }
+.hx-step--on .hx-step__label,
+.hx-step--on .hx-step__label i,
+.hx-step--on .hx-step__hint { color: #fff; }
+.hx-step--on .hx-step__hint { opacity: 0.9; }
+
+/* ===========================================================================
+   TRANSFER LIST - two lists with grant / revoke between them
+   (first used by Menu Setup > Role Mapping). Scoped for the same theme reason.
+   =========================================================================== */
+
+/* summary tiles */
+.hx-transfer-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 2px 10px 12px;
+}
+.hx-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hx-border);
+  border-radius: 10px;
+  background: var(--hx-surface);
+  box-shadow: var(--hx-shadow-sm);
+  text-align: left;
+}
+.hx-tile__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 15px;
+  background: var(--hx-accent-soft);
+  color: var(--hx-accent);
+}
+.hx-tile--success .hx-tile__icon { background: var(--hx-success-soft); color: var(--hx-success); }
+.hx-tile--info .hx-tile__icon { background: var(--hx-info-soft); color: var(--hx-info); }
+.hx-transfer-summary button.hx-tile--warn {
+  border: 1px solid var(--hx-warn) !important;
+  background: var(--hx-warn-soft);
+  cursor: pointer;
+}
+.hx-tile--warn .hx-tile__icon { background: #fff; color: var(--hx-warn); }
+.hx-tile__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.hx-tile__label {
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hx-text-faint);
+}
+.hx-tile--warn .hx-tile__label { color: var(--hx-warn); }
+.hx-tile__value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--hx-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* layout */
+.hx-transfer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  padding: 0 10px 10px;
+}
+.hx-transfer .hx-panel { border-radius: 10px; box-shadow: var(--hx-shadow); }
+
+/* middle action column */
+.hx-transfer__actions { display: flex; flex-direction: column; justify-content: center; }
+.hx-transfer__actions-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 1px dashed var(--hx-border-strong);
+  border-radius: 12px;
+  background: var(--hx-surface-muted);
+}
+.hx-transfer__actions-title {
+  font-size: var(--hx-font-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--hx-text-faint);
+}
+.hx-transfer button.hx-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--hx-border-strong) !important;
+  border-radius: 999px;
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  font-size: var(--hx-font);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.hx-transfer button.hx-pill:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--hx-shadow); }
+.hx-transfer button.hx-pill:disabled { opacity: 0.45; cursor: not-allowed; }
+.hx-transfer button.hx-pill--grant { background: var(--hx-success); border-color: var(--hx-success) !important; color: #fff; }
+.hx-transfer button.hx-pill--revoke { background: var(--hx-danger); border-color: var(--hx-danger) !important; color: #fff; }
+.hx-transfer button.hx-pill--ghost { color: var(--hx-text-muted); font-size: var(--hx-font-sm); }
+
+/* panel head search + toolbar */
+.hx-transfer__search { position: relative; flex: 1 1 180px; min-width: 140px; max-width: 280px; }
+.hx-transfer__search .hx-input { padding: 5px 10px 5px 28px; border-radius: 999px; }
+.hx-transfer__search > i {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; color: var(--hx-text-faint);
+}
+.hx-transfer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--hx-border);
+  background: var(--hx-surface-muted);
+  font-size: var(--hx-font-sm);
+  font-weight: 600;
+  color: var(--hx-text-muted);
+}
+.hx-transfer__bar label { margin: 0; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.hx-transfer__bar .hx-seg { margin-left: auto; }
+.hx-transfer__bar .hx-seg button.hx-seg__btn { padding: 3px 10px; font-size: var(--hx-font-sm); border: 0 !important; }
+
+/* rows */
+.hx-transfer__list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  height: 52vh;
+  overflow: auto;
+  background: var(--hx-surface-sunken);
+}
+.hx-transfer__row {
+  display: grid;
+  grid-template-columns: 16px 18px 34px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border: 1px solid var(--hx-border);
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  background: var(--hx-surface);
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.12s ease, border-color 0.12s ease;
+}
+.hx-transfer__row:hover { box-shadow: var(--hx-shadow); border-color: var(--hx-border-strong); }
+.hx-transfer__row.is-selected {
+  border-color: var(--hx-accent-border);
+  border-left-color: var(--hx-accent);
+  background: var(--hx-accent-soft);
+}
+.hx-transfer__row.is-dragging { opacity: 0.4; }
+.hx-transfer__row.is-dragover { box-shadow: inset 0 3px 0 var(--hx-accent); }
+.hx-transfer__row input[type="checkbox"] { margin: 0; width: 15px; height: 15px; cursor: pointer; }
+.hx-transfer__grip { cursor: grab; color: var(--hx-text-faint); text-align: center; }
+.hx-transfer__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.hx-transfer__main { min-width: 0; }
+.hx-transfer__name {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: var(--hx-font-md);
+  font-weight: 700;
+  color: var(--hx-text);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.hx-transfer__name > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.hx-transfer__seq { font-size: var(--hx-font-xs); font-weight: 800; color: var(--hx-text-faint); }
+.hx-transfer__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 3px;
+  font-size: var(--hx-font-sm);
+  color: var(--hx-text-muted);
+}
+.hx-transfer__url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--hx-surface-sunken);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+}
+.hx-transfer__desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hx-transfer__rowact { display: inline-flex; gap: 4px; opacity: 0; transition: opacity 0.12s ease; }
+.hx-transfer__row:hover .hx-transfer__rowact,
+.hx-transfer__row.is-selected .hx-transfer__rowact,
+.hx-transfer__row:focus-within .hx-transfer__rowact { opacity: 1; }
+.hx-transfer button.hx-rowbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--hx-border-strong) !important;
+  border-radius: 7px;
+  background: var(--hx-surface);
+  color: var(--hx-text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.hx-transfer button.hx-rowbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.hx-transfer button.hx-rowbtn--add { background: var(--hx-success-soft); border-color: var(--hx-success) !important; color: var(--hx-success); }
+.hx-transfer button.hx-rowbtn--remove { background: var(--hx-danger-soft); border-color: var(--hx-danger) !important; color: var(--hx-danger); }
+
+.hx-transfer__foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--hx-warn);
+  background: var(--hx-warn-soft);
+  color: var(--hx-warn);
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+}
+.hx-transfer__foot button.hx-pill { width: auto; padding: 4px 12px; }
+.hx-transfer__foot button.hx-pill:first-of-type { margin-left: auto; }
+
+@media (max-width: 991px) {
+  .hx-transfer { grid-template-columns: minmax(0, 1fr); }
+  .hx-transfer__actions-card { flex-direction: row; flex-wrap: wrap; }
+  .hx-transfer button.hx-pill { width: auto; flex: 1 1 140px; }
+  .hx-transfer__list { height: 40vh; }
+  .hx-transfer__rowact { opacity: 1; }
+}
+
+/* ===========================================================================
+   ICON PICKER - grouped, searchable Font Awesome grid (Menu Setup > Menu Master)
+   Buttons scoped under .hx-iconpick so the *_theme `button` rule cannot repaint them.
+   =========================================================================== */
+
+.hx-iconpick { position: relative; display: inline-block; }
+.hx-iconpick button.hx-iconpick__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--hx-border-strong) !important;
+  border-radius: 8px;
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  font-size: var(--hx-font);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--hx-shadow-sm);
+}
+.hx-iconpick button.hx-iconpick__trigger > i:first-child { font-size: 16px; color: var(--hx-accent); }
+.hx-iconpick__caret { font-size: 10px; color: var(--hx-text-faint); }
+
+.hx-iconpick__panel {
+  position: absolute;
+  z-index: 1050;
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(560px, 92vw);
+  border: 1px solid var(--hx-border);
+  border-radius: 12px;
+  background: var(--hx-surface);
+  box-shadow: var(--hx-shadow-lg);
+  overflow: hidden;
+}
+.hx-iconpick__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--hx-border);
+}
+.hx-iconpick__search { position: relative; flex: 1 1 auto; }
+.hx-iconpick__search .hx-input { padding: 6px 10px 6px 28px; border-radius: 999px; }
+.hx-iconpick__search > i {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; color: var(--hx-text-faint);
+}
+.hx-iconpick button.hx-iconpick__clear {
+  padding: 5px 10px;
+  border: 1px solid var(--hx-danger) !important;
+  border-radius: 999px;
+  background: var(--hx-danger-soft);
+  color: var(--hx-danger);
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+}
+.hx-iconpick__groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--hx-surface-muted);
+  border-bottom: 1px solid var(--hx-border);
+}
+.hx-iconpick button.hx-iconpick__chip {
+  padding: 3px 10px;
+  border: 1px solid var(--hx-border-strong) !important;
+  border-radius: 999px;
+  background: var(--hx-surface);
+  color: var(--hx-text-muted);
+  font-size: var(--hx-font-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.hx-iconpick button.hx-iconpick__chip.is-on {
+  border-color: var(--hx-accent) !important;
+  background: var(--hx-accent);
+  color: #fff;
+}
+.hx-iconpick__body { max-height: 320px; overflow: auto; padding: 4px 10px 10px; }
+.hx-iconpick__title {
+  margin: 8px 0 6px;
+  font-size: var(--hx-font-xs);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hx-text-faint);
+}
+.hx-iconpick__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 6px;
+}
+.hx-iconpick button.hx-iconpick__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px 6px;
+  border: 1px solid var(--hx-border) !important;
+  border-radius: 8px;
+  background: var(--hx-surface);
+  color: var(--hx-text);
+  white-space: normal;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+.hx-iconpick button.hx-iconpick__tile:hover {
+  transform: translateY(-1px);
+  border-color: var(--hx-accent) !important;
+  box-shadow: var(--hx-shadow);
+}
+.hx-iconpick button.hx-iconpick__tile.is-on {
+  border-color: var(--hx-accent) !important;
+  background: var(--hx-accent-soft);
+}
+.hx-iconpick__tile i { font-size: 18px; color: var(--hx-accent); }
+.hx-iconpick__tile span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9.5px;
+  color: var(--hx-text-muted);
+}

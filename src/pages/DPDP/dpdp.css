@@ -1,0 +1,94 @@
+/* DPDP Data Privacy (4 Nov 2026). Status colours come from theme.css color-indicator-* classes where a row is tinted.
+   Clickable text is a role="button" span, not <button>: theme.css paints every <button> with the theme colour. */
+
+.dpdp-hint { color: #6c757d; font-size: 12px; }
+.dpdp-bad { color: #b42318; font-weight: 600; }
+.dpdp-ok { color: #1c7347; font-weight: 600; }
+.dpdp-warn { color: #8f5f00; font-weight: 600; }
+.dpdp-link { color: #0f7b8a; cursor: pointer; text-decoration: underline; }
+.dpdp-num { font-variant-numeric: tabular-nums; }
+
+.dpdp-badge { display: inline-flex; align-items: center; gap: 5px; padding: 1px 9px; border-radius: 10px; font-size: 11.5px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+.dpdp-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.dpdp-badge.ok { background: #e5f4eb; color: #1e7a4b; }
+.dpdp-badge.warn { background: #fff3d6; color: #8a5300; }
+.dpdp-badge.bad { background: #fdecea; color: #b42318; }
+.dpdp-badge.info { background: #e7effa; color: #1d4e89; }
+.dpdp-badge.off { background: #eef1f5; color: #5a6576; }
+
+.dpdp-tag { display: inline-block; padding: 0 6px; border-radius: 4px; font-size: 11px; border: 1px solid #adb5bd; white-space: nowrap; margin: 1px 2px; }
+.dpdp-tag.teal { border-color: #0f7b8a; color: #0f7b8a; }
+.dpdp-tag.red { border-color: #b42318; color: #b42318; }
+.dpdp-tag.amber { border-color: #8a5300; color: #8a5300; }
+
+.dpdp-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.dpdp-fact { border: 1px solid #dee2e6; border-radius: 6px; padding: 8px 12px; background: #fff; }
+.dpdp-fact b { display: block; font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.dpdp-fact span { font-size: 12px; color: #495057; }
+.dpdp-fact.bad b { color: #b42318; }
+.dpdp-fact.warn b { color: #8a5300; }
+.dpdp-fact.ok b { color: #1e7a4b; }
+.dpdp-fact[role="button"] { cursor: pointer; }
+.dpdp-fact[role="button"]:hover { border-color: #6c757d; }
+
+.dpdp-bar { height: 8px; border-radius: 4px; background: #eef1f5; overflow: hidden; border: 1px solid #dee2e6; min-width: 80px; }
+.dpdp-bar > i { display: block; height: 100%; background: #0f7b8a; }
+
+.dpdp-check { list-style: none; margin: 0; padding: 0; }
+.dpdp-check li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; border-top: 1px solid #f1f3f5; }
+.dpdp-check li:first-child { border-top: 0; }
+.dpdp-check li small { color: #6c757d; margin-left: auto; }
+
+.dpdp-notice { border: 1px solid #dee2e6; border-radius: 6px; padding: 12px 16px; max-height: 420px; overflow: auto; background: #fafbfc; font-size: 13px; }
+.dpdp-notice h4 { font-size: 14px; margin: 12px 0 4px; }
+.dpdp-notice ul { padding-left: 18px; margin-bottom: 6px; }
+
+/* clocks on the breach register */
+.dpdp-clock { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; }
+.dpdp-clock > div { padding: 8px 12px; border-right: 1px solid #dee2e6; }
+.dpdp-clock > div:last-child { border-right: 0; }
+.dpdp-clock .st { font-size: 11.5px; color: #5a6576; }
+.dpdp-clock b { display: block; font-size: 13px; }
+.dpdp-clock .done { background: #e5f4eb; }
+.dpdp-clock .due { background: #fff3d6; }
+.dpdp-clock .late { background: #fdecea; }
+
+/* registration panel */
+.dpdp-panel .dpdp-chan { display: flex; flex-wrap: wrap; gap: 8px; }
+.dpdp-panel .dpdp-track { display: flex; flex-wrap: wrap; gap: 0; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; margin-top: 6px; font-size: 12px; }
+.dpdp-panel .dpdp-track span { padding: 3px 10px; border-right: 1px solid #dee2e6; color: #6c757d; }
+.dpdp-panel .dpdp-track span:last-child { border-right: 0; }
+.dpdp-panel .dpdp-track span.done { background: #e5f4eb; color: #1e7a4b; }
+.dpdp-panel .dpdp-track span.cur { background: #fff3d6; color: #8a5300; font-weight: 600; }
+
+.dpdp-choice { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; padding: 6px 0; border-top: 1px solid #f1f3f5; }
+.dpdp-choice:first-child { border-top: 0; }
+.dpdp-choice p { margin: 0; }
+.dpdp-choice small { color: #6c757d; display: block; }
+
+canvas.dpdp-sig { width: 100%; height: 140px; border: 1px dashed #adb5bd; border-radius: 6px; background: #fafbfc; touch-action: none; cursor: crosshair; }
+
+.dpdp-ledger td { font-size: 12px; }
+.dpdp-scroll { overflow-x: auto; }
+
+/* registration window: consent tile under the fingerprint tile (shares .fp-trigger from PatientBiometricDetails.css) */
+.fp-trigger.dpdp-tile { margin-top: 6px; }
+.fp-trigger.dpdp-tile.ok { border-color: #34d27b; color: #1e7a4b; }
+.fp-trigger.dpdp-tile.warn { border-color: #e0a526; color: #8a5300; }
+.fp-trigger.dpdp-tile.bad { border-color: #e5675b; color: #b42318; }
+.fp-trigger.dpdp-tile.info { border-color: #5b8fd6; color: #1d4e89; }
+
+/* registration photo column: document + consent image buttons side by side (no extra height) */
+.personal-photo-actions { display: flex; gap: 3px; }
+.dpdp-mini { flex: 1; min-width: 0; padding: 4px 0 !important; font-size: 12px; line-height: 1; border: 0 !important; color: #fff !important; cursor: pointer;
+  background: #6f42c1 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.dpdp-mini:hover { filter: brightness(1.12); }
+.dpdp-mini.ok { background: #1e9e5a !important; }
+.dpdp-mini.warn { background: #e8890c !important; }
+.dpdp-mini.bad { background: #d62f2f !important; }
+.dpdp-mini.info { background: #2f6fd6 !important; }
+.dpdp-mini.off { background: #6f42c1 !important; }
+/* consent still needs action: gentle pulse so the front desk notices it */
+.dpdp-mini.bad, .dpdp-mini.warn { animation: dpdp-pulse 1.8s ease-in-out infinite; }
+@keyframes dpdp-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(214, 47, 47, 0.55); } 50% { box-shadow: 0 0 0 4px rgba(214, 47, 47, 0); } }
+@media (prefers-reduced-motion: reduce) { .dpdp-mini.bad, .dpdp-mini.warn { animation: none; } }

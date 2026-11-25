@@ -1,0 +1,22 @@
+/* Modern skin — SmoothSelect dropdown popup (.md-pop) recolor.
+   Popup renders in a portal wrapped in the active theme class (orange_theme,
+   etc.) under <html data-design="modern">, so theme.css paints hovered/selected
+   rows orange (.background-theme-colornew = cream, .text-theme-colornew = orange).
+   Force a light-blue palette. Activates only when html[data-design="modern"]. */
+
+/* Hovered + selected option row → light blue */
+:root[data-design="modern"] .md-pop .background-theme-colornew {
+  background-color: #E8F2FE !important;
+  background-image: none !important;
+}
+
+/* Selected option text + check icon (uses currentColor) → blue */
+:root[data-design="modern"] .md-pop .text-theme-colornew {
+  color: #1976D2 !important;
+}
+
+/* Search box focus border inside the popup → blue */
+:root[data-design="modern"] .md-pop .border-colornew {
+  border: 1px solid #1E9BF0 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.14) !important;
+}

@@ -1,0 +1,272 @@
+/* AppUpdateNotifier — scoped under .aun-root. Selectors are doubled (.aun-root .aun-btn)
+   so theme.css's bare <button> styling cannot bleed in. */
+
+.aun-root {
+  --aun-blue-1: #1e9ee0;
+  --aun-blue-2: #4cc0f3;
+  --aun-blue-deep: #0f7fc0;
+  --aun-ink: #0f2a3d;
+  --aun-muted: #5b6b78;
+  --aun-ease: cubic-bezier(.2, .9, .3, 1.2);
+  font-family: inherit;
+}
+
+/* ---------- Modal ---------- */
+.aun-root .aun-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 30, 50, .38);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: aun-fade-in .25s ease both;
+}
+.aun-root .aun-backdrop.is-out { animation: aun-fade-out .28s ease both; }
+
+.aun-root .aun-modal {
+  width: 340px;
+  max-width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 127, 192, .35), 0 4px 14px rgba(0, 0, 0, .12);
+  animation: aun-pop-in .42s var(--aun-ease) both;
+}
+.aun-root .aun-backdrop.is-out .aun-modal {
+  /* shrinks toward the bottom-right corner, where the chip appears */
+  animation: aun-shrink-to-chip .28s ease-in both;
+}
+
+.aun-root .aun-hero {
+  position: relative;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--aun-blue-1) 0%, var(--aun-blue-2) 100%);
+  overflow: hidden;
+}
+.aun-root .aun-hero::after {
+  /* soft shine sweep */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: aun-shine 2.8s ease-in-out .4s infinite;
+}
+.aun-root .aun-hero-icon {
+  position: relative;
+  z-index: 1;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .95);
+  color: var(--aun-blue-deep);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
+}
+.aun-root .aun-hero-icon svg { width: 28px; height: 28px; }
+.aun-root .aun-hero-ring {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .7);
+  animation: aun-ripple 2.4s ease-out infinite;
+}
+.aun-root .aun-hero-ring--2 { animation-delay: 1.2s; }
+
+.aun-root .aun-body { padding: 18px 22px 20px; text-align: center; }
+.aun-root .aun-title {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--aun-ink);
+  letter-spacing: .1px;
+}
+.aun-root .aun-text {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--aun-muted);
+}
+
+.aun-root .aun-actions { display: flex; gap: 10px; }
+.aun-root .aun-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.aun-root .aun-btn:active { transform: scale(.97); }
+.aun-root .aun-btn--ghost {
+  background: #f1f6fa;
+  color: var(--aun-muted);
+  border: 1px solid #dbe6ee;
+}
+.aun-root .aun-btn--ghost:hover { background: #e6eff6; color: var(--aun-ink); }
+.aun-root .aun-btn--primary {
+  background: linear-gradient(135deg, var(--aun-blue-1), var(--aun-blue-2));
+  color: #fff;
+  border: 0;
+  box-shadow: 0 6px 16px rgba(30, 158, 224, .4);
+}
+.aun-root .aun-btn--primary:hover {
+  box-shadow: 0 8px 22px rgba(30, 158, 224, .55);
+  transform: translateY(-1px);
+}
+.aun-root .aun-btn--primary:hover .aun-btn-icon { transform: rotate(180deg); }
+.aun-root .aun-btn-icon { width: 15px; height: 15px; transition: transform .5s ease; }
+.aun-root .aun-btn:focus-visible { outline: 2px solid var(--aun-blue-deep); outline-offset: 2px; }
+
+/* ---------- Floating chip (after "Later") ---------- */
+.aun-root .aun-chip {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 2147482999;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 16px 8px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--aun-blue-1), var(--aun-blue-2));
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: visible;
+  box-shadow: 0 10px 26px rgba(30, 158, 224, .45);
+  animation: aun-chip-in .5s var(--aun-ease) both, aun-float 3s ease-in-out .6s infinite;
+  transition: box-shadow .2s ease, filter .2s ease;
+}
+.aun-root .aun-chip:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 14px 32px rgba(30, 158, 224, .6);
+  animation-play-state: running, paused;
+}
+.aun-root .aun-chip:focus-visible { outline: 2px solid var(--aun-blue-deep); outline-offset: 3px; }
+.aun-root .aun-chip-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(76, 192, 243, .55);
+  animation: aun-pulse 2.2s ease-out infinite;
+  pointer-events: none;
+}
+.aun-root .aun-chip-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .95);
+  color: var(--aun-blue-deep);
+}
+.aun-root .aun-chip-icon svg { width: 17px; height: 17px; }
+.aun-root .aun-chip-text { display: flex; flex-direction: column; line-height: 1.15; }
+.aun-root .aun-chip-text b { font-size: 13px; font-weight: 700; }
+.aun-root .aun-chip-text small { font-size: 11px; opacity: .9; }
+.aun-root .aun-chip-dot {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5a5f;
+  border: 2px solid #fff;
+}
+
+/* ---------- Smooth reload overlay ---------- */
+.aun-root .aun-reload {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483001;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, .88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: aun-fade-in .35s ease both;
+}
+.aun-root .aun-reload-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--aun-blue-1), var(--aun-blue-2));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 14px 36px rgba(30, 158, 224, .45);
+  animation: aun-pop-in .4s var(--aun-ease) both;
+}
+.aun-root .aun-reload-icon { width: 20px; height: 20px; }
+
+/* ---------- Motion ---------- */
+.aun-root .aun-spin { animation: aun-rotate 1.1s linear infinite; }
+.aun-root .aun-spin-slow { animation: aun-rotate 3.2s linear infinite; }
+
+@keyframes aun-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aun-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes aun-pop-in {
+  from { opacity: 0; transform: translateY(14px) scale(.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes aun-shrink-to-chip {
+  to { opacity: 0; transform: translate(35vw, 35vh) scale(.2); }
+}
+@keyframes aun-chip-in {
+  from { opacity: 0; transform: translateY(24px) scale(.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes aun-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes aun-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(76, 192, 243, .55); }
+  100% { box-shadow: 0 0 0 14px rgba(76, 192, 243, 0); }
+}
+@keyframes aun-ripple {
+  from { transform: scale(1); opacity: .8; }
+  to { transform: scale(2.2); opacity: 0; }
+}
+@keyframes aun-shine {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+@keyframes aun-rotate { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .aun-root .aun-chip { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aun-root *,
+  .aun-root *::before,
+  .aun-root *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+}

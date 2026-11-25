@@ -1,0 +1,6236 @@
+/* ===========================================================================
+   Dynamic Screen Builder — RUNTIME styles.
+   Everything here is driven by the --dsb-* theme tokens written onto
+   .dsb-screen by the renderer, so a theme swap restyles the page instantly.
+   These styles are shared by the builder canvas and the live page.
+   =========================================================================== */
+
+.dsb-screen {
+  font-family: var(--dsb-font-family);
+  font-size: var(--dsb-node-fs, var(--dsb-font-size));
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  background: transparent;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+.dsb-screen *,
+.dsb-screen *::before,
+.dsb-screen *::after {
+  box-sizing: border-box;
+}
+.dsb-screen button {
+  font-family: inherit;
+}
+/* The app's own page header, mounted above the tree as page chrome. It brings
+   its own card/Aurora styling and spacing, so nothing is restyled here. On the
+   canvas it is not a node: it cannot be dragged, and nothing inside it reacts.
+   The builder makes the bar itself one click target that opens its settings —
+   preview and the live page leave it fully interactive. */
+.dsb-screen-head[data-design="1"] {
+  pointer-events: none;
+}
+.dsb-screen-head[data-design="1"].is-pickable {
+  position: relative;
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+.dsb-screen-head[data-design="1"].is-pickable > * {
+  pointer-events: none;
+}
+.dsb-screen-head.is-pickable::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 7px;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transition: border-color 0.14s ease;
+}
+.dsb-screen-head.is-pickable:hover::after,
+.dsb-screen-head.is-pickable:focus-visible::after {
+  border-color: color-mix(in srgb, #4f46e5 45%, transparent);
+}
+.dsb-screen-head.is-pickable.is-sel::after {
+  border: 1.5px solid #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+/* Hung from the bar's bottom-left corner: inside the bar it would cover the
+   header's own buttons, and above it the frame's top edge clips it. */
+.dsb-screen-head-tag {
+  display: none;
+  position: absolute;
+  top: calc(100% + 1px);
+  inset-inline-start: -2px;
+  z-index: 12;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 0 5px 5px 5px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+}
+.dsb-screen-head.is-pickable:hover > .dsb-screen-head-tag,
+.dsb-screen-head.is-pickable.is-sel > .dsb-screen-head-tag {
+  display: inline-flex;
+}
+/* What the header carries on its right: text, a count, search and buttons. It
+   sits in the Heading's own secondTitle slot, so both skins place it. */
+.dsb-head-extras {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-size: 1.0417rem;
+  font-weight: 500;
+}
+.dsb-head-title,
+.dsb-head-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.dsb-head-text {
+  font-weight: 600;
+}
+.dsb-head-count {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: 0.9167rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dsb-head-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.dsb-head-search > svg {
+  position: absolute;
+  inset-inline-start: 8px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.dsb-head-search > input.form-control {
+  height: 26px;
+  width: 190px;
+  padding-block: 0;
+  padding-inline: 26px 8px;
+  font-size: 1rem;
+}
+.dsb-screen-head .dsb-head-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.dsb-screen-head .dsb-head-btn.is-icon {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+/* The app theme paints every <button> in its colour, which is the look of the
+   app's solid buttons. An outline, ghost, light or soft one keeps a light fill
+   instead, or its icon and text would sit in their own colour on the theme's. */
+.dsb-screen-head .dsb-head-btn[class*="btn-outline"],
+.dsb-screen-head .dsb-head-btn.btn-ghost,
+.dsb-screen-head .dsb-head-btn.btn-light,
+.dsb-screen-head .dsb-head-btn[class*="-soft"] {
+  background-color: #fff;
+  background-image: none;
+}
+
+.dsb-muted {
+  color: var(--dsb-text-muted);
+}
+.dsb-unknown {
+  padding: 8px 10px;
+  border: 1px dashed var(--dsb-danger);
+  border-radius: var(--dsb-radius-sm);
+  color: var(--dsb-node-fg, var(--dsb-danger));
+  font-size: var(--dsb-node-fs, 12px);
+}
+
+/* Wrapper around a PROJECT component (formComponent/*, UI/Heading …). It only
+   carries the inspector's Style output; everything inside keeps the app's own
+   markup and CSS so a built screen matches a hand-coded one.
+
+   It is also a bottom-anchored column: in a flex row that stretches its cells,
+   or beside a taller control, the field still sits on the row's baseline
+   instead of floating at the top of its cell. */
+.dsb-native {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Select + Add: the select takes the room, the + keeps its own width and sits
+   on the same line, the height of the box beside it — the Refer Doctor row of
+   the hand-coded admission page. */
+.dsb-selectadd {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+.dsb-selectadd-ctl {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-selectadd-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: var(--dsb-native-h, 2.0833rem);
+  padding: 0 8px;
+  line-height: 1;
+}
+
+/* ------------------------------------------ one rhythm for native controls
+
+   A screen mixes the project's own components — <Input>, <ReactSelect>,
+   PrimeReact's <Calendar>, the multiselect, the time picker — and every one of
+   them ships its own height, its own margin and its own label placement. Only
+   <Input> wraps itself in .custominputbox, so only its .form-group had the
+   0.4rem bottom margin cleared: the select and the calendar kept theirs and
+   rode ~5px above the text box beside them, on top of already being a
+   different height. One filter row then reads as four different form designs.
+
+   These rules give every native control ONE height and ONE bottom line, so a
+   row lines up whatever kinds of control it happens to hold. Everything is
+   scoped to .dsb-screen, so the hand-coded pages that use the same components
+   are untouched. */
+
+.dsb-screen {
+  /* The height every control on a screen shares — native or builder-drawn.
+     Both follow the theme's Control height token, so one knob moves them. */
+  --dsb-native-h: var(--dsb-control-height, 2.0833rem);
+  /* Where a label starts inside a control. The app's resting .lable sits at
+     `left: 4px` plus its own 6px margin, so 10px is the line every other
+     control has to meet to read as the same form. */
+  --dsb-native-pad-x: 10px;
+}
+
+/* The layout owns the gaps between controls; no component brings its own. */
+.dsb-screen .dsb-native .form-group {
+  margin-bottom: 0;
+}
+.dsb-screen .dsb-native .mi-field-shell,
+.dsb-screen .dsb-native .custom-date-input-new,
+.dsb-screen .dsb-native .cds-input-field-new,
+.dsb-screen .dsb-native .p-inputautocomplete-new {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Two more that bring a bottom margin of their own: the multiselect sits in
+   `.form-controls.mb-2` (6px), the time picker's outer div carries an inline
+   4px. Each rode that far above the row's bottom line. The multiselect's
+   hover wrapper is inline-block, which adds a line box of its own on top. */
+.dsb-screen .dsb-native .form-controls,
+.dsb-screen .dsb-native > .mtp-wrapper,
+.dsb-screen .dsb-native > div:has(> .p-calendar-timeonly) {
+  margin-bottom: 0 !important;
+}
+.dsb-screen .dsb-native .panel-hover-container {
+  display: block;
+  width: 100%;
+}
+
+/* One height. `!important` is what it takes: the app sets these inline
+   (FieldShell) or with `!important` of its own (.form-control, react-select's
+   inline styles). Textareas are left alone — their height is their rows. */
+.dsb-screen .dsb-native input.form-control,
+.dsb-screen .dsb-native .p-inputtext:not(textarea),
+.dsb-screen .dsb-native .p-calendar,
+.dsb-screen .dsb-native .p-multiselect,
+.dsb-screen .dsb-native .mi-field-shell,
+.dsb-screen .dsb-native .mi-field-shell > div {
+  height: var(--dsb-native-h) !important;
+  min-height: var(--dsb-native-h) !important;
+}
+
+/* react-select's box is the one that fights back: the modern skin sizes it
+   with `!important` at the same weight as the rule above, so which one won
+   would come down to stylesheet order. The repeated class settles it. */
+.dsb-screen.dsb-screen .dsb-native [class*="__control"] {
+  height: var(--dsb-native-h) !important;
+  min-height: var(--dsb-native-h) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+/* The old skin marks a required field with a red bottom border. On an input
+   that border is the box's own; on a react-select it lands on the wrapper, one
+   pixel UNDER the box, lifting the box that far off the row's line. Drawn on
+   the box itself it reads the same and sits where every other field does. */
+:root:not([data-design="modern"]) .dsb-screen .dsb-native .required-fields[class*="-container"] {
+  border-bottom: 0 !important;
+}
+:root:not([data-design="modern"]) .dsb-screen .dsb-native .required-fields[class*="-container"] > [class*="__control"] {
+  border-bottom-color: red !important;
+}
+/* Same fight with the multiselect: the modern skin gives it 2.25rem from
+   `:root[data-design="modern"] .p-multiselect.multiselect`. */
+.dsb-screen.dsb-screen .dsb-native .p-multiselect.multiselect {
+  height: var(--dsb-native-h) !important;
+  min-height: var(--dsb-native-h) !important;
+}
+
+/* The app's Checkbox floats its tick with position:absolute and a hand-set
+   top margin, and hangs mb-2 under its frame — which lifted it above the
+   inputs beside it. On a screen it is a control like the rest: the same
+   height, tick and text centred on one line. Scoped here so the hand-coded
+   pages that use the same component are left as they are. */
+.dsb-screen .dsb-native .checkbox-shell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--dsb-native-h);
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  box-sizing: border-box;
+}
+.dsb-screen .dsb-native .checkbox-shell > input[type="checkbox"] {
+  position: static !important;
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
+.dsb-screen .dsb-native .checkbox-shell > label {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin: 0 !important;
+  line-height: 1.2;
+}
+.dsb-screen .dsb-native .checkbox-shell > label > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The read-only Labeled Value. The old skin's LabeledInput hangs mb-2 under
+   itself, pulls its box up 1px and sizes it 2.15rem with the text pinned to
+   the top — so it rode above the inputs beside it and stood taller. Here it is
+   one more control: the same height, the same bottom line, the text centred
+   and starting where an input's text starts. The long-value branch has no
+   wrapper of its own, so the rules key on the box, not on the mb-2 div. */
+.dsb-screen .dsb-native.dsb-labeled > div {
+  position: relative;
+}
+.dsb-screen .dsb-native.dsb-labeled > div > .mb-2 {
+  margin-bottom: 0 !important;
+}
+:root:not([data-design="modern"]) .dsb-screen .dsb-native.dsb-labeled .valueName {
+  display: flex;
+  align-items: center;
+  height: var(--dsb-native-h);
+  min-height: var(--dsb-native-h);
+  margin: 0 !important;
+  /* 4px on top keeps the first characters clear of the caption that sits on
+     the border. */
+  padding: 4px var(--dsb-native-pad-x) 0 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.dsb-screen .dsb-native.dsb-labeled .aurora-frozen-field .value {
+  height: var(--dsb-native-h) !important;
+}
+.dsb-screen .dsb-native.dsb-labeled > div[style] {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* The calendar is an input plus a trigger button: it has to be a row that
+   fills the cell, or the button pushes the box out of the column. */
+.dsb-screen .dsb-native .p-calendar {
+  display: flex;
+  width: 100%;
+}
+.dsb-screen .dsb-native .p-calendar > .p-inputtext {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-screen .dsb-native .p-datepicker-trigger {
+  height: var(--dsb-native-h) !important;
+  flex: 0 0 auto;
+}
+
+/* The date-range picker (commonComponents/DateRangePicker) draws its own box:
+   its wrapper hangs `mb-2` under it, the box is 2.1rem of input plus a border,
+   and the calendar button is 2rem pinned to the top. Only the modern skin's
+   margin was cleared above, so in the classic skin it rode 8px above the
+   selects beside it and stood taller. Here it gets the row's one height and
+   bottom line, with the button filling the box's right edge. */
+.dsb-screen .dsb-native .cds-input-wrapper {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.dsb-screen .dsb-native .cds-input-field {
+  height: var(--dsb-native-h) !important;
+  min-height: var(--dsb-native-h) !important;
+  box-sizing: border-box;
+  padding-inline-start: var(--dsb-native-pad-x) !important;
+  overflow: hidden;
+}
+.dsb-screen .dsb-native .cds-input-field .cds-input-value {
+  height: 100% !important;
+  padding: 0 34px 0 0;
+  min-width: 0;
+}
+.dsb-screen .dsb-native .cds-calendar-trigger {
+  display: flex;
+  top: 0;
+  bottom: 0;
+  height: auto !important;
+}
+.dsb-screen .dsb-native .cds-calendar-trigger > .fa {
+  margin: 0 !important;
+}
+
+/* react-select is a small form design of its own inside the box: the value row
+   brings 2px/8px of padding of its own and the value another 2px of margin, so
+   label and value start at 12px where the <Input> beside it puts its label at
+   10px — a ragged left edge reading down a filter row. The inset is squared up
+   here; the vertical positions are the component's to make, and are left
+   alone. */
+.dsb-screen .dsb-native [class*="__value-container"],
+.dsb-screen .dsb-native [class*="__indicators"] {
+  height: 100%;
+}
+.dsb-screen .dsb-native [class*="__value-container"] {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-inline-start: var(--dsb-native-pad-x);
+}
+.dsb-screen .dsb-native [class*="__single-value"],
+.dsb-screen .dsb-native [class*="__input-container"] {
+  margin-left: 0;
+  margin-right: 0;
+}
+/* The placeholder IS the select's floating label: ReactSelect swaps in a value
+   container that renders it alongside the value, and the component's own style
+   object moves it — centred while the box is empty, up onto the border once
+   something is chosen. Only the inset is corrected here. Pinning its `top`
+   would hold the label on the centre line and print it straight through the
+   selected value. */
+.dsb-screen .dsb-native [class*="__placeholder"] {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Each component's own outer div is the column, so it takes the full width
+   rather than shrink-wrapping its content. */
+.dsb-screen .dsb-native:not(.dsb-native-btn) > *,
+.dsb-screen .dsb-native .form-group,
+.dsb-screen .dsb-native .custominputbox {
+  width: 100%;
+}
+
+/* The app pins a resting floating label 4px below the top of a 2rem box. The
+   moment a screen's Control height differs from that, the label strands near
+   the edge, so on a screen it is centred instead. Focused or filled it floats
+   up to the border exactly as the app draws it. */
+.dsb-screen .dsb-native .form-group > .lable {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.dsb-screen .dsb-native .form-control:focus + .lable,
+.dsb-screen .dsb-native .form-control:not(:placeholder-shown) + .lable {
+  top: -0.42rem;
+  transform: none;
+}
+/* The date picker's caption carries both classes: `labelPicker` pins it to the
+   border with `top: -5px !important`, and `lable` adds a 6px left margin. The
+   centring above then lifted it by half its own height (its `top` loses to the
+   !important, its transform does not), and the margin set its text 6px right
+   of every other caption. Undone here, it sits where the Labeled Value's and a
+   filled input's captions sit: on the border, text 15px in. */
+.dsb-screen .dsb-native .form-group > .labelPicker.lable {
+  transform: none;
+  margin-inline-start: 0;
+}
+
+/* An action button sits on the same line as the controls beside it. */
+.dsb-screen .dsb-native-btn > .btn {
+  height: var(--dsb-native-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Buttons shrink-wrap: a flex/grid parent must not stretch them unless the
+   Style tab explicitly sets a width, and "Full width" (btn-block) still wins. */
+.dsb-native-btn {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.dsb-native-btn > .btn-block {
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- form fields */
+
+.dsb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.dsb-label {
+  font-size: var(--dsb-node-fs, 11.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.dsb-req {
+  color: var(--dsb-danger);
+}
+.dsb-control {
+  min-width: 0;
+}
+.dsb-help {
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-err {
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-danger));
+}
+
+/* ------------------------------------------------------------ rich text ---
+   The builder's CKEditor (registry/richTextEditor) as a form field: a label over it, the
+   editor full width, a red edge when the field fails validation. On the
+   canvas a static stand-in of the same footprint (see RichTextPreview). */
+.dsb-native.dsb-rte {
+  justify-content: flex-start;
+  gap: 3px;
+}
+.dsb-rte-label {
+  margin: 0;
+  font-size: var(--dsb-node-fs, 12.5px);
+  font-weight: 600;
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+.dsb-rte-label.is-req::after {
+  content: " *";
+  color: var(--dsb-danger);
+}
+.dsb-rte-box {
+  min-width: 0;
+}
+.dsb-rte-box > div {
+  margin-bottom: 0 !important;
+}
+.dsb-rte-box.is-invalid .cke {
+  border-color: var(--dsb-danger) !important;
+  box-shadow: 0 0 0 1px var(--dsb-danger);
+}
+.dsb-rte-box.is-disabled {
+  opacity: 0.7;
+}
+.dsb-rte-preview {
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dsb-rte-mic {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #ced4da;
+  font-size: 12px;
+}
+.dsb-rte-lang {
+  padding: 2px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: #fff;
+}
+.dsb-rte-micbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: #6c757d;
+  color: #fff;
+  font-weight: 600;
+}
+.dsb-rte-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #f8f8f8;
+  border-bottom: 1px solid #d1d1d1;
+  color: #444;
+}
+.dsb-rte-glyph {
+  font-size: 13px;
+  line-height: 1;
+  min-width: 10px;
+  text-align: center;
+}
+.dsb-rte-sep {
+  width: 1px;
+  height: 14px;
+  background: #d1d1d1;
+}
+.dsb-rte-combo {
+  padding: 1px 6px;
+  border: 1px solid #d1d1d1;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 11px;
+  color: #555;
+}
+.dsb-rte-body {
+  padding: 10px 12px;
+  font-family: "Times New Roman", serif;
+  font-size: 15px;
+  color: #333;
+  overflow: hidden;
+}
+.dsb-rte-ph {
+  color: #9aa3ad;
+  font-style: italic;
+}
+
+/* floating label variant used by the reference screen */
+.dsb-field.is-float {
+  position: relative;
+  padding-top: 7px;
+}
+.dsb-field.is-float > .dsb-label {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 9px;
+  z-index: 1;
+  padding: 0 5px;
+  background: var(--dsb-surface);
+  font-size: var(--dsb-node-fs, 10.5px);
+  text-transform: none;
+  border-radius: 4px;
+}
+
+.dsb-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsb-input-ic {
+  position: absolute;
+  inset-inline-start: 9px;
+  color: var(--dsb-text-muted);
+  pointer-events: none;
+}
+.dsb-input {
+  width: 100%;
+  height: var(--dsb-control-height);
+  padding: 0 10px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius-sm);
+  background: var(--dsb-surface);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  font-size: var(--dsb-node-fs, var(--dsb-font-size));
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.dsb-input.has-ic {
+  padding-inline-start: 28px;
+}
+.dsb-input:hover {
+  border-color: var(--dsb-border-strong);
+}
+.dsb-input:focus {
+  border-color: var(--dsb-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dsb-primary) 16%, transparent);
+}
+.dsb-input:disabled {
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-text-muted);
+  cursor: not-allowed;
+}
+.dsb-textarea {
+  height: auto;
+  padding: 8px 10px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.dsb-field.is-error .dsb-input {
+  border-color: var(--dsb-danger);
+}
+.dsb-input-suffix {
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-input-btn {
+  position: absolute;
+  inset-inline-end: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsb-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dsb-input-btn:hover {
+  background: var(--dsb-primary-soft);
+  color: var(--dsb-primary);
+}
+.dsb-input-btn.is-static {
+  pointer-events: none;
+}
+.dsb-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsb-range-sep {
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+
+.dsb-check,
+.dsb-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--dsb-node-fs, var(--dsb-font-size));
+}
+.dsb-check input,
+.dsb-radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.dsb-check-box {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--dsb-border-strong);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: all 0.15s ease;
+}
+.dsb-check input:checked + .dsb-check-box {
+  background: var(--dsb-primary);
+  border-color: var(--dsb-primary);
+  color: #fff;
+}
+.dsb-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsb-radios.is-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.dsb-radio-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--dsb-border-strong);
+  position: relative;
+  transition: border-color 0.15s ease;
+}
+.dsb-radio input:checked + .dsb-radio-dot {
+  border-color: var(--dsb-primary);
+}
+.dsb-radio input:checked + .dsb-radio-dot::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--dsb-primary);
+}
+
+.dsb-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.dsb-switch input {
+  position: absolute;
+  opacity: 0;
+}
+.dsb-switch-track {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--dsb-border-strong);
+  position: relative;
+  transition: background 0.2s ease;
+}
+.dsb-switch-thumb {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-switch input:checked + .dsb-switch-track {
+  background: var(--dsb-primary);
+}
+.dsb-switch input:checked + .dsb-switch-track .dsb-switch-thumb {
+  transform: translateX(16px);
+}
+.dsb-switch-text {
+  font-size: var(--dsb-node-fs, 12px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+
+.dsb-upload {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border: 1.5px dashed var(--dsb-border-strong);
+  border-radius: var(--dsb-radius);
+  color: var(--dsb-text-muted);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.dsb-upload:hover {
+  border-color: var(--dsb-primary);
+  background: var(--dsb-primary-soft);
+  color: var(--dsb-primary);
+}
+.dsb-upload input {
+  display: none;
+}
+
+/* File Upload, Field look: one line, as tall as every other control on the
+   screen, a dashed box reading "Choose File". The label floats on the border
+   the way the app's inputs carry theirs, so a row of them reads as one form. */
+.dsb-upfield {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--dsb-native-h, 2.0833rem);
+  min-width: 0;
+  padding: 0 8px 0 var(--dsb-native-pad-x, 10px);
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f4f6fb;
+  color: var(--dsb-node-fg, #64748b);
+  font-size: var(--dsb-node-fs, 13px);
+  font-weight: var(--dsb-node-fw, 700);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.dsb-upfield > svg {
+  flex: none;
+}
+.dsb-upfield:hover,
+.dsb-upfield:focus-visible,
+.dsb-upfield.is-over {
+  border-color: var(--dsb-primary, #2563eb);
+  background: var(--dsb-primary-soft, #eff6ff);
+  color: var(--dsb-primary, #2563eb);
+  outline: none;
+}
+.dsb-upfield.is-over {
+  border-style: solid;
+}
+.dsb-upfield.is-error {
+  border-color: var(--dsb-danger, #dc2626);
+}
+.dsb-upfield.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.dsb-upfield.is-disabled:hover {
+  border-color: #cbd5e1;
+  background: #f4f6fb;
+  color: var(--dsb-node-fg, #64748b);
+}
+.dsb-upfield-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The picked file's name reads as a value, not a call to action. */
+.dsb-upfield.has-file .dsb-upfield-text {
+  color: var(--dsb-node-fg, var(--dsb-text, #1e293b));
+  font-weight: 600;
+}
+/* Sits on the dashed border; its background is the page above the line and
+   the box below it, so the dashes stop either side of the words. */
+.dsb-upfield-label {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 8px;
+  max-width: calc(100% - 16px);
+  padding: 0 4px;
+  overflow: hidden;
+  transform: translateY(-50%);
+  background: linear-gradient(to bottom, var(--dsb-surface, #fff) 50%, #f4f6fb 50%);
+  color: var(--dsb-text-muted, #64748b);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.dsb-upfield:hover .dsb-upfield-label,
+.dsb-upfield.is-over .dsb-upfield-label {
+  background: linear-gradient(to bottom, var(--dsb-surface, #fff) 50%, var(--dsb-primary-soft, #eff6ff) 50%);
+}
+.dsb-upfield.is-error .dsb-upfield-label {
+  color: var(--dsb-danger, #dc2626);
+}
+
+/* The ✕ that removes the picked file, at the end of the Field box or beside
+   the Button look's name. */
+.dsb-upload-x {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50% !important;
+  background: transparent;
+  color: var(--dsb-text-muted, #64748b);
+  cursor: pointer;
+}
+.dsb-upload-x:hover {
+  background: #fee2e2;
+  color: var(--dsb-danger, #dc2626);
+}
+
+/* File Upload, Button look: the button keeps a button's height; the chosen
+   file's name sits beside it and is cut short rather than wrapping. */
+.dsb-upload-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-upload-btn-row > .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  white-space: nowrap;
+}
+.dsb-upload-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--dsb-node-fs, 12px);
+  color: var(--dsb-node-fg, var(--dsb-text));
+}
+
+/* ----------------------------------------------------------------- buttons */
+
+.dsb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--dsb-control-height);
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--dsb-radius-sm);
+  font-size: var(--dsb-node-fs, var(--dsb-font-size));
+  font-weight: var(--dsb-node-fw, 600);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.12s ease, background 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
+}
+.dsb-btn:active {
+  transform: translateY(1px);
+}
+.dsb-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.dsb-btn.s-sm {
+  height: 30px;
+  padding: 0 10px;
+  font-size: var(--dsb-node-fs, 12px);
+}
+.dsb-btn.s-lg {
+  height: 42px;
+  padding: 0 18px;
+  font-size: var(--dsb-node-fs, 14px);
+}
+.dsb-btn.is-full {
+  width: 100%;
+}
+.dsb-btn.v-primary {
+  background: var(--dsb-primary);
+  color: #fff;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--dsb-primary) 40%, transparent);
+}
+.dsb-btn.v-primary:hover {
+  background: var(--dsb-primary-dark);
+}
+.dsb-btn.v-secondary {
+  background: var(--dsb-surface);
+  border-color: var(--dsb-border-strong);
+  color: var(--dsb-text-primary);
+}
+.dsb-btn.v-secondary:hover {
+  border-color: var(--dsb-primary);
+  color: var(--dsb-primary);
+}
+.dsb-btn.v-ghost {
+  background: transparent;
+  color: var(--dsb-text-muted);
+}
+.dsb-btn.v-ghost:hover {
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-text-primary);
+}
+.dsb-btn.v-danger {
+  background: var(--dsb-danger);
+  color: #fff;
+}
+.dsb-btn.v-link {
+  background: transparent;
+  color: var(--dsb-primary);
+  padding: 0;
+  height: auto;
+  text-decoration: underline;
+}
+.dsb-btn.v-icon {
+  width: var(--dsb-control-height);
+  padding: 0;
+  background: var(--dsb-surface);
+  border-color: var(--dsb-border);
+  color: var(--dsb-text-primary);
+}
+.dsb-btn.v-icon:hover {
+  border-color: var(--dsb-primary);
+  color: var(--dsb-primary);
+}
+
+.dsb-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsb-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dsb-icon-btn:hover {
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-text-primary);
+}
+/* An icon given its own background keeps it on hover (the inline fill wins)
+   and darkens a touch instead, so it still answers the pointer. */
+.dsb-icon-btn.has-bg,
+.dsb-iconcell.has-bg {
+  transition: filter 0.15s ease, transform 140ms ease;
+}
+/* A row this control has nothing to act on — no receipt number to change the
+   payment of. Greyed out and inert, rather than clickable and then refused. */
+.dsb-iconcell.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+.dsb-icon-btn.has-bg:hover,
+.dsb-iconcell.has-bg:hover,
+.dsb-iconcell.has-bg:focus-visible {
+  filter: brightness(0.92);
+}
+.dsb-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--dsb-primary);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------------------- containers */
+
+.dsb-container,
+.dsb-row,
+.dsb-col,
+.dsb-flex,
+.dsb-gridbox {
+  min-width: 0;
+}
+
+/* ------------------------------------------------------- equal control grid
+
+   Six controls to a row on a desktop, fewer as the page narrows, every cell the
+   same width. The count per tier is a variable so one rule serves every grid:
+   the node writes --dsb-fg (and the three smaller tiers) from the inspector.
+
+   The tiers are plain media queries because the live page is what has to be
+   right, and the canvas re-states them from the frame's own breakpoint class so
+   switching to Tablet on the canvas shows the tablet count rather than whatever
+   the designer's window happens to be.
+
+   The boundaries are the app's own grid boundaries — AdminLTE's xl/lg/md/sm at
+   1200 / 992 / 768 / 576. A hand-coded filter row is written `col-xl-2
+   col-md-4 col-sm-4 col-12`, so it goes six across from 1200px up; the full
+   count used to wait for 1400px here, which is why the same row built in the
+   builder dropped to four on a 1280px laptop while the hand-coded page beside
+   it still showed six. */
+.dsb-formgrid {
+  display: grid;
+  grid-template-columns: repeat(var(--dsb-fg, 6), minmax(0, 1fr));
+  align-items: end;
+}
+.dsb-formgrid > * {
+  min-width: 0;
+}
+@media (max-width: 1199.98px) {
+  .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-lg, 4), minmax(0, 1fr));
+  }
+}
+@media (max-width: 991.98px) {
+  .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-md, 2), minmax(0, 1fr));
+  }
+}
+@media (max-width: 575.98px) {
+  .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-sm, 1), minmax(0, 1fr));
+  }
+}
+/* Canvas: the frame states the breakpoint, so it wins over the window's width. */
+.dsb-bp-tablet .dsb-formgrid {
+  grid-template-columns: repeat(var(--dsb-fg-md, 2), minmax(0, 1fr));
+}
+.dsb-bp-mobile .dsb-formgrid {
+  grid-template-columns: repeat(var(--dsb-fg-sm, 1), minmax(0, 1fr));
+}
+
+/* A control brought in from a hand-coded page carries that page's own column
+   class (col-xl-2, col-md-4 …). Inside a layout that already decides the width,
+   that class only shrinks the control inside its cell — which is what makes an
+   imported filter row look ragged. Here the cell is the width, so the control
+   fills it; outside these layouts the class still does exactly what it says. */
+.dsb-formgrid [class^="col-"],
+.dsb-formgrid [class*=" col-"],
+.dsb-autofit [class^="col-"],
+.dsb-autofit [class*=" col-"] {
+  flex: 1 1 100%;
+  max-width: 100%;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* A button takes a cell like everything else, but keeps its own width inside
+   it — a Search stretched across a sixth of the page reads as a banner, not a
+   button. It sits at the bottom of the cell, on the same line as the inputs
+   beside it, instead of floating above them. "Full width" still wins. */
+.dsb-formgrid .dsb-native-btn {
+  align-self: end;
+  justify-self: start;
+}
+.dsb-formgrid .dsb-native-btn > .btn-block {
+  width: 100%;
+}
+
+/* "Auto-fit children": every direct child shares the free space equally.
+   At runtime the direct children ARE the components; on the builder canvas
+   they are the node wrappers — the rule fits both, so the canvas matches the
+   page. A child that was given an explicit size keeps it. */
+.dsb-autofit > * {
+  /* An ideal width, not a fixed one: children share the row equally and, when
+     the row can no longer give each of them that much, they wrap onto the next
+     line. That is the whole responsive behaviour — no breakpoint needed. */
+  flex: 1 1 var(--dsb-autofit-basis, 200px);
+  min-width: 0;
+}
+.dsb-autofit > .dsb-sized,
+.dsb-autofit > [data-dsb-sized="1"] {
+  flex: 0 0 auto;
+}
+
+/* A column, so a panel given a height hands its body what is left under the
+   header — and a scrolling child (a card list with a max height) fits that
+   instead of running under the panel's clipped bottom edge. Auto-height
+   panels look exactly as before. */
+.dsb-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--dsb-surface);
+  border-radius: var(--dsb-radius);
+  overflow: hidden;
+}
+.dsb-panel-head {
+  flex: 0 0 auto;
+}
+.dsb-panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.dsb-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--dsb-border);
+  background: var(--dsb-surface-alt);
+}
+.dsb-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dsb-primary);
+  min-width: 0;
+}
+.dsb-panel-title strong {
+  font-size: var(--dsb-node-fs, 13px);
+  font-weight: var(--dsb-node-fw, 700);
+  color: var(--dsb-node-fg, inherit);
+}
+/* A section header's icon as a tinted square: the colour carries the section
+   before its title is read. --dsb-badge is the inspector's "Header icon
+   colour"; the tint is mixed from it so one value paints both. */
+.dsb-ic-badge {
+  --dsb-badge: var(--dsb-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--dsb-badge);
+  background: color-mix(in srgb, var(--dsb-badge) 13%, transparent);
+}
+.dsb-ic-badge.is-plain {
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+/* ------------------------------------------------------------ leading icons
+   Portalled by NativeShell into the project control's own box (.form-group in
+   the classic skin, .mi-field-shell in the modern one). The control is the
+   app's component, so the room for the icon is made here: the typed text, the
+   resting floating label and react-select's value all move right. */
+.dsb-native.has-lead-ic .form-group,
+.dsb-native.has-lead-ic .mi-field-shell {
+  position: relative;
+}
+.dsb-lead-ic {
+  position: absolute;
+  top: 1rem;
+  inset-inline-start: 9px;
+  z-index: 3;
+  display: inline-flex;
+  transform: translateY(-50%);
+  color: var(--dsb-lead-ic, var(--dsb-text-muted, #64748b));
+  pointer-events: none;
+  transition: color 0.15s ease;
+}
+.dsb-native.has-lead-ic .mi-field-shell > .dsb-lead-ic {
+  top: 50%;
+}
+.dsb-native.has-lead-ic:focus-within .dsb-lead-ic {
+  color: var(--dsb-primary);
+}
+.dsb-native.has-lead-ic .form-group > input.form-control {
+  padding-inline-start: 28px !important;
+}
+/* The resting label sits where the text will; once it floats onto the border
+   it is out of the icon's way and goes back to its usual place. */
+.dsb-native.has-lead-ic .form-group > input.form-control:placeholder-shown:not(:focus) + .lable {
+  margin-inline-start: 25px;
+}
+.dsb-native.has-lead-ic .form-group [class*="__value-container"] {
+  padding-inline-start: 26px !important;
+}
+.dsb-native.has-lead-ic .mi-field-shell [data-tab-field] {
+  padding-inline-start: 28px !important;
+}
+.dsb-native.has-lead-ic .mi-field-shell > label {
+  left: 28px !important;
+}
+.dsb-panel-sub {
+  display: block;
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 400);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.dsb-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: opacity 0.2s ease;
+}
+.dsb-panel-body.is-collapsed {
+  display: none;
+}
+
+/* ------------------------------------------------ card with the app heading
+   The app's <Heading /> is drawn exactly as the page heading is — its theme
+   gradient, its padding, and the 2px theme line along its top (a box-shadow
+   on .card_background in the classic skin). Only what would put space between
+   it and the card is taken away: its page margin, and the card's own top
+   border, which the heading's line replaces. The 2px margin makes room for
+   that line inside the card's rounded, clipped top edge. */
+.dsb-panel.has-apphead {
+  border-top: 0 !important;
+}
+.dsb-panel-apphead {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.dsb-panel-apphead > .card {
+  margin: 2px 0 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.dsb-panel-apphead > .ah-head {
+  margin: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.dsb-panel-apphead.has-bg > .card .card-header,
+.dsb-panel-apphead.has-bg > .ah-head {
+  background: var(--dsb-apphead-bg) !important;
+}
+.dsb-panel-apphead .card-title {
+  /* Only the vertical margin: the left inset is the page heading's own. */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.dsb-panel-apphead-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-panel-apphead-right .dsb-panel-sub {
+  display: inline;
+  white-space: nowrap;
+}
+/* The card's own accent bar already marks the left edge. */
+.dsb-panel-apphead.has-accent > .ah-head {
+  border-left: 0 !important;
+}
+/* The app's theme paints every bare <button> in its colour; these are icon
+   buttons on a heading and keep the heading's own look. */
+.dsb-panel-apphead .dsb-icon-btn {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: inherit;
+}
+.dsb-panel-apphead .dsb-icon-btn:hover {
+  background: rgba(15, 23, 42, 0.06) !important;
+}
+/* A table's own toolbar (count, search, view toggle, refresh) moved up into
+   the heading of the card it sits in, instead of a row of its own. */
+.dsb-panel-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-panel-slot:empty {
+  display: none;
+}
+.dsb-panel-slot .dsb-grid-title,
+.dsb-panel-slot .dsb-grid-tools,
+.dsb-apphead-right .dsb-grid-tools,
+.dsb-apphead-right .dsb-cl-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsb-panel-slot .dsb-seg button,
+.dsb-panel-slot .dsb-icon-btn,
+.dsb-apphead-right .dsb-seg button,
+.dsb-apphead-right .dsb-icon-btn {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: inherit;
+  height: 24px;
+  min-width: 24px;
+  padding: 0 4px !important;
+}
+.dsb-panel-slot .dsb-seg button.is-on,
+.dsb-apphead-right .dsb-seg button.is-on {
+  background: rgba(15, 23, 42, 0.08) !important;
+}
+.dsb-panel-slot .dsb-seg,
+.dsb-apphead-right .dsb-seg {
+  padding: 1px;
+}
+.dsb-panel-slot .dsb-grid-search input,
+.dsb-apphead-right .dsb-grid-search input,
+.dsb-apphead-right .dsb-cl-search input {
+  height: 24px;
+}
+/* The grid itself, once its toolbar has gone up: no second box inside the
+   card — no border, no padding, no rounded frame. */
+.dsb-grid.is-in-card {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.dsb-panel-apphead-search {
+  width: 180px;
+  max-width: 100%;
+  height: 26px;
+  padding: 2px 8px;
+  font-size: 1rem;
+}
+
+.dsb-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  font-size: var(--dsb-node-fs, 12.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  box-shadow: var(--dsb-shadow);
+}
+.dsb-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.92;
+}
+.dsb-crumb em {
+  font-style: normal;
+  opacity: 0.55;
+  margin-inline-start: 3px;
+}
+.dsb-crumb:last-child {
+  opacity: 1;
+}
+/* Canvas-only marker on a bar that will read the menu once the screen is a
+   real route. Never rendered at runtime. */
+.dsb-crumb-note {
+  font-style: normal;
+  font-size: var(--dsb-node-fs, 10px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-inline-start: auto;
+  padding-inline-start: 8px;
+  white-space: nowrap;
+}
+
+/* Heading style: same proportions as the app's page header (AuroraHeading) —
+   slim bar, tinted icon tile, hairline border, accent on the left edge. */
+.dsb-crumbs.is-heading {
+  padding: 5px 10px;
+  min-height: 30px;
+  gap: 6px;
+  box-shadow: none;
+}
+.dsb-crumbs.is-heading .dsb-crumb {
+  opacity: 0.7;
+}
+.dsb-crumbs.is-heading .dsb-crumb:last-child {
+  opacity: 1;
+}
+.dsb-crumbs.is-plain {
+  padding: 4px 0;
+}
+.dsb-crumb-tile {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.dsb-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dsb-divider span {
+  flex: 1;
+  border-top: 1px solid var(--dsb-border);
+}
+.dsb-divider em {
+  font-style: normal;
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+
+.dsb-split {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+.dsb-split.is-stacked {
+  flex-direction: column;
+}
+.dsb-split-main {
+  min-width: 0;
+  flex-grow: 1;
+  transition: flex-basis 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-split-side {
+  min-width: 0;
+  flex-grow: 1;
+  background: var(--dsb-surface);
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  box-shadow: var(--dsb-shadow);
+  animation: dsb-slide-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+.dsb-split.is-stacked .dsb-split-side,
+.dsb-split.is-stacked .dsb-split-main {
+  width: 100%;
+  flex-basis: auto !important;
+}
+.dsb-split-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--dsb-border);
+  font-weight: var(--dsb-node-fw, 700);
+  font-size: var(--dsb-node-fs, 12.5px);
+  color: var(--dsb-node-fg, var(--dsb-primary));
+  background: var(--dsb-surface-alt);
+}
+.dsb-split-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+@keyframes dsb-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------- action grid */
+
+.dsb-actiongrid {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+.dsb-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  background: var(--dsb-surface);
+  cursor: pointer;
+  transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.16s ease, border-color 0.16s ease;
+}
+.dsb-action:hover {
+  transform: translateY(-2px);
+  border-color: var(--dsb-action-accent);
+  box-shadow: var(--dsb-shadow);
+}
+.dsb-action-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--dsb-action-accent, var(--dsb-primary));
+  background: color-mix(in srgb, var(--dsb-action-accent, #2563eb) 12%, transparent);
+}
+.dsb-action-label {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  text-align: center;
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  line-height: 1.25;
+}
+.dsb-actiongrid.is-compact .dsb-action {
+  padding: 7px 4px;
+}
+.dsb-action.is-more .dsb-action-ic {
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-text-muted);
+}
+
+/* --------------------------------------------------------------- data grid */
+
+.dsb-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--dsb-surface);
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  padding: 10px;
+  min-width: 0;
+}
+.dsb-grid-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 26px;
+}
+
+/* A table's section heading: the app's own card header ("details"), laid
+   flush across the top of the grid — out to its edges, tight padding, none of
+   the page-level margin and shadow the component brings with it. */
+.dsb-grid > .dsb-table-heading {
+  margin: -10px -10px -2px;
+  min-width: 0;
+}
+/* As on a card: the heading keeps its own look and top line, and loses only
+   the page margin. */
+.dsb-table-heading > .card,
+.dsb-table-heading > .modern-heading {
+  margin: 2px 0 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.dsb-table-heading .card-title {
+  /* Only the vertical margin: the left inset is the page heading's own. */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.dsb-grid-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: var(--dsb-node-fw, 700);
+  font-size: var(--dsb-node-fs, 13px);
+}
+.dsb-count-pill {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 700);
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--dsb-primary-soft);
+  color: var(--dsb-node-fg, var(--dsb-primary));
+}
+.dsb-grid-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* The grid's own search box: it narrows the rows already loaded, so it sits
+   with the view toggle and the refresh rather than with the screen's filters. */
+.dsb-grid-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 9px;
+  margin: 0;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius-sm, 6px);
+  background: var(--dsb-surface);
+  color: var(--dsb-text-muted);
+}
+.dsb-grid-search:focus-within {
+  border-color: var(--dsb-primary);
+}
+.dsb-grid-search input {
+  width: 170px;
+  max-width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--dsb-text-primary);
+  font-size: 1.0417rem;
+}
+.dsb-seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 8px;
+  background: var(--dsb-surface-alt);
+}
+.dsb-seg.is-wide {
+  width: 100%;
+}
+.dsb-seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  cursor: pointer;
+  font-size: var(--dsb-node-fs, 12px);
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.dsb-seg button.is-on {
+  background: var(--dsb-surface);
+  color: var(--dsb-primary);
+  box-shadow: var(--dsb-shadow);
+}
+
+.dsb-grid-scroll {
+  overflow: auto;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius-sm);
+  scrollbar-width: thin;
+}
+.dsb-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--dsb-node-fs, 12.5px);
+}
+.dsb-table thead th {
+  position: relative;
+  padding: 9px 10px;
+  text-align: start;
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--dsb-node-fg, var(--dsb-primary));
+  background: var(--dsb-surface-alt);
+  border-bottom: 1px solid var(--dsb-border);
+  white-space: nowrap;
+  user-select: none;
+}
+.dsb-table.is-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.dsb-table th.is-sortable {
+  cursor: pointer;
+}
+.dsb-table th.is-sortable:hover {
+  background: var(--dsb-primary-soft);
+}
+.dsb-th {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.dsb-th-ic {
+  flex: none;
+  opacity: 0.8;
+}
+.dsb-col-resize {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+}
+.dsb-col-resize:hover {
+  background: color-mix(in srgb, var(--dsb-primary) 35%, transparent);
+}
+/* `!important` because index.css zeroes every <td> in the app with
+   `td { padding: 0 !important }` — without it the text sat on the cell's left
+   border. Scoped to builder tables, so no hand-coded grid changes. */
+.dsb-table tbody td {
+  padding: 7px 10px !important;
+  border-bottom: 1px solid var(--dsb-border);
+  color: var(--dsb-text-primary);
+  vertical-align: middle;
+}
+.dsb-table tbody tr {
+  transition: background 0.13s ease;
+  cursor: pointer;
+}
+.dsb-table tbody tr:hover {
+  background: var(--dsb-primary-soft);
+}
+.dsb-table.is-zebra tbody tr:nth-child(even) {
+  background: var(--dsb-surface-alt);
+}
+.dsb-table tbody tr.is-selected {
+  background: color-mix(in srgb, var(--dsb-primary) 12%, transparent);
+  box-shadow: inset 3px 0 0 var(--dsb-primary);
+}
+.dsb-grid.is-dense .dsb-table tbody td {
+  padding: 4px 8px !important;
+}
+
+/* ------------------------------------------------------------- grid looks --
+   Two of them, and the difference is only ever defaults.
+
+   "App" is the grid the hand-coded pages draw (`.mainTable` in index.css):
+   13px, rows tight enough that a screenful is a screenful, every cell ruled,
+   alternating rows, and a header that takes the colour of whichever app theme
+   is switched on — so a built screen sits beside a written one and nobody can
+   tell which is which. "Plain" is the roomier builder grid.
+
+   Every value here is a fallback inside a custom property, so a table that
+   sets Font size, Header background or Stripe colour in the inspector wins
+   over both the look and the theme. */
+
+.dsb-table {
+  font-size: var(--dsb-grid-fs, var(--dsb-node-fs, 12.5px));
+}
+
+.dsb-grid.s-app .dsb-table thead th {
+  padding: 5px 8px;
+  font-size: var(--dsb-grid-fs, var(--dsb-node-fs, 13px));
+  font-weight: var(--dsb-node-fw, 600);
+  background: var(--dsb-grid-head-bg, #dff7f1);
+  color: var(--dsb-node-fg, var(--dsb-grid-head-fg, #184fd9));
+  border-bottom: 1px solid #cfcece;
+}
+.dsb-grid.s-app .dsb-table tbody td {
+  padding: 4px 8px !important;
+  font-size: var(--dsb-grid-fs, var(--dsb-node-fs, 13px));
+  /* The reference grid keeps every cell on one line and scrolls sideways
+     instead of growing rows of different heights. A column that wants to wrap
+     asks for it per column — Truncate, or a width. */
+  white-space: nowrap;
+}
+.dsb-grid.s-app .dsb-table tbody tr:nth-child(even) {
+  background: var(--dsb-grid-stripe, #eff6fd);
+}
+.dsb-grid.s-app .dsb-table tbody tr:hover {
+  background: #d8ebfa;
+}
+.dsb-grid.s-app .dsb-table tbody tr.is-selected {
+  background: color-mix(in srgb, var(--dsb-primary) 14%, transparent);
+}
+/* Tighter again on top of the app look, rather than instead of it. */
+.dsb-grid.s-app.is-dense .dsb-table thead th,
+.dsb-grid.s-app.is-dense .dsb-table tbody td {
+  padding: 2px 6px !important;
+}
+
+/* Header wording: the written pages title their columns as typed
+   ("Emergency No"), the builder grid shouted them. Both, on a switch. */
+.dsb-grid.hc-normal .dsb-table thead th {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.dsb-grid.hc-upper .dsb-table thead th {
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Rules between cells. `rows` is what the builder grid always drew. */
+.dsb-grid.gl-none .dsb-table thead th,
+.dsb-grid.gl-none .dsb-table tbody td {
+  border-bottom: 0;
+}
+.dsb-grid.gl-all .dsb-table thead th,
+.dsb-grid.gl-all .dsb-table tbody td {
+  border-inline-end: 1px solid var(--dsb-border);
+}
+.dsb-grid.gl-all .dsb-table tr > *:last-child {
+  border-inline-end: 0;
+}
+
+/* The header follows the app theme, the same way `.mainTable thead th` does —
+   generated from assets/css/theme.css, whose class sits on #root. A screen
+   built here and a page written by hand then agree on the colour of a column
+   heading without either of them naming it. The custom properties keep the
+   inspector in charge: set Header background and this stops applying. */
+#root.default_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #ddf5ee;
+  --dsb-grid-head-fg: #22d8a9;
+}
+#root.orange_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #fff0d8;
+  --dsb-grid-head-fg: #d55f00;
+}
+#root.peach_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #f7f6d7;
+  --dsb-grid-head-fg: #b17300;
+}
+#root.pale_pink_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #ecd3ea;
+  --dsb-grid-head-fg: #bc3c8b;
+}
+#root.red_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #f3d4f0;
+  --dsb-grid-head-fg: #8b2424;
+}
+#root.sky_blue_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #d9eef7;
+  --dsb-grid-head-fg: #03a0e7;
+}
+#root.light_blue_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #dfe4f7;
+  --dsb-grid-head-fg: #7EA0EA;
+}
+#root.pink_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #FFF0F5;
+  --dsb-grid-head-fg: #FFA4C3;
+}
+#root.purple_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #e0d3f1;
+  --dsb-grid-head-fg: #B48AF6;
+}
+#root.gray_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #cfcccc;
+  --dsb-grid-head-fg: #666866;
+}
+#root.pale_yellow_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #FCFACA;
+  --dsb-grid-head-fg: #807a7a;
+}
+#root.light_celadon_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #DDFFC3;
+  --dsb-grid-head-fg: #807a7a;
+}
+#root.pale_aqua_theme .dsb-grid.s-app {
+  --dsb-grid-head-bg: #DAFFFC;
+  --dsb-grid-head-fg: #807a7a;
+}
+
+.dsb-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+/* The frame-menu trigger sits in the strip as one more icon: the app's own
+   control is a plain inline span, so it needs the button's box to line up with
+   the icons beside it. */
+.dsb-row-actions .dsb-framemenu {
+  width: 26px;
+  height: 26px;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--dsb-text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dsb-row-actions .dsb-framemenu:hover {
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-text-primary);
+}
+
+.dsb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 700);
+  line-height: 1.7;
+  white-space: nowrap;
+}
+.dsb-chip.s-sm {
+  font-size: var(--dsb-node-fs, 10px);
+  padding: 1px 7px;
+}
+.dsb-chip.v-outline {
+  border-style: solid;
+}
+
+/* ------------------------------------------------------------ card view --
+   A card per row, colour-coded in soft pastels: --dsb-cc (accent), -soft
+   (card wash), -band (header band) and -ink come from the row (see
+   cardPalette), so every "OPD" card shares a colour and "EMG" has its own.
+   Without them (colour coding off) the card falls back to the theme. */
+.dsb-cards {
+  display: grid;
+  grid-template-columns: repeat(var(--dsb-card-cols, 3), minmax(0, 1fr));
+  /* Each row as tall as its cards. A card clips its overflow, so its minimum
+     height is 0; with plain auto rows a height-limited list (fill height, max
+     height, a flex column) squeezed every row down to the header band and hid
+     the fields, instead of scrolling. */
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 10px;
+  overflow: auto;
+  padding: 4px 2px 6px;
+}
+.dsb-card-row {
+  --dsb-cc: var(--dsb-primary);
+  --dsb-cc-soft: var(--dsb-surface);
+  --dsb-cc-band: var(--dsb-primary-soft);
+  --dsb-cc-ink: var(--dsb-text-primary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--dsb-cc) 22%, var(--dsb-border));
+  border-top: 3px solid color-mix(in srgb, var(--dsb-cc) 55%, #fff);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 2px 8px -4px color-mix(in srgb, var(--dsb-cc) 30%, transparent);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.dsb-card-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--dsb-cc) 45%, transparent);
+  border-color: color-mix(in srgb, var(--dsb-cc) 45%, var(--dsb-border));
+}
+.dsb-card-row.is-selected {
+  border-color: var(--dsb-cc);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsb-cc) 28%, transparent);
+}
+
+/* Header band: avatar, name, then the badges on the right. */
+.dsb-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: linear-gradient(120deg, var(--dsb-cc-band) 0%, var(--dsb-cc-soft) 70%, #fff 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--dsb-cc) 14%, transparent);
+}
+.dsb-card-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* A filled gradient disc: reads as the card's colour at a glance. */
+.dsb-card-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--dsb-cc) 70%, #fff), var(--dsb-cc));
+  color: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 3px 8px -3px color-mix(in srgb, var(--dsb-cc) 70%, transparent);
+}
+.dsb-card-initials {
+  font-size: 0.9583rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.dsb-card-names {
+  min-width: 0;
+}
+.dsb-card-title {
+  font-weight: var(--dsb-node-fw, 700);
+  font-size: var(--dsb-node-fs, 13.5px);
+  color: var(--dsb-node-fg, var(--dsb-cc-ink));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-card-sub {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 3px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.9167rem;
+  font-weight: 600;
+  color: var(--dsb-cc-ink);
+  background: color-mix(in srgb, var(--dsb-cc) 12%, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.dsb-card-num {
+  min-width: 26px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--dsb-cc) 25%, var(--dsb-border));
+  color: var(--dsb-cc-ink);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+/* Each tick box as a small labelled pill — three bare boxes in a row say
+   nothing about which is "Original" and which is "Logo". */
+.dsb-card-tick {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px 1px 4px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--dsb-cc) 25%, var(--dsb-border));
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dsb-cc-ink);
+  max-width: 96px;
+}
+.dsb-card-tick-lbl {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-card-tick input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--dsb-cc);
+  cursor: pointer;
+}
+
+/* Fields: ruled cells, label over value, as many across as the card is wide
+   (2 on a narrow card, 3-4 on a wide one), so a card with ten fields is
+   still short enough to read whole. Each cell rules its own right and
+   bottom edge, so they line up however many cells a row holds; the card
+   clips the ones along its outer edge. */
+.dsb-card-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  margin: 0 -1px -1px 0;
+}
+.dsb-card-kv {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  padding: 3px 8px;
+  line-height: 1.3;
+  box-shadow: inset -1px -1px 0 color-mix(in srgb, var(--dsb-cc) 14%, #eef1f6);
+}
+.dsb-card-kv > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  /* Smaller than the value always, also when the table's font size is set. */
+  font-size: calc(var(--dsb-node-fs, 12.5px) * 0.74);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dsb-node-fg, color-mix(in srgb, var(--dsb-cc) 55%, #64748b));
+}
+.dsb-card-kv > span svg {
+  color: var(--dsb-cc);
+}
+.dsb-card-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--dsb-cc) 60%, #fff);
+  flex: none;
+}
+.dsb-card-kv strong {
+  font-size: var(--dsb-node-fs, 12px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dsb-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: var(--dsb-node-fs, 11.5px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+/* How many rows a page holds, next to the count it changes. */
+.dsb-pager-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-block: 0;
+  margin-inline-start: 10px;
+  margin-inline-end: auto;
+}
+.dsb-pager-size select {
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius-sm, 6px);
+  background: var(--dsb-surface);
+  color: var(--dsb-text-primary);
+  font-size: var(--dsb-node-fs, 11.5px);
+}
+.dsb-pager-btns {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.dsb-pager-btns button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 5px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 6px;
+  background: var(--dsb-surface);
+  color: var(--dsb-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dsb-pager-btns button:hover:not(:disabled) {
+  border-color: var(--dsb-primary);
+  color: var(--dsb-primary);
+}
+.dsb-pager-btns button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dsb-pager-num {
+  padding: 0 6px;
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+
+/* --------------------------------------------------------- stats and tiles */
+
+.dsb-stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px 12px 16px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  background: var(--dsb-surface);
+  box-shadow: var(--dsb-shadow);
+  overflow: hidden;
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease;
+}
+.dsb-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--dsb-shadow-lg);
+}
+.dsb-stat-bar {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--dsb-stat-accent);
+}
+.dsb-stat-label {
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 600);
+  letter-spacing: 0.3px;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  text-transform: uppercase;
+}
+.dsb-stat-value {
+  font-size: var(--dsb-node-fs, 24px);
+  font-weight: var(--dsb-node-fw, 800);
+  line-height: 1.2;
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+.dsb-stat.s-sm .dsb-stat-value {
+  font-size: var(--dsb-node-fs, 19px);
+}
+.dsb-stat.s-lg .dsb-stat-value {
+  font-size: var(--dsb-node-fs, 30px);
+}
+.dsb-stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 600);
+}
+.dsb-stat-trend.d-up {
+  color: var(--dsb-success);
+}
+.dsb-stat-trend.d-down {
+  color: var(--dsb-danger);
+}
+/* A trend with a background reads as a pill, sized to its text. */
+.dsb-stat-trend.has-bg {
+  align-self: flex-start;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+/* The text column takes the room the icon leaves, so a trend aligned right
+   or centre lines up with the card, not with the width of its number. */
+.dsb-stat-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-stat-trendrow {
+  display: flex;
+}
+.dsb-stat-trendrow.a-center {
+  justify-content: center;
+}
+.dsb-stat-trendrow.a-right {
+  justify-content: flex-end;
+}
+/* "36  68%": the trend follows the number on its baseline. */
+.dsb-stat-valrow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.dsb-stat-valrow .dsb-stat-trend.has-bg {
+  align-self: center;
+}
+/* Icon first: it sits in the middle of the card, beside the text. */
+.dsb-stat.ic-left {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.dsb-stat.ic-left .dsb-stat-ic {
+  align-self: center;
+}
+.dsb-stat-ic.is-circle {
+  border-radius: 50%;
+}
+.dsb-stat-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  color: var(--dsb-stat-accent);
+  background: color-mix(in srgb, var(--dsb-stat-accent) 12%, transparent);
+  flex: none;
+  align-self: flex-start;
+}
+
+.dsb-tile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  background: var(--dsb-surface);
+}
+.dsb-tile-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex: none;
+}
+.dsb-tile-main {
+  min-width: 0;
+}
+.dsb-tile-label {
+  font-size: var(--dsb-node-fs, 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  font-weight: var(--dsb-node-fw, 600);
+}
+.dsb-tile-value {
+  font-size: var(--dsb-node-fs, 13px);
+  font-weight: var(--dsb-node-fw, 700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dsb-vital {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--dsb-border);
+  border-inline-start: 3px solid var(--dsb-vital-accent);
+  border-radius: var(--dsb-radius);
+  background: var(--dsb-surface);
+}
+.dsb-vital-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--dsb-vital-accent);
+}
+.dsb-vital-label {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.dsb-vital-value {
+  font-size: var(--dsb-node-fs, 19px);
+  font-weight: var(--dsb-node-fw, 800);
+  line-height: 1.15;
+}
+.dsb-vital-value small {
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  margin-inline-start: 4px;
+}
+.dsb-vital-range {
+  font-size: var(--dsb-node-fs, 10.5px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+
+/* --------------------------------------------------------- vital alerts --
+   A tripped vital says so twice: in colour, and in movement. The colour is the
+   message; the movement is only there to pull an eye that is somewhere else on
+   the screen, so every one of these is small, slow and finite where it can be. */
+.dsb-vital.is-alert {
+  border-color: color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 45%, var(--dsb-border));
+  background: color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 6%, var(--dsb-surface));
+}
+.dsb-vital.is-alert .dsb-vital-label,
+.dsb-vital.is-alert .dsb-vital-range {
+  color: color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 70%, var(--dsb-text-muted));
+}
+.dsb-vital.a-pulse {
+  animation: dsb-vital-pulse 1.8s ease-in-out infinite !important;
+}
+.dsb-vital.a-glow {
+  animation: dsb-vital-glow 2s ease-in-out infinite !important;
+}
+/* Two beats and a rest, the shape of a pulse rather than a throb. */
+.dsb-vital.a-beat .dsb-vital-value {
+  display: inline-block;
+  animation: dsb-vital-beat 1.6s ease-in-out infinite !important;
+  transform-origin: left center;
+}
+.dsb-vital.a-blink .dsb-vital-value {
+  animation: dsb-vital-blink 1.2s steps(1, end) infinite !important;
+}
+/* The whole card shakes, continuously, with a ring around it — the alert a
+   nurse is meant to catch from across the room. Kept running even where the OS
+   asks for reduced motion: this one is a clinical signal, not decoration. */
+.dsb-vital.a-shake {
+  /* !important, deliberately: page-level stylesheets in this app carry blanket
+     `* { animation-duration: .001ms !important }` resets for reduced motion,
+     and one of them leaking is enough to silence a clinical alert without a
+     trace. The duration and the iteration count are the two a blanket reset
+     overwrites, so those are the two that are defended. */
+  animation: dsb-vital-shake 0.5s ease-in-out 0s infinite normal none running !important;
+  will-change: transform;
+  box-shadow: color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 15%, transparent) 0px 0px 0px 2px;
+}
+@keyframes dsb-vital-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 45%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+@keyframes dsb-vital-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: 0 6px 22px color-mix(in srgb, var(--dsb-vital-alert, #dc2626) 38%, transparent);
+  }
+}
+@keyframes dsb-vital-beat {
+  0%,
+  55%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.07);
+  }
+  24% {
+    transform: scale(1);
+  }
+  36% {
+    transform: scale(1.05);
+  }
+}
+@keyframes dsb-vital-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes dsb-vital-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+/* Motion is switched off on plenty of machines — Windows' "Animation effects"
+   toggle reports itself to the browser as prefers-reduced-motion, and a clinical
+   screen cannot answer that by going silent. So nothing MOVES, but the reading
+   still breathes: a slow opacity fade carries the alert with no motion in it. */
+@media (prefers-reduced-motion: reduce) {
+  /* Matching !important, so this still wins over the defended rules above:
+     pulse and glow give way to a fade that carries no motion. Shake does not —
+     it was asked for explicitly. */
+  .dsb-vital.a-pulse,
+  .dsb-vital.a-glow {
+    animation: none !important;
+  }
+  .dsb-vital.a-pulse .dsb-vital-value,
+  .dsb-vital.a-glow .dsb-vital-value,
+  .dsb-vital.a-beat .dsb-vital-value,
+  .dsb-vital.a-blink .dsb-vital-value {
+    animation: dsb-vital-fade 2s ease-in-out infinite !important;
+    transform: none;
+  }
+}
+@keyframes dsb-vital-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.dsb-textblock.l-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.dsb-textblock.has-bg {
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.dsb-tb-label {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-tb-value {
+  font-size: var(--dsb-node-fs, 12.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+/* The part carrying the icon lines the two up on their centres; a clamped value
+   beside it must still be allowed to shrink and ellipsise. */
+.dsb-tb-label.has-icon,
+.dsb-tb-value.has-icon {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dsb-tb-icon {
+  flex: none;
+}
+.dsb-textblock.l-inline.has-icon {
+  align-items: center;
+}
+/* Alignment. Stacked parts align their text (and, when they carry an icon,
+   their flex row); inline parts move as a pair along the row. */
+.dsb-textblock.a-center {
+  text-align: center;
+}
+.dsb-textblock.a-right {
+  text-align: end;
+}
+.dsb-textblock.a-center .has-icon {
+  justify-content: center;
+}
+.dsb-textblock.a-right .has-icon {
+  justify-content: flex-end;
+}
+.dsb-textblock.l-inline.a-center {
+  justify-content: center;
+}
+.dsb-textblock.l-inline.a-right {
+  justify-content: flex-end;
+}
+/* Space between: label at the start, value at the far end — beside each other
+   when inline, on their own lines when stacked. */
+.dsb-textblock.l-inline.a-between {
+  justify-content: space-between;
+}
+.dsb-textblock.a-between .dsb-tb-value {
+  text-align: end;
+}
+.dsb-textblock.a-between .dsb-tb-value.has-icon {
+  justify-content: flex-end;
+}
+.dsb-heading {
+  margin: 0;
+}
+
+.dsb-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dsb-node-fg, #fff);
+  font-weight: var(--dsb-node-fw, 700);
+  overflow: hidden;
+  flex: none;
+}
+.dsb-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dsb-iconbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+}
+
+/* -------------------------------------------------------------------- tabs */
+
+.dsb-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.dsb-tabbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--dsb-border);
+}
+.dsb-tabbar::-webkit-scrollbar {
+  display: none;
+}
+.dsb-tabbar.a-center {
+  justify-content: center;
+}
+.dsb-tabbar.a-right {
+  justify-content: flex-end;
+}
+.dsb-tabbar.is-stretch .dsb-tab {
+  flex: 1;
+  justify-content: center;
+}
+.dsb-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border: 0;
+  background: transparent;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  font-size: var(--dsb-node-fs, 12px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.16s ease, background 0.16s ease;
+}
+.dsb-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--dsb-primary);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dsb-tab:hover {
+  color: var(--dsb-text-primary);
+}
+.dsb-tab.is-on {
+  color: var(--dsb-primary);
+}
+.dsb-tab.is-on::after {
+  transform: scaleX(1);
+}
+.dsb-tabs.v-pill .dsb-tabbar {
+  border-bottom: 0;
+  gap: 6px;
+}
+.dsb-tabs.v-pill .dsb-tab {
+  border-radius: 999px;
+  background: var(--dsb-surface-alt);
+}
+.dsb-tabs.v-pill .dsb-tab.is-on {
+  background: var(--dsb-primary);
+  color: #fff;
+}
+.dsb-tabs.v-pill .dsb-tab::after {
+  display: none;
+}
+.dsb-tabs.v-boxed .dsb-tab.is-on {
+  background: var(--dsb-surface);
+  border: 1px solid var(--dsb-border);
+  border-bottom-color: var(--dsb-surface);
+  border-radius: 8px 8px 0 0;
+}
+.dsb-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  font-size: var(--dsb-node-fs, 10px);
+  font-weight: var(--dsb-node-fw, 800);
+}
+.dsb-tab.is-on .dsb-tab-count {
+  background: var(--dsb-primary);
+  color: #fff;
+}
+.dsb-tab-empty {
+  padding: 10px;
+  font-size: var(--dsb-node-fs, 11.5px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-tabbody,
+.dsb-pane {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: dsb-fade 0.2s ease;
+}
+@keyframes dsb-fade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------- overlays */
+
+.dsb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(2px);
+  animation: dsb-fade 0.18s ease;
+}
+.dsb-modal {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  background: var(--dsb-surface);
+  border-radius: var(--dsb-radius-lg);
+  box-shadow: var(--dsb-shadow-lg);
+  animation: dsb-pop 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes dsb-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dsb-modal-head,
+.dsb-modal-body {
+  padding: 14px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dsb-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--dsb-border);
+}
+/* The canvas preview is a container too, so the counts below answer to the
+   modal box on the canvas exactly as they answer to the dialog at runtime. */
+.dsb-modal-inline {
+  border: 1.5px dashed var(--dsb-border-strong);
+  border-radius: var(--dsb-radius);
+  background: var(--dsb-surface);
+  container-type: inline-size;
+}
+.dsb-modal-flag {
+  font-size: var(--dsb-node-fs, 9.5px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--dsb-surface-alt);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+/* The canvas preview of a modal footer holds the app's own buttons, which are
+   styled by .ftr_btn — it only has to line them up the way the dialog does. */
+.dsb-modal-inline .dsb-modal-foot .ftr_btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* The modal body, once the screen's skin is back around it (ScreenScope).
+   Same stacking as the canvas preview, so a dialog designed on the canvas is
+   laid out the same when it opens. The dialog's own <p> wrapper brings a
+   browser margin that would show up as a gap above the first control. */
+.dsb-modal-scope {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+/* A dialog is not the page, and it does not get to use the page's breakpoints.
+   The grid's tiers key off the WINDOW, so "six across on a desktop" measured
+   against a 1400px browser becomes six unreadable slivers inside a 520px
+   dialog — and the page's own boundaries would put every ordinary dialog in the
+   *smallest* tier, because 520px is under all of them. Inside a dialog the
+   counts are measured against the dialog, at dialog-sized boundaries: the full
+   count from 680px up, then each smaller tier as it narrows.
+
+   An unnamed @container resolves to the nearest container, which is the scope
+   element above, and these beat the window queries on specificity whatever the
+   source order. Both the modal's own row (.dsb-modal-grid) and any Grid dropped
+   inside it are .dsb-formgrid, so one set of rules serves both. */
+@container (max-width: 679.98px) {
+  .dsb-modal-scope .dsb-formgrid,
+  .dsb-drawer-scope .dsb-formgrid,
+  .dsb-modal-inline .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-lg, 4), minmax(0, 1fr));
+  }
+}
+@container (max-width: 519.98px) {
+  .dsb-modal-scope .dsb-formgrid,
+  .dsb-drawer-scope .dsb-formgrid,
+  .dsb-modal-inline .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-md, 2), minmax(0, 1fr));
+  }
+}
+@container (max-width: 399.98px) {
+  .dsb-modal-scope .dsb-formgrid,
+  .dsb-drawer-scope .dsb-formgrid,
+  .dsb-modal-inline .dsb-formgrid {
+    grid-template-columns: repeat(var(--dsb-fg-sm, 1), minmax(0, 1fr));
+  }
+}
+
+/* The modal's own body as a row of controls. It is the scope element's child
+   rather than the scope element itself, because the scope is what the container
+   queries above measure — a container cannot size itself by its own width. */
+.dsb-modal-grid {
+  align-items: end;
+}
+.dsb-modal-scope > .dsb-modal-grid {
+  flex: 1 1 auto;
+}
+.p-dialog-content > p:has(> .dsb-modal-scope) {
+  margin: 0;
+}
+
+/* The frame-menu trigger. The control inside is the app's own — this only has
+   to sit it on the row's line and give the canvas preview something to look at,
+   since the real menu is role-filtered and is never fetched at design time. */
+.dsb-framemenu {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-framemenu-label {
+  font-size: var(--dsb-node-fs, 11.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  white-space: nowrap;
+}
+.dsb-framemenu-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px dashed var(--dsb-border-strong);
+  border-radius: var(--dsb-radius-sm);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  font-size: var(--dsb-node-fs, 11.5px);
+  white-space: nowrap;
+}
+.dsb-framemenu-flag {
+  font-size: var(--dsb-node-fs, 9.5px);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--dsb-surface-alt);
+}
+
+/* The frame menu as a drop-down over the page — what an action raises, since
+   an action has no trigger to hang a list off. Built to read as the app's own
+   menu card: white panel, uppercase group headers, a blue file icon per form,
+   grey hover. Items are divs, not buttons, for the same reason the app's menu
+   uses divs — a page-wide `button` rule would otherwise paint them.
+
+   Everything is scoped under .dsb-screen because the card is portalled to
+   <body>: the ScreenScope wrapper re-declares the class and the --dsb-*
+   variables out there, and the extra class also wins over the app's own
+   element rules. */
+.dsb-screen.dsb-framecard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--dsb-surface);
+  border: 1px solid var(--dsb-border-strong);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+.dsb-screen .dsb-framecard-search {
+  padding: 8px;
+  background: var(--dsb-surface-alt);
+  border-bottom: 1px solid var(--dsb-border);
+}
+.dsb-screen .dsb-framecard-list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.dsb-screen .dsb-framecard-group {
+  border-bottom: 1px solid var(--dsb-border);
+}
+.dsb-screen .dsb-framecard-head {
+  padding: 10px 15px;
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  background: var(--dsb-surface-alt);
+}
+.dsb-screen .dsb-framecard-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px 8px 24px;
+  font-size: var(--dsb-node-fs, 12.5px);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  border-top: 1px solid var(--dsb-border);
+  cursor: pointer;
+}
+.dsb-screen .dsb-framecard-item:first-child {
+  border-top: 0;
+}
+.dsb-screen .dsb-framecard-item svg {
+  color: var(--dsb-primary);
+  flex: 0 0 auto;
+}
+.dsb-screen .dsb-framecard-item:hover {
+  background: var(--dsb-surface-alt);
+}
+.dsb-screen .dsb-framecard-note {
+  padding: 18px;
+  text-align: center;
+  font-size: var(--dsb-node-fs, 12px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-screen .dsb-framecard-note.is-err {
+  color: var(--dsb-danger);
+}
+
+/* A modal told to show no footer. The project's <Modal> draws Save and Cancel
+   unless it is handed a footer of its own, so "none" is handed a marker instead
+   — and PrimeReact would still lay out the bar around it. Unscoped on purpose:
+   the dialog is portalled to <body>, outside .dsb-screen. */
+.p-dialog-footer:has(> .dsb-modal-nofoot) {
+  display: none;
+}
+
+/* A dialog raised from inside a drawer has to stack OVER it.
+   PrimeReact hands every dialog its own z-index off its own counter (~1100 up),
+   which knows nothing about an overlay the builder drew at 2900 — so the Vital
+   Graph opened from a tile inside a panel was rendered behind that panel. The
+   flag is on <body> for as long as a drawer is open, and `!important` is what
+   it takes: the number PrimeReact writes is an inline style. */
+body.dsb-drawer-open .p-dialog-mask,
+body.dsb-drawer-open .p-sidebar-mask,
+body.dsb-drawer-open .p-component-overlay {
+  z-index: 3200 !important;
+}
+
+/* ---------------------------------------------------------------- drawer ----
+   Portalled to <body>, so it is measured against the viewport and nothing the
+   page is doing — a scrolled table, the canvas's zoom wrapper — can move it. */
+.dsb-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2900;
+  pointer-events: none;
+  /* Closed, it is out of the way completely: no invisible sheet over the page,
+     and no tab stop inside a panel nobody can see. The visibility flip waits
+     for the slide to finish, so the panel is never cut off mid-travel. */
+  visibility: hidden;
+  transition: visibility 0s linear 0.46s;
+}
+.dsb-drawer-root.is-open {
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.dsb-drawer-dim {
+  position: absolute;
+  inset: 0;
+  /* Darker under the panel than across the rest of the page: the eye is pulled
+     towards the side the drawer comes from instead of the whole screen going
+     flat grey. */
+  background: linear-gradient(
+    to var(--dsb-dim-to, left),
+    rgba(2, 6, 23, 0.5),
+    rgba(2, 6, 23, 0.32) 45%,
+    rgba(2, 6, 23, 0.26)
+  );
+  backdrop-filter: blur(3px) saturate(0.9);
+  -webkit-backdrop-filter: blur(3px) saturate(0.9);
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-drawer-root.s-left .dsb-drawer-dim {
+  --dsb-dim-to: right;
+}
+.dsb-drawer-root.is-open .dsb-drawer-dim {
+  opacity: 1;
+}
+.dsb-drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--dsb-drawer-w, 420px);
+  max-width: calc(100vw - 24px);
+  display: flex;
+  flex-direction: column;
+  background: var(--dsb-surface);
+  color: var(--dsb-text-primary);
+  /* Three layers, each doing one job: a wide soft cast that lifts the panel off
+     the page, a tight one that keeps it a solid object, and a hairline of light
+     along the top so it still reads as a surface on white. */
+  box-shadow:
+    0 32px 90px rgba(2, 6, 23, 0.3),
+    0 4px 14px rgba(2, 6, 23, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  /* The slide IS the impression the panel makes. An expo-out curve covers most
+     of the distance immediately and then settles over the last few pixels, so
+     it reads as weight coming to rest rather than a box pushed across. */
+  transition:
+    transform 0.46s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+  will-change: transform;
+  opacity: 0;
+  /* Everything inside is cut to the panel's own corner. Without it the accent
+     rail and the tinted header run straight past the rounded edge and show as
+     a stray line beside the corner — which is exactly what they did. */
+  overflow: hidden;
+}
+.dsb-drawer.s-right {
+  right: 0;
+  /* A hair past the edge, so the panel's shadow leaves the screen with it and
+     never sits at rest as a smudge down the side. */
+  transform: translate3d(calc(100% + 24px), 0, 0);
+  border-radius: 20px 0 0 20px;
+}
+.dsb-drawer.s-left {
+  left: 0;
+  transform: translate3d(calc(-100% - 24px), 0, 0);
+  border-radius: 0 20px 20px 0;
+}
+.dsb-drawer-root.is-open .dsb-drawer {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+/* A rail of the theme colour down the edge the panel came from — the one piece
+   of chrome that says which side it belongs to.
+   Full height on purpose: a gradient that faded out part way read as a line
+   that had been cut off rather than as an edge. It carries its own light-to-
+   deep fall instead, and the panel's `overflow: hidden` keeps it inside the
+   corner radius at both ends. */
+.dsb-drawer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 2px;
+  /* Strongest where the header is and quietly present after that: the rail is
+     the panel's edge, not the loudest thing in it. */
+  background: linear-gradient(
+    180deg,
+    var(--dsb-primary) 0%,
+    color-mix(in srgb, var(--dsb-primary) 55%, transparent) 20%,
+    color-mix(in srgb, var(--dsb-primary) 22%, transparent) 100%
+  );
+  pointer-events: none;
+}
+.dsb-drawer.s-right::before {
+  left: 0;
+}
+.dsb-drawer.s-left::before {
+  right: 0;
+}
+/* A sheet rather than a side panel: the full width of the screen, sliding up
+   from the bottom (or down from the top). This is what the hand-coded
+   single-window pages open every action in, and what a built screen needs to
+   look like one of them. */
+.dsb-drawer.s-bottom,
+.dsb-drawer.s-top {
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: auto;
+  width: var(--dsb-drawer-w, 100vw);
+  max-width: 100vw;
+  height: var(--dsb-drawer-h, 92vh);
+  max-height: 100vh;
+}
+.dsb-drawer.s-bottom {
+  bottom: 0;
+  transform: translate3d(0, calc(100% + 24px), 0);
+  border-radius: 20px 20px 0 0;
+}
+.dsb-drawer.s-top {
+  top: 0;
+  transform: translate3d(0, calc(-100% - 24px), 0);
+  border-radius: 0 0 20px 20px;
+}
+/* The rail runs along the edge it came from, which is now horizontal. */
+.dsb-drawer.s-bottom::before,
+.dsb-drawer.s-top::before {
+  top: auto;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--dsb-primary) 0%,
+    color-mix(in srgb, var(--dsb-primary) 55%, transparent) 20%,
+    color-mix(in srgb, var(--dsb-primary) 22%, transparent) 100%
+  );
+}
+.dsb-drawer.s-bottom::before {
+  top: 0;
+}
+.dsb-drawer.s-top::before {
+  bottom: 0;
+}
+.dsb-drawer-root.s-bottom .dsb-drawer-dim {
+  --dsb-dim-to: top;
+}
+.dsb-drawer-root.s-top .dsb-drawer-dim {
+  --dsb-dim-to: bottom;
+}
+.dsb-drawer-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  /* The leading edge clears the 3px rail, so the title does not sit on it. */
+  padding: 14px 16px 13px 20px;
+  /* Tinted at the top and clean at the bottom: the bar reads as the panel's own
+     header rather than as a grey band laid over it. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dsb-primary) 9%, var(--dsb-surface)) 0%,
+    var(--dsb-surface) 100%
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--dsb-primary) 14%, var(--dsb-border));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.dsb-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: var(--dsb-node-fw, 700);
+  font-size: 1.2083rem;
+  letter-spacing: 0.2px;
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-drawer-title::before {
+  content: "";
+  flex: none;
+  width: 4px;
+  height: 18px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, var(--dsb-primary), color-mix(in srgb, var(--dsb-primary) 55%, #fff));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dsb-primary) 10%, transparent);
+}
+.dsb-drawer-x {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 10px;
+  background: var(--dsb-surface);
+  color: var(--dsb-text-muted);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-drawer-x:hover {
+  background: var(--dsb-danger, #ef4444);
+  border-color: var(--dsb-danger, #ef4444);
+  color: #fff;
+  transform: rotate(90deg);
+}
+.dsb-drawer-x:active {
+  transform: rotate(90deg) scale(0.94);
+}
+.dsb-drawer-x:focus-visible {
+  outline: 2px solid var(--dsb-primary);
+  outline-offset: 2px;
+}
+.dsb-drawer-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 16px 22px 20px;
+  /* A breath of the theme colour under the header, gone by the first card —
+     enough to stop a tall empty panel reading as a blank sheet. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dsb-primary) 4%, var(--dsb-surface)) 0,
+    var(--dsb-surface) 180px
+  );
+  overflow-y: auto;
+  /* The panel's own scroll stops at its own ends — flicking the drawer must not
+     carry on scrolling the table behind it. */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dsb-border) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.dsb-drawer-body::-webkit-scrollbar {
+  width: 8px;
+}
+.dsb-drawer-body::-webkit-scrollbar-thumb {
+  background: var(--dsb-border);
+  border-radius: 8px;
+}
+.dsb-drawer-body::-webkit-scrollbar-thumb:hover {
+  background: var(--dsb-text-muted);
+}
+/* The drawer's contents are laid out against the DRAWER's width, not the
+   window's — the same bargain the modal strikes, so a four-across form grid
+   inside a 420px panel stacks instead of producing four slivers. */
+.dsb-drawer-scope {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  container-type: inline-size;
+}
+/* The contents arrive just behind the panel rather than with it: the panel is
+   already settling when the first block fades up, which is what makes an open
+   read as one movement instead of a rectangle appearing fully formed. */
+@keyframes dsb-drawer-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > * {
+  animation: dsb-drawer-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > *:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > *:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > *:nth-child(4) {
+  animation-delay: 0.24s;
+}
+.dsb-drawer-root.is-open .dsb-drawer-scope > *:nth-child(n + 5) {
+  animation-delay: 0.28s;
+}
+@media (max-width: 640px) {
+  .dsb-drawer {
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+  }
+  .dsb-drawer::before {
+    display: none;
+  }
+}
+/* A dark theme takes its light from the other direction: the inner highlight
+   would otherwise be a white scar down the edge of a dark panel. */
+.dsb-drawer-root.is-dark .dsb-drawer {
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-drawer,
+  .dsb-drawer-dim {
+    transition-duration: 0.01ms;
+  }
+  .dsb-drawer-root.is-open .dsb-drawer-scope > * {
+    animation: none;
+  }
+  .dsb-drawer-x:hover,
+  .dsb-drawer-x:active {
+    transform: none;
+  }
+}
+
+.dsb-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: help;
+  border-bottom: 1px dotted var(--dsb-border-strong);
+}
+.dsb-tooltip::after,
+.dsb-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(3px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #0f172a;
+  color: var(--dsb-node-fg, #fff);
+  font-size: var(--dsb-node-fs, 11px);
+  font-weight: var(--dsb-node-fw, 500);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  z-index: 50;
+}
+.dsb-tooltip:hover::after,
+.dsb-tip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.dsb-tip {
+  position: relative;
+  display: inline-flex;
+  color: var(--dsb-text-muted);
+}
+
+.dsb-toast {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: var(--dsb-radius);
+  font-size: var(--dsb-node-fs, 12.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  animation: dsb-fade 0.2s ease;
+}
+.dsb-toast.v-success {
+  background: #dcfce7;
+  color: #15803d;
+}
+.dsb-toast.v-info {
+  background: #cffafe;
+  color: #0e7490;
+}
+.dsb-toast.v-warning {
+  background: #ffedd5;
+  color: #c2410c;
+}
+.dsb-toast.v-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.dsb-toast span {
+  flex: 1;
+}
+
+/* -------------------------------------------------- empty & loading states */
+
+.dsb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 14px;
+  text-align: center;
+  color: var(--dsb-text-muted);
+}
+.dsb-empty-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 4px;
+  border-radius: 18px;
+  color: var(--dsb-primary);
+  background: color-mix(in srgb, var(--dsb-primary) 10%, transparent);
+}
+.dsb-empty.is-danger .dsb-empty-ic {
+  color: var(--dsb-danger);
+  background: color-mix(in srgb, var(--dsb-danger) 10%, transparent);
+}
+.dsb-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 5px 12px;
+  border: 1px solid color-mix(in srgb, var(--dsb-primary) 35%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--dsb-primary) 8%, transparent) !important;
+  color: var(--dsb-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dsb-empty-cta:hover {
+  background: color-mix(in srgb, var(--dsb-primary) 14%, transparent) !important;
+}
+.dsb-empty-t {
+  font-size: var(--dsb-node-fs, 13px);
+  font-weight: var(--dsb-node-fw, 700);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+.dsb-empty-h {
+  font-size: var(--dsb-node-fs, 11.5px);
+}
+.dsb-skel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dsb-skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--dsb-surface-alt) 25%, color-mix(in srgb, var(--dsb-border) 60%, transparent) 37%, var(--dsb-surface-alt) 63%);
+  background-size: 400% 100%;
+  animation: dsb-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes dsb-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ------------------------------------------------------------- responsive */
+
+.dsb-bp-mobile .dsb-cards,
+.dsb-screen .dsb-cards {
+  grid-template-columns: repeat(var(--dsb-card-cols, 3), minmax(0, 1fr));
+}
+.dsb-bp-mobile .dsb-cards {
+  grid-template-columns: 1fr;
+}
+.dsb-bp-mobile .dsb-split {
+  flex-direction: column;
+}
+.dsb-bp-mobile .dsb-split-main,
+.dsb-bp-mobile .dsb-split-side {
+  width: 100%;
+  flex-basis: auto !important;
+}
+.dsb-bp-tablet .dsb-card-body {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.dsb-bp-mobile .dsb-card-body {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 720px) {
+  .dsb-screen .dsb-cards {
+    grid-template-columns: 1fr;
+  }
+  .dsb-screen .dsb-split {
+    flex-direction: column;
+  }
+  .dsb-screen .dsb-split-main,
+  .dsb-screen .dsb-split-side {
+    width: 100%;
+    flex-basis: auto !important;
+  }
+}
+
+/* Totals row — a summary, so it sits apart from the data above it. */
+.dsb-table tfoot .dsb-totals td {
+  position: sticky;
+  bottom: 0;
+  background: var(--dsb-surface-alt, #f8fafc);
+  border-top: 2px solid var(--dsb-border);
+  font-weight: var(--dsb-node-fw, 700);
+  white-space: nowrap;
+  /* Lined up with the cells above it (the app zeroes every td). */
+  padding: 4px 8px !important;
+}
+
+/* ---------------------------------------------------------------- confirm */
+/* The dialog an action chain waits on. Sits above a modal, because the thing
+   being confirmed is usually inside one. */
+.dsb-confirm-host { z-index: 12000; }
+
+.dsb-confirm {
+  width: min(420px, calc(100vw - 32px));
+  background: var(--dsb-surface, #fff);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+  animation: dsb-confirm-in 0.14s ease-out;
+}
+
+@keyframes dsb-confirm-in {
+  from { transform: translateY(8px) scale(0.98); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.dsb-confirm-body { display: flex; gap: 12px; padding: 18px 18px 14px; }
+
+.dsb-confirm-body h4 {
+  margin: 0 0 4px;
+  font-size: var(--dsb-node-fs, 15px);
+  font-weight: var(--dsb-node-fw, 700);
+  color: var(--dsb-node-fg, var(--dsb-text, #0f172a));
+}
+
+.dsb-confirm-body p {
+  margin: 0;
+  font-size: var(--dsb-node-fs, 13px);
+  line-height: 1.55;
+  color: var(--dsb-node-fg, var(--dsb-muted, #64748b));
+}
+
+.dsb-confirm-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--dsb-node-fs, 19px);
+  font-weight: var(--dsb-node-fw, 800);
+  line-height: 1;
+}
+
+.dsb-confirm-icon.is-warning { background: #fef3c7; color: #b45309; }
+.dsb-confirm-icon.is-danger,
+.dsb-confirm-icon.is-error { background: #fee2e2; color: #b91c1c; }
+.dsb-confirm-icon.is-info { background: #dbeafe; color: #1d4ed8; }
+.dsb-confirm-icon.is-success { background: #dcfce7; color: #15803d; }
+
+.dsb-confirm-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--dsb-surface-2, #f8fafc);
+  border-top: 1px solid var(--dsb-border, #e6eaf2);
+}
+
+/* ------------------------------------------------------------------ charts */
+/* Plain SVG, so everything below is only chrome and type. The SVG stretches
+   to its box; the viewBox keeps the geometry sane at any width. */
+.dsb-chart {
+  background: var(--dsb-surface, #fff);
+  border: 1px solid var(--dsb-border, #e6eaf2);
+  border-radius: var(--dsb-radius, 12px);
+  padding: 12px 14px 10px;
+}
+
+.dsb-chart-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.dsb-chart-head h4 { margin: 0; font-size: 1.1667rem; font-weight: 700; color: var(--dsb-text, #0f172a); }
+.dsb-chart-head p { margin: 2px 0 0; font-size: 0.9583rem; color: var(--dsb-muted, #64748b); }
+
+.dsb-chart-total {
+  margin-inline-start: auto;
+  font-size: var(--dsb-node-fs, 15px);
+  font-weight: var(--dsb-node-fw, 800);
+  color: var(--dsb-node-fg, var(--dsb-accent, #4f46e5));
+  white-space: nowrap;
+}
+
+.dsb-chart-body { width: 100%; }
+.dsb-chart-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+.dsb-chart-grid { stroke: var(--dsb-border, #e6eaf2); stroke-width: 1; shape-rendering: crispEdges; }
+.dsb-chart-tick { font-size: var(--dsb-node-fs, 9.5px); fill: var(--dsb-muted, #94a3b8); }
+.dsb-chart-cat { font-size: var(--dsb-node-fs, 10px); fill: var(--dsb-muted, #64748b); }
+.dsb-chart-val { font-size: var(--dsb-node-fs, 10px); font-weight: 700; fill: var(--dsb-text, #334155); }
+.dsb-chart-slice { font-size: var(--dsb-node-fs, 10px); font-weight: 800; fill: #fff; }
+.dsb-chart-hole-v { font-size: var(--dsb-node-fs, 18px); font-weight: 800; fill: var(--dsb-text, #0f172a); }
+.dsb-chart-hole-l { font-size: var(--dsb-node-fs, 9.5px); fill: var(--dsb-muted, #94a3b8); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.dsb-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--dsb-border, #e6eaf2);
+}
+
+.dsb-chart-legend span { display: inline-flex; align-items: center; gap: 5px; font-size: 0.9167rem; color: var(--dsb-muted, #64748b); }
+.dsb-chart-legend i { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+.dsb-chart-legend b { color: var(--dsb-node-fg, var(--dsb-text, #0f172a)); font-weight: 700; }
+
+.dsb-chart-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: var(--dsb-node-fs, 11px);
+  color: var(--dsb-node-fg, var(--dsb-muted, #94a3b8));
+}
+
+/* The select-all box in a checkbox column's header. Sits before the label and
+   never inherits the header's click-to-sort cursor. */
+/* An icon action in a cell: a button with no chrome until it is pointed at. */
+.dsb-cell-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.dsb-cell-iconbtn:hover {
+  background: var(--dsb-primary-soft, rgba(79, 70, 229, 0.12));
+}
+
+/* A bare icon in a cell — no button chrome. It only lifts and tints when
+   pointed at, and only shows a hand when the column has click actions. */
+.dsb-iconcell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  color: var(--dsb-primary, #4f46e5);
+  outline: none;
+  transition: background 140ms ease, transform 140ms ease;
+}
+.dsb-iconcell:hover,
+.dsb-iconcell:focus-visible {
+  background: var(--dsb-primary-soft, rgba(79, 70, 229, 0.12));
+  transform: translateY(-1px);
+}
+.dsb-iconcell:focus-visible {
+  box-shadow: 0 0 0 2px var(--dsb-primary-soft, rgba(79, 70, 229, 0.35));
+}
+.dsb-iconcell.is-clickable {
+  cursor: pointer;
+}
+
+/* The floating tooltip for that icon. Portalled to the body and fixed, so a
+   scrolling table body cannot clip it; `left`/`top` come from the icon's rect
+   and the transform does the centring and the lift. */
+/* ------------------------------------------------------------ action tile --
+   A labelled icon that opens something: the unit the hand-coded patient panel
+   is built out of, so a built screen's strip of actions matches it. */
+.dsb-acttile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  /* The default is "fill the cell" — a strip of tiles is laid out by its grid,
+     not by each tile's own idea of how wide it is. A width or height set on the
+     tile arrives inline and overrides this. */
+  width: 100%;
+  min-width: 0;
+  padding: 12px 8px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 14px;
+  background: var(--dsb-surface);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+}
+.dsb-acttile:hover:not(.is-disabled) {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--dsb-tile-color, var(--dsb-primary)) 40%, var(--dsb-border));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--dsb-tile-color, var(--dsb-primary)) 18%, transparent);
+}
+.dsb-acttile:active:not(.is-disabled) {
+  transform: translateY(0);
+}
+.dsb-acttile:focus-visible {
+  outline: 2px solid var(--dsb-tile-color, var(--dsb-primary));
+  outline-offset: 2px;
+}
+.dsb-acttile.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* The icon sits in a chip tinted with its own colour — the colour is what tells
+   the tiles apart at a glance, so it carries the icon rather than the border. */
+.dsb-acttile-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: var(--dsb-tile-color, var(--dsb-primary));
+  background: color-mix(in srgb, var(--dsb-tile-color, var(--dsb-primary)) 12%, transparent);
+  flex: none;
+}
+.dsb-acttile-label {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dsb-acttile.is-compact {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  text-align: start;
+}
+.dsb-acttile.is-compact .dsb-acttile-ic {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.dsb-acttile.is-compact .dsb-acttile-label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--dsb-node-fs, 12px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-acttile {
+    transition: none;
+  }
+  .dsb-acttile:hover:not(.is-disabled) {
+    transform: none;
+  }
+}
+
+/* ----------------------------------------------------------------- image --
+   A picture pinned to a size the layout can live with, with the full thing one
+   click away. The box owns the size; the <img> only fills it. */
+.dsb-img {
+  margin: 0;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+.dsb-img-box {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--dsb-primary-soft, rgba(15, 23, 42, 0.05));
+  border-radius: var(--dsb-radius, 10px);
+  line-height: 0;
+}
+.dsb-img.s-square .dsb-img-box {
+  border-radius: 0;
+}
+.dsb-img.s-circle .dsb-img-box {
+  border-radius: 50%;
+}
+.dsb-img.is-bordered .dsb-img-box {
+  border: 1px solid var(--dsb-border);
+}
+.dsb-img-el {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* object-fit comes from the prop; the position keeps a cropped portrait on
+     the face rather than the middle of the frame. */
+  object-position: center top;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-img.is-zoomable .dsb-img-box {
+  cursor: zoom-in;
+}
+.dsb-img.is-zoomable .dsb-img-box:focus-visible {
+  outline: 2px solid var(--dsb-primary);
+  outline-offset: 2px;
+}
+.dsb-img.is-zoomable .dsb-img-box:hover .dsb-img-el {
+  transform: scale(1.04);
+}
+/* The zoom badge only appears on hover — an always-on icon over a small photo
+   is more chrome than picture. */
+.dsb-img-zoom {
+  position: absolute;
+  inset-inline-end: 6px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.62);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+.dsb-img.is-zoomable .dsb-img-box:hover .dsb-img-zoom,
+.dsb-img.is-zoomable .dsb-img-box:focus-visible .dsb-img-zoom {
+  opacity: 1;
+  transform: none;
+}
+.dsb-img-cap {
+  font-size: var(--dsb-node-fs, 11.5px);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* The full picture, over everything, portalled to the body so no scroller or
+   transformed wrapper can clip or move it. */
+.dsb-img-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 4200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  background: rgba(2, 6, 23, 0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: zoom-out;
+  animation: dsb-lightbox-in 0.22s ease-out;
+}
+.dsb-img-lightbox img {
+  max-width: min(1100px, 92vw);
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  cursor: default;
+  animation: dsb-lightbox-img-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-img-lightcap {
+  color: #e2e8f0;
+  font-size: 1.0417rem;
+  letter-spacing: 0.2px;
+}
+.dsb-img-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-img-close:hover {
+  background: rgba(239, 68, 68, 0.9);
+  transform: rotate(90deg);
+}
+@keyframes dsb-lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dsb-lightbox-img-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-img-el,
+  .dsb-img-lightbox,
+  .dsb-img-lightbox img,
+  .dsb-img-close {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------- truncation --
+   A value that is allowed to run out of room: clamped to N lines with an
+   ellipsis, and the whole of it offered in a bubble on hover. The line count
+   travels as a custom property so one rule serves every setting. */
+.dsb-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--dsb-clamp, 1);
+  line-clamp: var(--dsb-clamp, 1);
+  overflow: hidden;
+  /* A long unbroken value — an id, a URL — must wrap rather than push the
+     card's own width out past the layout. */
+  overflow-wrap: anywhere;
+  min-width: 0;
+  /* A cell asked to keep to N lines has to be allowed to HAVE lines: the app
+     grid keeps its cells on one, and a clamp inside one of those would
+     otherwise never wrap and never ellipsise. */
+  white-space: normal;
+}
+/* A clamped span is a flex/grid item as often as not, and an item that cannot
+   shrink below its content never ellipsises. */
+.dsb-fieldcard-value,
+.dsb-tb-value,
+.dsb-tb-label,
+.dsb-tile-main,
+.dsb-tile-value,
+.dsb-record-value {
+  min-width: 0;
+}
+.dsb-clamp:focus-visible {
+  outline: 2px solid var(--dsb-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* The bubble carrying a full value is a paragraph, not a caption: wider, left
+   aligned, and readable at a normal weight. */
+.dsb-floattip.is-text {
+  max-width: 360px;
+  padding: 8px 11px;
+  font-weight: var(--dsb-node-fw, 500);
+  font-size: var(--dsb-node-fs, 12px);
+  line-height: 1.45;
+  text-align: start;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.dsb-floattip {
+  position: fixed;
+  z-index: 4000;
+  max-width: 260px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.28);
+  color: var(--dsb-node-fg, #f8fafc);
+  font-size: var(--dsb-node-fs, 11.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+  white-space: normal;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  animation: dsb-floattip-in 140ms ease-out;
+}
+.dsb-floattip.is-below {
+  transform: translate(-50%, 0);
+  animation-name: dsb-floattip-in-below;
+}
+/* The arrow: a rotated square tucked under the bubble's edge. */
+.dsb-floattip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 1px;
+  background: #0f172a;
+  transform: rotate(45deg);
+}
+.dsb-floattip.is-below::after {
+  bottom: auto;
+  top: -4px;
+  background: #1e293b;
+}
+@keyframes dsb-floattip-in {
+  from { opacity: 0; transform: translate(-50%, calc(-100% + 4px)); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
+}
+@keyframes dsb-floattip-in-below {
+  from { opacity: 0; transform: translate(-50%, -4px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* An editable cell fills its column and keeps the row height it had. */
+.dsb-cell-input {
+  width: 100%;
+  min-width: 60px;
+  padding: 4px 6px;
+  border: 1px solid var(--dsb-border, #d9dee7);
+  border-radius: 5px;
+  background: var(--dsb-surface, #fff);
+  color: var(--dsb-node-fg, inherit);
+  font: inherit;
+  font-size: var(--dsb-node-fs, 12.5px);
+  line-height: 1.35;
+}
+
+.dsb-cell-input:focus {
+  outline: none;
+  border-color: var(--dsb-accent, #4f46e5);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+.dsb-cell-area {
+  resize: vertical;
+}
+
+/* A cell that fails its column's validation rules. Border and tint only, so
+   the row keeps its height; the message is the cell's tooltip. */
+.dsb-cell-input.is-invalid,
+.dsb-cell-ac.is-invalid .dsb-cell-input,
+.dsb-cell-ac.is-invalid .p-autocomplete-dropdown.p-button {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+.dsb-cell-input.is-invalid:focus,
+.dsb-cell-ac.is-invalid .dsb-cell-input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.18);
+}
+
+/* An autocomplete cell: the box fills the cell, its dropdown button sits flush
+   on the right, and the suggestion list is the form Auto Complete's panel. */
+.dsb-cell-ac {
+  width: 100%;
+  min-width: 120px;
+}
+.dsb-cell-ac .dsb-cell-ac-root {
+  display: flex;
+  width: 100%;
+}
+.dsb-cell-ac .dsb-cell-ac-root .dsb-cell-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-cell-ac .p-autocomplete-dd .dsb-cell-input {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+.dsb-cell-ac .p-autocomplete-dropdown.p-button {
+  flex: 0 0 26px;
+  width: 26px;
+  padding: 0;
+  border: 1px solid var(--dsb-border, #d9dee7);
+  border-inline-start: 0;
+  border-radius: 0;
+  border-start-end-radius: 5px;
+  border-end-end-radius: 5px;
+  background: var(--dsb-surface, #fff);
+  color: #64748b;
+  box-shadow: none;
+}
+.dsb-cell-ac .p-autocomplete-dropdown.p-button:hover {
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--dsb-accent, #4f46e5);
+}
+.dsb-cell-ac .p-autocomplete-dropdown .p-button-icon {
+  font-size: 11px;
+}
+
+.dsb-table th .dsb-th-check {
+  margin-inline-end: 6px;
+  vertical-align: middle;
+  cursor: pointer;
+  accent-color: var(--dsb-accent, #4f46e5);
+}
+
+/* The upload's two states the stylesheet did not have: locked, and "something
+   is attached, take it off again". */
+.dsb-upload.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.dsb-upload-clear {
+  align-self: flex-start;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 999px;
+  background: var(--dsb-surface);
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  font-size: var(--dsb-node-fs, 10.5px);
+  cursor: pointer;
+}
+.dsb-upload-clear:hover {
+  border-color: var(--dsb-danger);
+  color: var(--dsb-danger);
+}
+
+/* A chart point that runs a chain when it is clicked. Only carried when the
+   node actually has one, so a plain chart keeps a plain cursor. */
+.dsb-chart-hit {
+  cursor: pointer;
+}
+.dsb-chart-hit:hover {
+  opacity: 0.82;
+}
+
+/* ---------------------------------------------------------------- field card */
+/* [icon] LABEL over a value — the unit a patient header is built out of. */
+.dsb-fieldcard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius);
+  /* A card, not a box: a hairline of light at the top, the faintest fall to the
+     bottom, and one soft shadow. Enough to sit ON the panel rather than be cut
+     out of it, and cheap enough to repeat six times across a header strip. */
+  background: linear-gradient(180deg, var(--dsb-surface) 0%, color-mix(in srgb, var(--dsb-surface) 96%, var(--dsb-text-muted)) 100%);
+  box-shadow:
+    0 1px 2px rgba(2, 6, 23, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dsb-fieldcard:hover {
+  border-color: color-mix(in srgb, var(--dsb-fc-accent, var(--dsb-primary)) 35%, var(--dsb-border));
+  box-shadow:
+    0 4px 12px rgba(2, 6, 23, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+}
+.dsb-fieldcard.is-plain,
+.dsb-fieldcard.is-plain:hover {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.dsb-fieldcard-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  /* The icon reads as part of the caption, not as a second colour, unless the
+     card is given an accent of its own. */
+  color: var(--dsb-fc-accent, var(--dsb-text-muted));
+}
+/* The icon gets a tinted disc of its own — the difference between a caption
+   with a glyph in front of it and a card that looks designed. */
+.dsb-fieldcard:not(.is-plain) .dsb-fieldcard-top > svg {
+  flex: none;
+  box-sizing: content-box;
+  padding: 3px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--dsb-fc-accent, var(--dsb-primary)) 11%, transparent);
+  color: var(--dsb-fc-accent, var(--dsb-primary));
+}
+.dsb-fieldcard-label {
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 700);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-fieldcard-value {
+  font-size: var(--dsb-node-fs, 14px);
+  font-weight: var(--dsb-node-fw, 700);
+  line-height: 1.25;
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  /* `anywhere` split G-WARD/G01/1 after the G. A bed number breaks at its own
+     separators or not at all. */
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.dsb-fieldcard.l-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.dsb-fieldcard.a-center {
+  align-items: center;
+  text-align: center;
+}
+.dsb-fieldcard.a-right {
+  align-items: flex-end;
+  text-align: end;
+}
+.dsb-fieldcard.l-inline.a-center {
+  justify-content: center;
+}
+.dsb-fieldcard.l-inline.a-right {
+  justify-content: flex-end;
+}
+
+/* ------------------------------------------------------------ record details */
+/* The record a modal / drawer was opened on, as label + value pairs. */
+.dsb-record {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.dsb-record-title {
+  font-size: var(--dsb-node-fs, 13px);
+  font-weight: var(--dsb-node-fw, 700);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+}
+.dsb-record-grid {
+  display: grid;
+  gap: 10px 16px;
+}
+.dsb-record-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dsb-record.l-inline .dsb-record-item {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+.dsb-record.l-inline .dsb-record-label {
+  flex: 0 0 auto;
+}
+/* A field's icon rides its label, so the column of labels reads as icons
+   first and words second. */
+.dsb-record-ic {
+  flex: none;
+  color: var(--dsb-primary);
+  opacity: 0.85;
+}
+.dsb-record-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--dsb-node-fs, 10.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--dsb-node-fg, var(--dsb-text-muted));
+}
+.dsb-record-value {
+  font-size: var(--dsb-node-fs, 12.5px);
+  font-weight: var(--dsb-node-fw, 600);
+  color: var(--dsb-node-fg, var(--dsb-text-primary));
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------ node typography, natives */
+/*
+   Style → Typography reaches the builder's own components through the
+   `--dsb-node-*` custom properties above, each rule keeping its own value as
+   the fallback. That trick needs a fallback to write, and the components the
+   app owns — <Input>, react-select, PrimeReact's calendar — are sized by
+   whichever skin is active, so there is none to write honestly.
+
+   So the wrapper carries a marker class instead (utils/typography.js), one per
+   setting, present only when the node asked for that one. Nothing below is
+   loaded until then, and asking for a size never disturbs the skin's colour or
+   weight. `!important` for the same reason it appears higher up this file: the
+   skins set these with `!important` of their own.
+*/
+.dsb-native.has-fs input,
+.dsb-native.has-fs textarea,
+.dsb-native.has-fs select,
+.dsb-native.has-fs label,
+.dsb-native.has-fs .lable,
+.dsb-native.has-fs .p-inputtext,
+.dsb-native.has-fs .p-dropdown-label,
+.dsb-native.has-fs .p-multiselect-label,
+.dsb-native.has-fs [class*="__control"],
+.dsb-native.has-fs [class*="__single-value"],
+.dsb-native.has-fs [class*="__multi-value"],
+.dsb-native.has-fs [class*="__placeholder"],
+.dsb-native.has-fs .btn {
+  font-size: inherit !important;
+}
+.dsb-native.has-fw input,
+.dsb-native.has-fw textarea,
+.dsb-native.has-fw select,
+.dsb-native.has-fw label,
+.dsb-native.has-fw .lable,
+.dsb-native.has-fw .p-inputtext,
+.dsb-native.has-fw .p-dropdown-label,
+.dsb-native.has-fw .p-multiselect-label,
+.dsb-native.has-fw [class*="__control"],
+.dsb-native.has-fw [class*="__single-value"],
+.dsb-native.has-fw [class*="__placeholder"],
+.dsb-native.has-fw .btn {
+  font-weight: inherit !important;
+}
+.dsb-native.has-fg input,
+.dsb-native.has-fg textarea,
+.dsb-native.has-fg select,
+.dsb-native.has-fg label,
+.dsb-native.has-fg .lable,
+.dsb-native.has-fg .p-inputtext,
+.dsb-native.has-fg .p-dropdown-label,
+.dsb-native.has-fg .p-multiselect-label,
+.dsb-native.has-fg [class*="__single-value"] {
+  color: inherit !important;
+}
+.dsb-native.has-ta input,
+.dsb-native.has-ta textarea,
+.dsb-native.has-ta .p-inputtext,
+.dsb-native.has-ta [class*="__single-value"] {
+  text-align: inherit;
+}
+
+/* The row controls along the foot of a card. Same strip the table draws in its
+   ACTION column — a card view that dropped it turned a working grid into a
+   read-only one. Wraps rather than scrolls: eight icons on a narrow card are
+   two rows of four, not four icons and a secret. */
+.dsb-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: auto;
+  padding: 4px 10px;
+  background: linear-gradient(90deg, #fff 0%, var(--dsb-cc-soft) 100%);
+  border-top: 1px solid color-mix(in srgb, var(--dsb-cc) 14%, #eef1f6);
+}
+/* Buttons in the foot a size down, so a card is not mostly its buttons. */
+.dsb-card-actions .btn {
+  padding: 1px 10px !important;
+  font-size: 0.9583rem !important;
+  line-height: 1.6;
+}
+.dsb-card-actions .dsb-cell-iconbtn,
+.dsb-card-actions .dsb-iconcell {
+  width: 26px;
+  height: 26px;
+}
+.dsb-card-act {
+  display: inline-flex;
+  align-items: center;
+}
+.dsb-card-actions .dsb-row-actions {
+  flex-wrap: wrap;
+}
+.dsb-card-actions .dsb-muted {
+  font-size: 0.9167rem;
+}
+
+/* ---------------------------------------------------------- critical alert --
+   Portalled to <body> like the drawer, and for the same reason: it is placed
+   against the viewport, and `position: fixed` inside the canvas's transformed
+   zoom wrapper would be placed against the wrapper instead.
+
+   It sits UNDER the drawer (2900) and under every dialog on purpose. The card
+   says who needs attention; once somebody has opened that patient, it must not
+   shout over the record they went to read. */
+.dsb-alertp-root {
+  position: static;
+}
+
+/* Two animations at once — one that plays on arrival, one that runs until the
+   card is dealt with — and the pair is chosen by two independent classes. CSS
+   has no way to add a second `animation` from another rule, so the shorthand is
+   written once here and the classes fill in custom properties. `none 0s` is a
+   perfectly good animation, which is what makes "no entrance" and "still" fall
+   out of the same declaration.
+
+   `!important` for the same reason the vitals animations carry it: a
+   page-level reduced-motion reset elsewhere in this app must not quietly
+   switch off the one thing on screen trying to be noticed. */
+.dsb-alertp {
+  --dsb-alertp-enter: none;
+  --dsb-alertp-enter-dur: 0s;
+  --dsb-alertp-attn: none;
+  --dsb-alertp-attn-dur: 0s;
+  position: fixed;
+  z-index: 2850;
+  max-width: calc(100vw - 24px);
+  background: var(--dsb-surface, #fff);
+  border: 1px solid color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 32%, var(--dsb-border, #e5e7eb));
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  animation:
+    var(--dsb-alertp-enter) var(--dsb-alertp-enter-dur) cubic-bezier(0.2, 0.8, 0.3, 1) both,
+    var(--dsb-alertp-attn) var(--dsb-alertp-attn-dur) ease-in-out 0.3s infinite !important;
+}
+
+.dsb-alertp.e-slide {
+  --dsb-alertp-enter: dsb-alertp-slide;
+  --dsb-alertp-enter-dur: 0.26s;
+}
+.dsb-alertp.e-fade {
+  --dsb-alertp-enter: dsb-alertp-fade;
+  --dsb-alertp-enter-dur: 0.26s;
+}
+.dsb-alertp.e-zoom {
+  --dsb-alertp-enter: dsb-alertp-zoom;
+  --dsb-alertp-enter-dur: 0.26s;
+}
+.dsb-alertp.e-pop {
+  --dsb-alertp-enter: dsb-alertp-pop;
+  --dsb-alertp-enter-dur: 0.42s;
+}
+
+.dsb-alertp.a-pulse {
+  --dsb-alertp-attn: dsb-alertp-pulse;
+  --dsb-alertp-attn-dur: 1.6s;
+}
+.dsb-alertp.a-glow {
+  --dsb-alertp-attn: dsb-alertp-glow;
+  --dsb-alertp-attn-dur: 2s;
+}
+.dsb-alertp.a-shake {
+  --dsb-alertp-attn: dsb-alertp-shake;
+  --dsb-alertp-attn-dur: 0.5s;
+  will-change: transform;
+}
+.dsb-alertp.a-beat {
+  --dsb-alertp-attn: dsb-alertp-beat;
+  --dsb-alertp-attn-dur: 1.6s;
+}
+
+/* Dragging beats everything: a card that shakes while it is being carried
+   cannot be put down accurately, and a transition on left/top fights the
+   pointer. */
+.dsb-alertp.is-dragging {
+  animation: none !important;
+  transition: none !important;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.26);
+  cursor: grabbing;
+}
+
+/* Dropped: it TRAVELS to the corner it was nearest rather than appearing in
+   it, so the eye keeps hold of the thing it was dragging. */
+.dsb-alertp.is-settling {
+  animation: none !important;
+  transition:
+    left 0.3s cubic-bezier(0.2, 0.8, 0.3, 1),
+    top 0.3s cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Leaving is animated too — a card that vanishes on the click leaves the eye
+   checking whether it was ever there. The node unmounts once this has run. */
+.dsb-alertp.is-closing {
+  animation: dsb-alertp-out 0.19s ease both !important;
+  pointer-events: none;
+}
+
+/* On the canvas it is an ordinary card in the flow: selectable, moved by the
+   builder's own drag, and not floating over the inspector. */
+.dsb-alertp.is-inline {
+  position: relative;
+  z-index: auto;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+}
+
+.dsb-alertp-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--dsb-alertp-accent, #ef4444),
+    color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 62%, #000)
+  );
+}
+.dsb-alertp-head.is-grab {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.dsb-alertp.is-dragging .dsb-alertp-head.is-grab {
+  cursor: grabbing;
+}
+
+.dsb-alertp-ic {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.dsb-alertp-ic.is-ringing svg {
+  transform-origin: top center;
+  animation: dsb-alertp-bell 1.4s ease-in-out infinite !important;
+}
+
+.dsb-alertp-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.0417rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dsb-alertp-badge {
+  flex-shrink: 0;
+  min-width: 22px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 78%, #000);
+  font-size: 0.9167rem;
+  font-weight: 800;
+  text-align: center;
+  animation: dsb-alertp-badge 1.2s ease-in-out infinite !important;
+}
+
+.dsb-alertp-grip {
+  display: inline-flex;
+  opacity: 0.7;
+  cursor: grab;
+}
+
+.dsb-alertp-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  opacity: 0.9;
+  cursor: pointer;
+}
+.dsb-alertp-x:hover {
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+}
+
+.dsb-alertp-body {
+  padding: 8px 10px 10px;
+}
+
+.dsb-alertp-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin-bottom: 7px;
+  font-size: 0.9583rem;
+  line-height: 1.35;
+  color: var(--dsb-text-muted, #64748b);
+}
+.dsb-alertp-msg svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--dsb-alertp-accent, #ef4444);
+}
+
+.dsb-alertp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+}
+
+.dsb-alertp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 9px;
+  text-align: start;
+  border: 1px solid color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 22%, var(--dsb-surface, #fff));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 7%, var(--dsb-surface, #fff));
+  cursor: pointer;
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease,
+    transform 0.14s ease;
+}
+.dsb-alertp-item:hover {
+  border-color: color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 48%, var(--dsb-surface, #fff));
+  background: color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 12%, var(--dsb-surface, #fff));
+  transform: translateX(2px);
+}
+.dsb-alertp-item:active {
+  transform: translateX(2px) scale(0.99);
+}
+
+/* The names arrive after the card, one after another, so the whole thing reads
+   as a single movement instead of a box that blinks into existence complete.
+   Off with the entrance animation — "None" means none. */
+.dsb-alertp:not(.e-none) .dsb-alertp-item {
+  animation: dsb-alertp-item-in 0.3s ease both !important;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(1) {
+  animation-delay: 0.08s;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(2) {
+  animation-delay: 0.13s;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(3) {
+  animation-delay: 0.18s;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(4) {
+  animation-delay: 0.23s;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(5) {
+  animation-delay: 0.28s;
+}
+.dsb-alertp:not(.e-none) .dsb-alertp-item:nth-child(n + 6) {
+  animation-delay: 0.32s;
+}
+
+.dsb-alertp-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dsb-alertp-accent, #ef4444);
+}
+
+.dsb-alertp-item-main {
+  flex: 1;
+  min-width: 0;
+}
+.dsb-alertp-item-title,
+.dsb-alertp-item-sub {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-alertp-item-title {
+  font-size: 1.0417rem;
+  font-weight: 700;
+  color: var(--dsb-text, #1f2a37);
+}
+.dsb-alertp-item-sub {
+  font-size: 0.875rem;
+  color: var(--dsb-text-muted, #94a3b8);
+}
+
+.dsb-alertp-tag {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--dsb-alertp-accent, #ef4444);
+  color: #fff;
+  font-size: 0.7917rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dsb-alertp-more {
+  padding-top: 6px;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--dsb-text-muted, #94a3b8);
+}
+
+/* ------------------------------------------------------------- entrances -- */
+
+@keyframes dsb-alertp-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dsb-alertp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dsb-alertp-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dsb-alertp-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dsb-alertp-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+  }
+}
+
+@keyframes dsb-alertp-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------- attention -- */
+
+@keyframes dsb-alertp-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 30px rgba(15, 23, 42, 0.18),
+      0 0 0 0 color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 55%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 10px 30px rgba(15, 23, 42, 0.18),
+      0 0 0 10px color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 0%, transparent);
+  }
+}
+
+@keyframes dsb-alertp-glow {
+  0%,
+  100% {
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 10px 30px rgba(15, 23, 42, 0.18),
+      0 0 26px color-mix(in srgb, var(--dsb-alertp-accent, #ef4444) 45%, transparent);
+  }
+}
+
+@keyframes dsb-alertp-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-3px);
+  }
+  30% {
+    transform: translateX(3px);
+  }
+  45% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-1.5px);
+  }
+  90% {
+    transform: translateX(1.5px);
+  }
+}
+
+@keyframes dsb-alertp-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.035);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.02);
+  }
+  56% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dsb-alertp-badge {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes dsb-alertp-bell {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(16deg);
+  }
+  20% {
+    transform: rotate(-14deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  40% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+  60% {
+    transform: rotate(0);
+  }
+}
+
+/* A cell told to wrap. Long free text — an address, a panel name — reads as a
+   short paragraph rather than being cut at the column edge. Opt-in per column,
+   because a grid where every cell wraps has no scannable rows left. */
+.dsb-cell-wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ------------------------------------------------------------- Card List
+   One card per record (registry/cardList). The accent drives the border, the
+   icon tile and the status dot; a selected card swaps to --cl-sel and wears a
+   tick in its corner. Colours arrive per card as custom properties, so a rule
+   or a {{row.ColorCode}} changes one card without touching the stylesheet. */
+.dsb-cardlist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+/* The list's header. --cl-head is the one colour it is built from (icon tile,
+   count, band); --cl-head-fg is the title. Four looks, same markup. */
+.dsb-cl-head {
+  --cl-head: var(--dsb-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  min-width: 0;
+  min-height: var(--cl-head-minh, 0);
+}
+.dsb-cl-head.hs-band {
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--cl-head) 22%, var(--dsb-border));
+  border-inline-start: 4px solid var(--cl-head);
+  border-radius: var(--dsb-radius, 10px);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cl-head) 11%, var(--dsb-surface)) 0%,
+    color-mix(in srgb, var(--cl-head) 3%, var(--dsb-surface)) 100%
+  );
+}
+.dsb-cl-head.hs-card {
+  padding: 10px 14px;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius, 10px);
+  background: var(--dsb-surface);
+  box-shadow: var(--dsb-shadow);
+}
+.dsb-cl-head.hs-underline {
+  padding: 2px 2px 9px;
+  border-bottom: 2px solid color-mix(in srgb, var(--cl-head) 65%, transparent);
+}
+.dsb-cl-head-main {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.dsb-cl-head-ic {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cl-head-ic, 36px);
+  height: var(--cl-head-ic, 36px);
+  border-radius: calc(var(--cl-head-ic, 36px) * 0.28);
+  background: linear-gradient(135deg, var(--cl-head), color-mix(in srgb, var(--cl-head) 72%, #000));
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--cl-head) 32%, transparent);
+}
+.dsb-cl-head.hs-plain .dsb-cl-head-ic,
+.dsb-cl-head.hs-underline .dsb-cl-head-ic {
+  background: color-mix(in srgb, var(--cl-head) 14%, var(--dsb-surface));
+  color: var(--cl-head);
+  box-shadow: none;
+}
+.dsb-cl-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dsb-cl-head-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: var(--cl-head-fs, var(--dsb-node-fs, 15px));
+  font-weight: var(--dsb-node-fw, 700);
+  line-height: 1.25;
+  color: var(--cl-head-fg, var(--dsb-text-primary));
+}
+.dsb-cl-head-sub {
+  font-size: var(--cl-head-sub-fs, 12px);
+  color: var(--dsb-text-muted);
+}
+.dsb-cl-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.dsb-cl-count em {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.86em;
+  opacity: 0.9;
+}
+.dsb-cl-count.c-badge {
+  padding: 0.42em 0.85em;
+  border-radius: 999px;
+  background: var(--cl-head);
+  color: #fff;
+  font-size: var(--cl-count-fs, 12px);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--cl-head) 30%, transparent);
+}
+.dsb-cl-count.c-soft {
+  padding: 0.34em 0.85em;
+  border: 1px solid color-mix(in srgb, var(--cl-head) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cl-head) 12%, var(--dsb-surface));
+  color: var(--cl-head);
+  font-size: var(--cl-count-fs, 12px);
+}
+.dsb-cl-count.c-big {
+  font-size: var(--cl-count-fs, 24px);
+  color: var(--cl-head);
+  letter-spacing: -0.01em;
+}
+.dsb-cl-count.c-big em {
+  font-size: max(12px, 0.5em);
+  color: var(--dsb-text-muted);
+  opacity: 1;
+}
+.dsb-cl-head-side {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-inline-start: auto;
+  min-width: 0;
+}
+.dsb-cl-sums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dsb-cl-sum {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--cl-sum) 35%, var(--dsb-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cl-sum) 8%, var(--dsb-surface));
+  color: var(--dsb-text-primary);
+  font-size: var(--cl-chip-fs, 12px);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease,
+    border-color 0.15s ease;
+}
+.dsb-cl-sum .dsb-cl-dot {
+  width: calc(var(--cl-chip-fs, 12px) * 0.66);
+  height: calc(var(--cl-chip-fs, 12px) * 0.66);
+  background: var(--cl-sum);
+}
+.dsb-cl-sum b {
+  font-weight: 800;
+  color: var(--cl-sum);
+}
+button.dsb-cl-sum {
+  cursor: pointer;
+}
+button.dsb-cl-sum:hover {
+  background: color-mix(in srgb, var(--cl-sum) 16%, var(--dsb-surface));
+}
+.dsb-cl-sum.is-on {
+  border-color: var(--cl-sum);
+  background: var(--cl-sum);
+  color: #fff;
+}
+button.dsb-cl-sum.is-on:hover {
+  background: var(--cl-sum);
+}
+.dsb-cl-sum.is-on b {
+  color: #fff;
+}
+.dsb-cl-sum.is-on .dsb-cl-dot {
+  background: #fff;
+}
+.dsb-cl-sum.is-dim {
+  opacity: 0.55;
+}
+.dsb-cl-tools:empty {
+  display: none;
+}
+.dsb-cl-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsb-cl-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 9px;
+  margin: 0;
+  border: 1px solid var(--dsb-border);
+  border-radius: var(--dsb-radius-sm, 6px);
+  background: var(--dsb-surface);
+  color: var(--dsb-text-muted);
+}
+.dsb-cl-search:focus-within {
+  border-color: var(--dsb-primary);
+}
+.dsb-cl-search input {
+  width: var(--cl-search-w, 170px);
+  max-width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--dsb-text-primary);
+  font-size: 1.0417rem;
+}
+.dsb-cl-scroll {
+  min-width: 0;
+}
+/* Room for the selected card's corner tick, which a scroll box would clip. */
+.dsb-cl-scroll.is-scroll {
+  padding: 8px 8px 2px 0;
+  overflow-y: auto;
+}
+/* A list with a height to keep to gives up room before its cards spill: in a
+   column of fixed height (a panel, a pane, its own Style height) the header
+   stays and the cards scroll in what is left, so the last row can always be
+   scrolled into view instead of sitting under the container's edge. */
+.dsb-cardlist.is-bounded {
+  min-height: 0;
+}
+.dsb-cardlist.is-bounded > .dsb-cl-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* Only the cards give up room; the header and any note keep their height. */
+.dsb-cardlist.is-bounded > :not(.dsb-cl-scroll) {
+  flex-shrink: 0;
+}
+.dsb-cl-group + .dsb-cl-group {
+  margin-top: 14px;
+}
+.dsb-cl-group-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dsb-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.dsb-cl-group-h em {
+  font-style: normal;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--dsb-surface-alt);
+  border: 1px solid var(--dsb-border);
+}
+.dsb-cl-list {
+  display: grid;
+  min-width: 0;
+}
+.dsb-cl-list.l-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+.dsb-cl-list.l-row {
+  grid-auto-flow: column;
+  overflow-x: auto;
+  padding: 8px 2px 6px;
+  scroll-snap-type: x proximity;
+}
+.dsb-cl-list.l-row > .dsb-cl-card {
+  scroll-snap-align: start;
+}
+.dsb-cl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: var(--cl-card-minh, 0);
+  padding: 10px 12px;
+  border: 1.5px solid var(--cl-border, var(--dsb-border));
+  border-radius: var(--dsb-radius-sm, 6px);
+  background: var(--dsb-surface);
+  color: var(--dsb-text-primary);
+  text-align: start;
+  transition:
+    transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    opacity 0.16s ease;
+}
+.dsb-cl-card.is-clickable {
+  cursor: pointer;
+}
+.dsb-cl-card.is-clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--dsb-shadow-lg);
+  border-color: var(--cl-border, var(--cl-accent));
+}
+.dsb-cl-card.is-clickable:focus-visible {
+  outline: 2px solid var(--cl-accent);
+  outline-offset: 2px;
+}
+.dsb-cl-card.is-selected {
+  border-color: var(--cl-sel);
+  box-shadow: 0 0 0 1px var(--cl-sel), 0 4px 14px color-mix(in srgb, var(--cl-sel) 18%, transparent);
+}
+.dsb-cl-card.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+/* Canvas look-alikes: the first card is the one being edited. */
+.dsb-cl-card.is-preview .dsb-cl-body {
+  pointer-events: none;
+}
+.dsb-cl-check {
+  position: absolute;
+  top: -8px;
+  inset-inline-end: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cl-sel);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--dsb-surface);
+  z-index: 1;
+}
+.dsb-cl-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.dsb-cl-media {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  color: var(--cl-accent);
+  background: color-mix(in srgb, var(--cl-accent) 12%, var(--dsb-surface));
+}
+.dsb-cl-media.s-circle {
+  border-radius: 50%;
+}
+.dsb-cl-media.s-square {
+  border-radius: 2px;
+}
+.dsb-cl-media.is-img {
+  background: var(--dsb-surface-alt);
+  border: 1px solid var(--dsb-border);
+}
+.dsb-cl-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.dsb-cl-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-cl-title {
+  font-size: var(--cl-title-fs, var(--dsb-node-fs, 14px));
+  font-weight: var(--dsb-node-fw, 700);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-cardlist.wraps-title .dsb-cl-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.dsb-cl-sub {
+  font-size: var(--cl-sub-fs, 12px);
+  color: var(--dsb-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-cl-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--cl-status-fs, 12.5px);
+  font-weight: 500;
+  min-width: 0;
+}
+.dsb-cl-status span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-cl-dot {
+  flex: 0 0 auto;
+  width: calc(var(--cl-status-fs, 12.5px) * 0.64);
+  height: calc(var(--cl-status-fs, 12.5px) * 0.64);
+  border-radius: 50%;
+}
+.dsb-cl-value {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  max-width: 45%;
+  text-align: end;
+}
+.dsb-cl-value span {
+  font-size: 0.875rem;
+  color: var(--dsb-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.dsb-cl-value strong {
+  font-size: var(--cl-value-fs, 14px);
+  font-weight: 700;
+  color: var(--cl-accent);
+  overflow-wrap: anywhere;
+}
+.dsb-cl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-cl-body:empty {
+  display: none;
+}
+.dsb-cardlist.is-compact .dsb-cl-card {
+  padding: 7px 9px;
+  gap: 6px;
+}
+.dsb-cardlist.is-compact .dsb-cl-main {
+  gap: 8px;
+}
+.dsb-cardlist.is-compact .dsb-cl-title {
+  font-size: var(--cl-title-fs, var(--dsb-node-fs, 13px));
+}
+.dsb-cl-note {
+  font-size: 0.9583rem;
+  color: var(--dsb-text-muted);
+  font-style: italic;
+}
+
+/* ------------------------------------------------------- halo card design
+   A centred stat card: the icon solid in the accent inside a pastel ring, the
+   value as a badge on the ring, title and caption, then a footer of meta lines
+   under a hairline. Every pastel is mixed from --cl-accent, so a palette, a
+   {{row.Colour}} or a Colors-tab rule recolours the whole card at once. Scoped
+   to .is-halo: the classic card above is untouched. */
+.dsb-cl-card.is-halo {
+  --cl-tint: color-mix(in srgb, var(--cl-accent) 9%, var(--dsb-surface));
+  --cl-halo: color-mix(in srgb, var(--cl-accent) 13%, var(--dsb-surface));
+  align-items: stretch;
+  gap: 10px;
+  padding: 18px 16px 14px;
+  border-width: 1px;
+  border-radius: 16px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--cl-accent) 8%, transparent);
+  /* backwards, not both: a held end state would pin transform and kill the hover lift. */
+  animation: dsb-cl-halo-in 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+/* "Accent colour" on a halo card means the soft border, not the deep tone. */
+.dsb-cl-card.is-halo:not(.is-selected) {
+  border-color: color-mix(in srgb, var(--cl-border, var(--cl-accent)) 32%, var(--dsb-border));
+}
+.dsb-cl-card.is-halo.f-soft {
+  background:
+    radial-gradient(120% 70% at 50% 0%, var(--cl-tint) 0%, var(--cl-tint) 34%, transparent 70%),
+    var(--dsb-surface);
+}
+.dsb-cl-card.is-halo.f-pastel {
+  background: linear-gradient(180deg, var(--cl-tint), color-mix(in srgb, var(--cl-accent) 4%, var(--dsb-surface)));
+}
+.dsb-cl-card.is-halo.is-clickable:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--cl-accent) 55%, var(--dsb-border));
+  box-shadow:
+    0 10px 24px -8px color-mix(in srgb, var(--cl-accent) 30%, transparent),
+    0 2px 6px color-mix(in srgb, var(--cl-accent) 10%, transparent);
+}
+.dsb-cl-card.is-halo.is-selected {
+  border-color: var(--cl-sel);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--cl-sel) 35%, transparent),
+    0 8px 20px -8px color-mix(in srgb, var(--cl-sel) 35%, transparent);
+}
+.dsb-cl-card.is-halo .dsb-cl-check {
+  top: 8px;
+  inset-inline-end: 8px;
+}
+.dsb-cl-halo-top {
+  display: flex;
+  justify-content: center;
+}
+.dsb-cl-halo {
+  position: relative;
+  display: inline-flex;
+  padding: 11px;
+  border-radius: 50%;
+  background: var(--cl-halo);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease;
+}
+.dsb-cl-card.is-halo.is-clickable:hover .dsb-cl-halo {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cl-accent) 7%, transparent);
+}
+.dsb-cl-card.is-halo .dsb-cl-media {
+  box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--cl-accent) 60%, transparent);
+}
+.dsb-cl-card.is-halo .dsb-cl-media.is-img {
+  background: var(--dsb-surface);
+}
+.dsb-cl-halo-badge {
+  position: absolute;
+  inset-inline-end: -4px;
+  bottom: 2px;
+  display: inline-flex;
+  gap: 3px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid var(--cl-accent);
+  background: var(--dsb-surface);
+  color: var(--cl-accent);
+  box-shadow: 0 0 0 3px var(--dsb-surface);
+  white-space: nowrap;
+}
+.dsb-cl-halo-badge b {
+  font-size: var(--cl-value-fs, 13px);
+  font-weight: 800;
+  line-height: 1;
+}
+.dsb-cl-halo-badge em {
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.dsb-cl-halo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.dsb-cl-card.is-halo .dsb-cl-title {
+  max-width: 100%;
+  font-size: var(--cl-title-fs, var(--dsb-node-fs, 16px));
+  font-weight: var(--dsb-node-fw, 700);
+  color: color-mix(in srgb, var(--cl-accent) 30%, var(--dsb-text-primary));
+}
+.dsb-cl-card.is-halo .dsb-cl-sub {
+  max-width: 100%;
+  font-size: var(--cl-sub-fs, 12.5px);
+  font-weight: 500;
+  color: var(--cl-accent);
+}
+.dsb-cl-halo-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--cl-accent) 22%, var(--dsb-border));
+  min-width: 0;
+}
+.dsb-cl-halo-metas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  max-width: 100%;
+}
+.dsb-cl-halo-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: var(--cl-status-fs, 12.5px);
+  color: color-mix(in srgb, var(--cl-accent) 45%, var(--dsb-text-secondary, var(--dsb-text-muted)));
+}
+.dsb-cl-halo-meta svg {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+.dsb-cl-halo-meta span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsb-cl-card.is-halo .dsb-cl-status {
+  justify-content: center;
+  max-width: 100%;
+  font-weight: 600;
+}
+.dsb-cl-card.is-halo .dsb-cl-body {
+  align-items: center;
+}
+.dsb-cardlist.is-compact .dsb-cl-card.is-halo {
+  padding: 12px 10px 10px;
+  gap: 7px;
+}
+.dsb-cardlist.is-compact .dsb-cl-card.is-halo .dsb-cl-halo {
+  padding: 8px;
+}
+@keyframes dsb-cl-halo-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dsb-cl-card.is-halo,
+  .dsb-cl-halo {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------- a cell that says words
+   A row the control does not belong on: "Visit Closed" where the button was,
+   a dash where neither applies. Muted, so a list of buttons still reads as a
+   list of buttons. */
+.dsb-cell-instead {
+  color: var(--dsb-text-muted);
+  font-size: 1.0417rem;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------ a formula's read-out box */
+.dsb-formula,
+input.dsb-formula {
+  background: var(--dsb-surface-2, #f6f7f9);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* -------------------------------------------- preformatted Label + Value */
+.dsb-tb-pre {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 6px;
+  background: var(--dsb-surface-2, #f6f7f9);
+  font: 1rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 360px;
+  overflow: auto;
+}
+
+/* ------------------------------------- one of the app's own parts, embedded */
+.dsb-embed {
+  border: 1px solid var(--dsb-border);
+  border-radius: 8px;
+  background: var(--dsb-surface);
+  padding: 10px;
+  min-width: 0;
+}
+.dsb-embed.is-plain {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.dsb-embed-title {
+  font-size: 1.0833rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+/* Nothing picked yet, and the canvas stand-in: the same quiet box, so a
+   layout is judged at the size the real thing will take. */
+.dsb-embed.is-empty,
+.dsb-embed.is-design {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-style: dashed;
+  color: var(--dsb-text-muted);
+  font-size: 1.0417rem;
+  min-height: 72px;
+}
+.dsb-embed.is-design b {
+  color: var(--dsb-text);
+  font-size: 1.0833rem;
+}
+
+/* ---------------------------------------------------------- payment control
+   The app's own billing panel, mounted as a node. It brings its own Bootstrap
+   markup, so there is nothing to style but the wrapper it sits in — and the
+   canvas stand-in, which is the same markup with nothing behind it. */
+.dsb-payment {
+  min-width: 0;
+}
+/* The panel is mounted from the first render even with nothing owed — it draws
+   nothing then, and this note stands in its place. */
+.dsb-payment .dsb-payment-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px dashed var(--dsb-border);
+  border-radius: 8px;
+  color: var(--dsb-text-muted);
+  font-size: 1.0417rem;
+}
+/* The tender table's header, drawn without the table: the canvas has no rows
+   to put under it and an empty <Tables /> would still ask for its data. */
+.dsb-payment .dsb-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 10px;
+  margin: 0 10px 10px;
+  border: 1px solid var(--dsb-border);
+  border-radius: 6px;
+  background: var(--dsb-surface-2, rgba(0, 0, 0, 0.03));
+  font-size: 0.9167rem;
+  font-weight: 600;
+  color: var(--dsb-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.dsb-payment .dsb-payment-grid span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Where the save button goes. Outlined only while it is empty, so a designer
+   can see there is a slot without a box appearing around the real button. */
+.dsb-payment .dsb-payment-slot {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+.dsb-payment.is-design .dsb-payment-slot:has(.dsb-drop-hint) {
+  border: 1px dashed var(--dsb-border);
+  border-radius: 6px;
+  justify-content: center;
+  color: var(--dsb-text-muted);
+  font-size: 1rem;
+}
+
+/* The Required message, when a save was stopped because no payment mode was
+   added. Above the panel, because the panel is two cards tall and a message
+   under it is off the bottom of the screen. */
+.dsb-payment .dsb-payment-err {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.dsb-payment.is-error > .card,
+.dsb-payment.is-error .card {
+  border-color: var(--dsb-danger, #dc2626);
+}
+
+/* A grid with no frame of its own keeps its section heading flush too. */
+.dsb-grid.is-in-card > .dsb-table-heading {
+  margin: 0 0 -2px;
+}
+
+/* ------------------------------------------------------- frozen columns ---
+   "Freeze columns at the start / end": those cells stay in place while the
+   rest of the grid scrolls sideways. They carry their own background (a
+   sticky cell is see-through otherwise, and the scrolling text would run
+   under it) in a tint of their own so they read as apart, and the innermost
+   one casts a soft shadow onto the columns sliding beneath it. */
+.dsb-table .dsb-fz {
+  position: sticky;
+  z-index: 1;
+}
+.dsb-table tbody td.dsb-fz,
+.dsb-table tfoot td.dsb-fz {
+  background: var(--dsb-freeze-bg, color-mix(in srgb, var(--dsb-primary) 6%, #fff));
+}
+.dsb-table tbody tr:hover td.dsb-fz {
+  background: var(--dsb-freeze-bg, color-mix(in srgb, var(--dsb-primary) 12%, #fff));
+}
+.dsb-table thead th.dsb-fz {
+  z-index: 3;
+}
+.dsb-table:not(.is-sticky) thead th.dsb-fz {
+  z-index: 2;
+}
+.dsb-table .dsb-fz-l.is-edge {
+  box-shadow: 4px 0 6px -3px rgba(15, 23, 42, 0.18);
+}
+.dsb-table .dsb-fz-r.is-edge {
+  box-shadow: -4px 0 6px -3px rgba(15, 23, 42, 0.18);
+}
+/* Mirrored, the start-frozen columns sit on the right and cast to the left. */
+.dsb-screen[dir="rtl"] .dsb-table .dsb-fz-l.is-edge {
+  box-shadow: -4px 0 6px -3px rgba(15, 23, 42, 0.18);
+}
+.dsb-screen[dir="rtl"] .dsb-table .dsb-fz-r.is-edge {
+  box-shadow: 4px 0 6px -3px rgba(15, 23, 42, 0.18);
+}
+
+/* --------------------------------------------------------- draggable rows ---
+   "Drag rows to reorder": a narrow grip in front of the first column (or the
+   whole row, with Drag by: anywhere), the row being moved faded, and a line
+   on the edge of the row it will land against. */
+.dsb-table thead th.dsb-drag-th,
+.dsb-table tbody td.dsb-drag-cell,
+.dsb-table tfoot td.dsb-drag-cell {
+  width: 26px;
+  min-width: 26px;
+  max-width: 26px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: center;
+}
+.dsb-table tbody td.dsb-drag-cell {
+  color: var(--dsb-text-muted);
+  cursor: grab;
+}
+.dsb-table tbody td.dsb-drag-cell > svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+.dsb-table tbody tr:hover td.dsb-drag-cell {
+  color: var(--dsb-primary);
+}
+.dsb-table tbody td.dsb-drag-cell.is-off {
+  cursor: default;
+  opacity: 0.45;
+}
+.dsb-table tbody tr.is-grab {
+  cursor: grab;
+}
+.dsb-table tbody tr.is-dragging {
+  opacity: 0.45;
+}
+.dsb-table tbody tr.is-drop-before > td {
+  box-shadow: inset 0 2px 0 var(--dsb-primary);
+}
+.dsb-table tbody tr.is-drop-after > td {
+  box-shadow: inset 0 -2px 0 var(--dsb-primary);
+}
+
+
+/* ------------------------------------------------ app heading on a component
+   registry/appHeading: a table, card list, chart, record view, embedded page
+   or split-view detail titled with the app's own <Heading />. It keeps its
+   own look (theme gradient, top line, padding) and loses only the page
+   margin; inside a padded frame it is pulled out to the frame's edges so it
+   reads as that frame's top, like a card's. */
+.dsb-apphead {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.dsb-apphead > .card {
+  margin: 2px 0 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.dsb-apphead > .ah-head {
+  margin: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.dsb-apphead .card-title {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.dsb-apphead-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dsb-apphead-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.dsb-apphead-sub {
+  font-size: 0.9583rem;
+  font-weight: 500;
+  color: var(--dsb-text-muted);
+  white-space: nowrap;
+}
+.dsb-apphead-right .dsb-cl-sums {
+  flex-wrap: nowrap;
+}
+
+/* Pulled to the edges of the frame it heads. */
+.dsb-grid > .dsb-apphead.is-grid-head {
+  margin: -10px -10px 0;
+}
+.dsb-grid.is-dense > .dsb-apphead.is-grid-head {
+  margin-bottom: -2px;
+}
+.dsb-chart > .dsb-apphead.is-chart-head {
+  margin: -12px -14px 8px;
+}
+.dsb-embed > .dsb-apphead.is-embed-head {
+  margin: -10px -10px 8px;
+}
+.dsb-embed.is-plain > .dsb-apphead.is-embed-head {
+  margin: 0 0 8px;
+}
+.dsb-grid > .dsb-apphead.is-grid-head > .card,
+.dsb-grid > .dsb-apphead.is-grid-head > .ah-head,
+.dsb-chart > .dsb-apphead.is-chart-head > .card,
+.dsb-chart > .dsb-apphead.is-chart-head > .ah-head {
+  border-top-left-radius: var(--dsb-radius) !important;
+  border-top-right-radius: var(--dsb-radius) !important;
+}
+
+/* "Total Records : 514" on the right of a heading, ahead of the tools. */
+.dsb-apphead-count,
+.dsb-panel-slot .dsb-grid-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.dsb-apphead-count .dsb-apphead-sub,
+.dsb-panel-slot .dsb-grid-title .dsb-apphead-sub {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--dsb-text-muted);
+}
+
+
+/* ------------------------------------------------------------ auto complete
+   registry/formControls AutoCompleteInput: PrimeReact's AutoComplete with the
+   app's floating label sitting on its top edge, as on the hand-coded pages
+   (frontOffice/OPD/LabPackageInclude). */
+.dsb-ac-wrap {
+  position: relative;
+}
+.dsb-ac-wrap .p-autocomplete {
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+}
+.dsb-ac-wrap .p-autocomplete-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dsb-ac-wrap .dsb-ac-label {
+  position: absolute;
+  top: -7px;
+  inset-inline-start: 4px;
+  z-index: 1;
+  margin: 0;
+  padding: 0 4px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.dsb-ac-wrap.is-required .dsb-ac-label::after {
+  content: " *";
+  color: #dc2626;
+}
+.dsb-ac-wrap .p-autocomplete-dropdown {
+  flex: none;
+  align-self: stretch;
+  height: auto;
+  width: 28px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+/* Picked chips, wrapping inside the box. */
+/* Picked chips, wrapping inside a box drawn like the other inputs. */
+.dsb-ac-wrap .p-autocomplete-multiple-container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 26px;
+  padding: 3px 6px !important;
+  margin: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+.dsb-ac-wrap .p-autocomplete-dd .p-autocomplete-multiple-container {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.dsb-ac-wrap .p-autocomplete-multiple-container:focus-within {
+  border-color: var(--dsb-primary, #2563eb);
+}
+.dsb-ac-wrap .p-autocomplete-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px 0 8px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--dsb-primary, #2563eb) 12%, #fff) !important;
+  border: 1px solid color-mix(in srgb, var(--dsb-primary, #2563eb) 25%, #fff);
+  color: var(--dsb-primary, #1d4ed8) !important;
+  font-size: 0.9583rem;
+  font-weight: 600;
+  line-height: 18px;
+}
+.dsb-ac-wrap .p-autocomplete-token-icon {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  opacity: 0.75;
+}
+.dsb-ac-wrap .p-autocomplete-input-token {
+  flex: 1 1 60px;
+  min-width: 60px;
+}
+.dsb-ac-wrap .p-autocomplete-input-token input {
+  width: 100%;
+  border: 0 !important;
+  outline: 0;
+  box-shadow: none !important;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+}
+/* A suggestion with its second line. */
+.dsb-ac-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.dsb-ac-item-sub {
+  font-size: 0.9167rem;
+  opacity: 0.7;
+}
+.dsb-ac-panel {
+  z-index: 3000 !important;
+  max-height: 260px;
+  overflow: auto;
+}
+
+/* ------------------------------------------------------------ right to left
+   A screen is mirrored by `dir="rtl"` on its root (ScreenRenderer, and
+   ScreenScope for the overlays that portal out) — set when the screen pins
+   "Right → left" or the app's language is written that way (utils/i18n).
+
+   `dir` alone flips the flow: grid columns, flex rows, table columns, a
+   control's text and caret. The builder's own rules above use logical sides
+   (inset-inline-start, padding-inline-end, text-align: start) so they follow
+   it. What is left here is the app's own controls, which were drawn for left
+   to right with physical sides — some of them inline, hence the !important. */
+
+/* The app's floating labels: `.lable` rests at left 4px + a 6px margin and
+   floats to `left: 0 !important`; the date picker's caption sits at 12px. */
+.dsb-screen[dir="rtl"] .form-group > .lable,
+.dsb-screen[dir="rtl"] .form-group > label {
+  left: auto !important;
+  right: 4px;
+  margin-left: 0;
+  margin-right: 6px;
+}
+.dsb-screen[dir="rtl"] .form-control:focus + label,
+.dsb-screen[dir="rtl"] .form-control:not(:placeholder-shown) + label,
+.dsb-screen[dir="rtl"] .form-textarea:focus + label,
+.dsb-screen[dir="rtl"] .form-textarea:not(:placeholder-shown) + label {
+  right: 0 !important;
+}
+.dsb-screen[dir="rtl"] .labelPicker {
+  right: 12px;
+}
+
+/* The app's <Input> writes `text-align: left` inline. A caller that asked for
+   right or centre wrote something else, so only the default is turned. */
+.dsb-screen[dir="rtl"] input[style*="text-align: left"],
+.dsb-screen[dir="rtl"] textarea[style*="text-align: left"] {
+  text-align: right !important;
+}
+/* Numbers, phones and ids read left to right in Arabic too; the box keeps the
+   screen's side, the characters keep their order. */
+.dsb-screen[dir="rtl"] input[type="number"],
+.dsb-screen[dir="rtl"] input[type="tel"],
+.dsb-screen[dir="rtl"] input[type="email"] {
+  direction: ltr;
+  text-align: right !important;
+}
+
+/* The modern skin's FieldShell positions its icon, caption and clear button
+   inline from the left. */
+.dsb-screen[dir="rtl"] .mi-field-shell > svg {
+  left: auto !important;
+  right: 9px !important;
+}
+.dsb-screen[dir="rtl"] .mi-field-shell > label {
+  left: auto !important;
+  right: 10px !important;
+}
+.dsb-screen[dir="rtl"] .mi-field-shell > svg ~ label,
+.dsb-screen[dir="rtl"] .dsb-native.has-lead-ic .mi-field-shell > label {
+  right: 28px !important;
+}
+.dsb-screen[dir="rtl"] .mi-field-shell > button {
+  right: auto !important;
+  left: 7px !important;
+}
+
+/* Bootstrap 4 spacing, float and alignment utilities are physical. Inside a
+   mirrored screen they swap, so markup written for LTR lands the same way. */
+.dsb-screen[dir="rtl"] .ml-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+.dsb-screen[dir="rtl"] .ml-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+.dsb-screen[dir="rtl"] .ml-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+.dsb-screen[dir="rtl"] .mr-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+.dsb-screen[dir="rtl"] .mr-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+.dsb-screen[dir="rtl"] .mr-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+.dsb-screen[dir="rtl"] .ml-auto { margin-left: 0 !important; margin-right: auto !important; }
+.dsb-screen[dir="rtl"] .mr-auto { margin-right: 0 !important; margin-left: auto !important; }
+.dsb-screen[dir="rtl"] .pl-2 { padding-left: 0 !important; padding-right: 0.5rem !important; }
+.dsb-screen[dir="rtl"] .pr-2 { padding-right: 0 !important; padding-left: 0.5rem !important; }
+.dsb-screen[dir="rtl"] .float-left { float: right !important; }
+.dsb-screen[dir="rtl"] .float-right { float: left !important; }
+.dsb-screen[dir="rtl"] .text-left { text-align: right !important; }
+.dsb-screen[dir="rtl"] .text-right { text-align: left !important; }
+
+/* The switch's thumb travels toward the end. */
+.dsb-screen[dir="rtl"] .dsb-switch input:checked + .dsb-switch-track .dsb-switch-thumb {
+  transform: translateX(-16px);
+}
+/* The header tag hangs from the bar's bottom-start corner. */
+.dsb-screen[dir="rtl"] .dsb-screen-head-tag {
+  border-radius: 5px 0 5px 5px;
+}
+
+/* Icons that point along the line point the other way. Ones that mean
+   something absolute — a refresh, a clock — are left as they are. */
+.dsb-screen[dir="rtl"] .lucide-chevron-right,
+.dsb-screen[dir="rtl"] .lucide-chevron-left,
+.dsb-screen[dir="rtl"] .lucide-chevrons-right,
+.dsb-screen[dir="rtl"] .lucide-chevrons-left,
+.dsb-screen[dir="rtl"] .lucide-arrow-right,
+.dsb-screen[dir="rtl"] .lucide-arrow-left,
+.dsb-screen[dir="rtl"] .lucide-move-right,
+.dsb-screen[dir="rtl"] .lucide-move-left,
+.dsb-screen[dir="rtl"] .lucide-log-in,
+.dsb-screen[dir="rtl"] .lucide-log-out,
+.dsb-screen[dir="rtl"] .lucide-undo-2,
+.dsb-screen[dir="rtl"] .lucide-redo-2,
+.dsb-screen[dir="rtl"] .lucide-external-link,
+.dsb-screen[dir="rtl"] .lucide-send,
+.dsb-screen[dir="rtl"] .pi-angle-right,
+.dsb-screen[dir="rtl"] .pi-angle-left,
+.dsb-screen[dir="rtl"] .pi-chevron-right,
+.dsb-screen[dir="rtl"] .pi-chevron-left,
+.dsb-screen[dir="rtl"] .pi-arrow-right,
+.dsb-screen[dir="rtl"] .pi-arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Popups the app's controls portal to <body> — react-select's menu, the
+   PrimeReact panels — are outside every screen root, so they read
+   <body data-dsb-dir="rtl">, which a live right-to-left screen sets. */
+body[data-dsb-dir="rtl"] [class*="__menu-portal"],
+body[data-dsb-dir="rtl"] .p-autocomplete-panel,
+body[data-dsb-dir="rtl"] .p-dropdown-panel,
+body[data-dsb-dir="rtl"] .p-multiselect-panel,
+body[data-dsb-dir="rtl"] .p-datepicker,
+body[data-dsb-dir="rtl"] .dsb-confirm-host,
+body[data-dsb-dir="rtl"] .dsb-img-lightbox,
+body[data-dsb-dir="rtl"] .dsb-floattip {
+  direction: rtl;
+}
+body[data-dsb-dir="rtl"] .dsb-img-close {
+  right: auto;
+  left: 20px;
+}
+
+/* Nested Row Table (registry/nestedRowTable): +/-, the open row, the sub-table. */
+.dsb-nest-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.dsb-nest-toggle:hover {
+  background: color-mix(in srgb, var(--dsb-primary) 14%, transparent);
+}
+.dsb-nest-toggle svg {
+  stroke-width: 3;
+}
+.dsb-grid .dsb-table tbody tr.dsb-nest-open,
+.dsb-grid.s-app .dsb-table tbody tr.dsb-nest-open,
+.dsb-grid.s-app .dsb-table tbody tr.dsb-nest-open:hover {
+  background: var(--dsb-nest-open, #add8e6);
+}
+.dsb-grid .dsb-table tbody tr.dsb-nest-detail,
+.dsb-grid .dsb-table tbody tr.dsb-nest-detail:hover,
+.dsb-grid.s-app .dsb-table tbody tr.dsb-nest-detail,
+.dsb-grid.s-app .dsb-table tbody tr.dsb-nest-detail:hover {
+  background: #fff;
+}
+.dsb-grid .dsb-table tbody tr.dsb-nest-detail > td {
+  height: auto;
+  padding: 6px;
+  white-space: normal;
+}
+.dsb-nest-detail .dsb-grid {
+  --dsb-grid-head-bg: #f7dfe2;
+  --dsb-grid-head-fg: #184fd9;
+  margin: 0;
+}

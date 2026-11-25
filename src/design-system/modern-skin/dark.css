@@ -1,0 +1,566 @@
+/* =====================================================================
+   Modern skin — DARK MODE fixes.
+   In modern view #root keeps the (light-oriented) sky_blue_theme class while
+   data-theme="dark" is set, so many shared/legacy/PrimeReact/react-select
+   surfaces stay light (white inputs, white cards, dark-on-dark text). This
+   layer forces them onto the dark tokens. Everything is scoped to
+   :root[data-design="modern"][data-theme="dark"], so LIGHT MODE IS UNTOUCHED.
+   Colors come from --ds-color-* tokens (design-system/themes/dark.js):
+     bg #0B1120 · panel #111827 · panel2 #0F172A · border #1E293B
+     text #E2E8F0 · text-muted #94A3B8 · accent #2DD4BF · input-bg #0F172A
+   Imported LAST so it wins over the other modern-skin files + theme.css.
+   ===================================================================== */
+
+/* ---------------- LabeledInput "frozen field" (modern) ----------------
+   Its inline styles read --aurora-* vars that are defined NOWHERE, so in
+   light mode they fall back to light literals (#1f2937 text, #fff label
+   notch). On dark that = dark-on-dark text + a white label pill = unreadable.
+   Define the dark values here; the inline var() picks them up — no
+   !important, and the isNote red stays (set explicitly, not via a var).
+   Light mode untouched: vars stay undefined → original light fallbacks. */
+:root[data-design="modern"][data-theme="dark"] {
+  --aurora-text: var(--ds-color-text, #E2E8F0);
+  --aurora-text-muted: var(--ds-color-text-muted, #94A3B8);
+  --aurora-surface: var(--ds-color-panel, #111827);
+  --aurora-accent: var(--ds-color-accent, #2DD4BF);
+}
+
+/* the frozen-field value box ships only a left accent border inline — give it
+   a full outline matching the table border on dark, keeping the teal left bar. */
+:root[data-design="modern"][data-theme="dark"] .aurora-frozen-field .value {
+  border: 1px solid #3A4A63 !important;
+  border-left: 3px solid var(--ds-color-accent, #2DD4BF) !important;
+}
+
+/* ---------------- Inputs / textareas / selects ---------------- */
+:root[data-design="modern"][data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+:root[data-design="modern"][data-theme="dark"] textarea,
+:root[data-design="modern"][data-theme="dark"] select,
+:root[data-design="modern"][data-theme="dark"] .form-control,
+:root[data-design="modern"][data-theme="dark"] .form-select,
+:root[data-design="modern"][data-theme="dark"] .form-textarea,
+:root[data-design="modern"][data-theme="dark"] .custominputbox input,
+:root[data-design="modern"][data-theme="dark"] .custominputbox textarea,
+:root[data-design="modern"][data-theme="dark"] .custominputbox select,
+:root[data-design="modern"][data-theme="dark"] .p-inputtext,
+:root[data-design="modern"][data-theme="dark"] .p-autocomplete-input,
+:root[data-design="modern"][data-theme="dark"] .p-calendar .p-inputtext,
+:root[data-design="modern"][data-theme="dark"] .textbox,
+:root[data-design="modern"][data-theme="dark"] .textbox-text {
+  background-color: var(--ds-color-input-bg, #0F172A) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  /* visible table-matching outline (token border #1E293B is too dark to see) */
+  border: 1px solid #3A4A63 !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] input::placeholder,
+:root[data-design="modern"][data-theme="dark"] textarea::placeholder,
+:root[data-design="modern"][data-theme="dark"] .p-inputtext::placeholder,
+:root[data-design="modern"][data-theme="dark"] .textbox-text::placeholder {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+  opacity: 1;
+}
+
+/* focus ring */
+:root[data-design="modern"][data-theme="dark"] input:focus,
+:root[data-design="modern"][data-theme="dark"] textarea:focus,
+:root[data-design="modern"][data-theme="dark"] select:focus,
+:root[data-design="modern"][data-theme="dark"] .form-control:focus,
+:root[data-design="modern"][data-theme="dark"] .p-inputtext:focus {
+  border-color: var(--ds-color-accent, #2DD4BF) !important;
+  /* thinner focus ring (was 3px — read as a thick border) */
+  box-shadow: 0 0 0 1px var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+}
+
+/* FieldShell focus ring: locked sky_blue_theme paints
+   `.border-colornew { border:1.4px solid #03a0e7; box-shadow:0 0 0 3px #f0f8ff }`
+   — the near-white 3px halo looks huge on dark. Slim it + drop the white. */
+:root[data-design="modern"][data-theme="dark"] .border-colornew {
+  border-width: 1px !important;
+  box-shadow: 0 0 0 1px var(--ds-color-accent-soft, rgba(45,212,191,.18)) !important;
+}
+
+/* disabled inputs — visible but de-emphasised */
+:root[data-design="modern"][data-theme="dark"] input:disabled,
+:root[data-design="modern"][data-theme="dark"] textarea:disabled,
+:root[data-design="modern"][data-theme="dark"] select:disabled,
+:root[data-design="modern"][data-theme="dark"] .form-control:disabled,
+:root[data-design="modern"][data-theme="dark"] .p-inputtext:disabled {
+  /* lighter-blue tint (dark-appropriate) + not-allowed, matching light modern */
+  background-color: rgba(96, 165, 250, 0.12) !important;
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+
+/* ---------------- react-select (classNamePrefix carries the theme,
+   so the generated classes are *__control / *__menu / *__option …) ------- */
+:root[data-design="modern"][data-theme="dark"] [class*="__control"] {
+  background-color: var(--ds-color-input-bg, #0F172A) !important;
+  border: 1px solid #3A4A63 !important;
+}
+
+/* PrimeReact multiselect / dropdown have NO inner <input> — border the trigger
+   box itself so it matches the inputs + table. (p-calendar / p-autocomplete
+   wrap a real input that already gets the border above — don't double it.) */
+:root[data-design="modern"][data-theme="dark"] .p-multiselect,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown {
+  border: 1px solid #3A4A63 !important;
+  border-radius: 6px !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__menu"],
+:root[data-design="modern"][data-theme="dark"] [class*="__menu-list"] {
+  background-color: var(--ds-color-panel, #111827) !important;
+  border: 1px solid var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__single-value"],
+:root[data-design="modern"][data-theme="dark"] [class*="__input"],
+:root[data-design="modern"][data-theme="dark"] [class*="__input-container"] {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__placeholder"] {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__option"] {
+  background-color: transparent !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__option--is-focused"] {
+  background-color: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__option--is-selected"] {
+  background-color: var(--ds-color-accent, #2DD4BF) !important;
+  color: #06281F !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__indicator-separator"] {
+  background-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__multi-value"] {
+  background-color: var(--ds-color-panel2, #0F172A) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__multi-value__label"] {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+/* option separators are a hardcoded "lightgray" in ReactSelect customStyles;
+   the floating placeholder gets a hardcoded white pill bg — darken both */
+:root[data-design="modern"][data-theme="dark"] [class*="__option"] {
+  border-bottom-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__placeholder"] {
+  background-color: transparent !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__menu-list"],
+:root[data-design="modern"][data-theme="dark"] [class*="__menu-notice"] {
+  background-color: var(--ds-color-panel, #111827) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] [class*="__group-heading"] {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+}
+
+/* ---- SmoothSelect popup (.md-pop): option <button>/input don't inherit the
+   panel's light color (UA paints button text black) → invisible on dark ---- */
+:root[data-design="modern"][data-theme="dark"] .md-pop button,
+:root[data-design="modern"][data-theme="dark"] .md-pop input,
+:root[data-design="modern"][data-theme="dark"] .md-pop [role="button"] {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+
+/* ---- PrimeReact MultiSelect items/labels — force readable in dark
+   (panel is portaled; explicit so it never depends on a token fallback) ---- */
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item span,
+:root[data-design="modern"][data-theme="dark"] .ms-modern-panel .p-multiselect-item,
+:root[data-design="modern"][data-theme="dark"] .ms-modern-panel .p-multiselect-item span,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect .p-multiselect-label,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-token-label {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item {
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item.p-highlight,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item:hover,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect-panel .p-multiselect-item.p-focus {
+  background: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+
+/* ---------------- MultiSelect (modern-skin) DARK ----------------
+   multiselect.css colors everything from light --ms-* tokens and paints a bright
+   4px focus halo (--ms-accent-soft #eaf2ff). On dark that = a thick light border.
+   Recolor the tokens to the dark input palette and slim the active ring to 1px
+   so the trigger/filter match the dark inputs + react-select. */
+:root[data-design="modern"][data-theme="dark"] {
+  --ms-border: #3A4A63;
+  --ms-bg: var(--ds-color-input-bg, #0F172A);
+  --ms-panel: var(--ds-color-panel, #111827);
+  --ms-accent: var(--ds-color-accent, #2DD4BF);
+  --ms-border-focus: var(--ds-color-accent, #2DD4BF);
+  --ms-accent-soft: rgba(45, 212, 191, 0.16);
+}
+:root[data-design="modern"][data-theme="dark"] .p-multiselect.multiselect.p-focus,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect.multiselect.p-inputwrapper-focus,
+:root[data-design="modern"][data-theme="dark"] .p-multiselect.multiselect:focus {
+  border-color: var(--ds-color-accent, #2DD4BF) !important;
+  box-shadow: 0 0 0 1px var(--ds-color-accent-soft, rgba(45,212,191,.18)) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ms-modern-panel {
+  box-shadow: 0 24px 60px -20px rgba(0,0,0,.7), 0 2px 10px -6px rgba(0,0,0,.55) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ms-modern-panel .p-multiselect-filter.p-inputtext:focus {
+  border-color: var(--ds-color-accent, #2DD4BF) !important;
+  box-shadow: 0 0 0 1px var(--ds-color-accent-soft, rgba(45,212,191,.18)) !important;
+}
+
+/* Checkbox wrapper border → match dark inputs (#3A4A63), not the inline #ccc */
+:root[data-design="modern"][data-theme="dark"] .checkbox-shell {
+  border-color: #3A4A63 !important;
+}
+
+/* ---------------- Labels / headings / body text ---------------- */
+:root[data-design="modern"][data-theme="dark"] label,
+:root[data-design="modern"][data-theme="dark"] .lable,
+:root[data-design="modern"][data-theme="dark"] .labelPicker,
+:root[data-design="modern"][data-theme="dark"] .placeholderLabel,
+:root[data-design="modern"][data-theme="dark"] .form-label,
+:root[data-design="modern"][data-theme="dark"] .col-form-label {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+}
+
+/* Floating-label pills (.label / .labelPicker / floated #search .lable) hardcode
+   `background:#fff` in index.css → a white notch on dark. Match the input bg so
+   the label cuts the field border cleanly instead of showing a light pill. */
+:root[data-design="modern"][data-theme="dark"] .label,
+:root[data-design="modern"][data-theme="dark"] .labelPicker,
+:root[data-design="modern"][data-theme="dark"] .searchtest,
+:root[data-design="modern"][data-theme="dark"] #search:focus-within + .lable,
+:root[data-design="modern"][data-theme="dark"] #search input[type="text"]:not(:placeholder-shown) + .lable,
+:root[data-design="modern"][data-theme="dark"] #searchtest > .p-inputwrapper-filled + .lable {
+  background: var(--ds-color-input-bg, #0F172A) !important;
+  background-image: none !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] h1,
+:root[data-design="modern"][data-theme="dark"] h2,
+:root[data-design="modern"][data-theme="dark"] h3,
+:root[data-design="modern"][data-theme="dark"] h4,
+:root[data-design="modern"][data-theme="dark"] h5,
+:root[data-design="modern"][data-theme="dark"] h6,
+:root[data-design="modern"][data-theme="dark"] .card-title,
+:root[data-design="modern"][data-theme="dark"] .modal-title {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+
+/* generic dark-text utility classes that would vanish on dark bg */
+:root[data-design="modern"][data-theme="dark"] .text-dark,
+:root[data-design="modern"][data-theme="dark"] .text-black,
+:root[data-design="modern"][data-theme="dark"] .text-black a,
+:root[data-design="modern"][data-theme="dark"] .text-secondary {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+
+/* ---------------- ColorCodingSearch stat chips (modern) ----------------
+   The chip is inline-styled light (#fff bg, slate label). On dark that's a
+   white pill. Override via class (!important beats non-important inline);
+   the colored top-bar + count bg come from a .color-indicator-*-bg class —
+   leave those (they're the accent). Add a subtle hover lift for polish. */
+:root[data-design="modern"][data-theme="dark"] .ccs-chip {
+  background: var(--ds-color-panel2, #0F172A) !important;
+  border: 1px solid var(--ds-color-border, #1E293B) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.45) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ccs-chip:hover {
+  border-color: var(--ds-color-accent, #2DD4BF) !important;
+  box-shadow: 0 6px 16px -6px rgba(0,0,0,.7) !important;
+  transform: translateY(-1px);
+}
+:root[data-design="modern"][data-theme="dark"] .ccs-chip-label {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+/* count sits on a pastel accent bg → keep near-black text for contrast */
+:root[data-design="modern"][data-theme="dark"] .ccs-chip-count {
+  color: #0B1120 !important;
+}
+
+/* ---------------- AuroraHeading (injected CSS hardcodes #fff bar) ------- */
+:root[data-design="modern"][data-theme="dark"] .ah-head {
+  background: var(--ds-color-panel, #111827) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ah-title {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ah-search {
+  background: var(--ds-color-input-bg, #0F172A) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ah-iconbtn {
+  background: var(--ds-color-panel2, #0F172A) !important;
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+/* tile + chip ship a light #E8F2FE in heading-button.css — darken for dark mode */
+:root[data-design="modern"][data-theme="dark"] .ah-tile,
+:root[data-design="modern"][data-theme="dark"] .ah-tile.background-theme-colornew,
+:root[data-design="modern"][data-theme="dark"] .ah-head .ah-chip {
+  background: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+  color: var(--ds-color-accent, #2DD4BF) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .ah-tile svg {
+  color: var(--ds-color-accent, #2DD4BF) !important;
+}
+
+/* ---------------- Cards / panels / theme-class leaks ---------------- */
+:root[data-design="modern"][data-theme="dark"] .card,
+:root[data-design="modern"][data-theme="dark"] .card_background,
+:root[data-design="modern"][data-theme="dark"] .modal-content,
+:root[data-design="modern"][data-theme="dark"] .patient_registration {
+  background-color: var(--ds-color-panel, #111827) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .card-header,
+:root[data-design="modern"][data-theme="dark"] .modal-header,
+:root[data-design="modern"][data-theme="dark"] .modal-footer {
+  background: var(--ds-color-panel2, #0F172A) !important;
+  background-image: none !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .card_background {
+  box-shadow: 0px -2px var(--ds-color-accent, #2DD4BF) !important;
+}
+
+/* sky_blue_theme "new theme" highlight helpers used app-wide */
+:root[data-design="modern"][data-theme="dark"] .background-theme-colornew {
+  background-color: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .text-theme-colornew {
+  color: var(--ds-color-accent, #2DD4BF) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .background-theme-colornew.text-theme-colornew {
+  color: var(--ds-color-accent, #2DD4BF) !important;
+}
+
+/* ---------------- SlideScreen / Dialog content ---------------- */
+:root[data-design="modern"][data-theme="dark"] .side-screen,
+:root[data-design="modern"][data-theme="dark"] .side-screen .main-content {
+  background-color: var(--ds-color-bg, #0B1120) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .p-dialog .p-dialog-content,
+:root[data-design="modern"][data-theme="dark"] .p-dialog .p-dialog-footer {
+  background-color: var(--ds-color-panel, #111827) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+
+/* ---------------- Dropdown menus (bootstrap / PrimeReact / SmoothSelect) -- */
+:root[data-design="modern"][data-theme="dark"] .dropdown-menu,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown-panel,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown-items-wrapper,
+:root[data-design="modern"][data-theme="dark"] .md-pop {
+  background-color: var(--ds-color-panel, #111827) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .dropdown-item,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown-item {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .dropdown-item:hover,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown-item:hover,
+:root[data-design="modern"][data-theme="dark"] .p-dropdown-item.p-highlight {
+  background-color: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+/* SmoothSelect popup rows: override the light-blue (dropdown.css) for dark */
+:root[data-design="modern"][data-theme="dark"] .md-pop .background-theme-colornew {
+  background-color: var(--ds-color-accent-soft, rgba(45,212,191,.12)) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .md-pop .text-theme-colornew {
+  color: var(--ds-color-accent, #2DD4BF) !important;
+}
+
+/* PrimeReact calendar (date picker) */
+:root[data-design="modern"][data-theme="dark"] .p-datepicker,
+:root[data-design="modern"][data-theme="dark"] .p-datepicker .p-datepicker-header,
+:root[data-design="modern"][data-theme="dark"] .p-datepicker table td > span {
+  background-color: var(--ds-color-panel, #111827) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .p-datepicker table td > span.p-highlight {
+  background-color: var(--ds-color-accent, #2DD4BF) !important;
+  color: #06281F !important;
+}
+
+/* ---------------- Checkboxes / radios ---------------- */
+:root[data-design="modern"][data-theme="dark"] input[type="checkbox"],
+:root[data-design="modern"][data-theme="dark"] input[type="radio"],
+:root[data-design="modern"][data-theme="dark"] .form-check-input,
+:root[data-design="modern"][data-theme="dark"] .table-checkbox {
+  accent-color: var(--ds-color-accent, #2DD4BF);
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+
+/* ---------------- Borders / dividers ---------------- */
+:root[data-design="modern"][data-theme="dark"] hr,
+:root[data-design="modern"][data-theme="dark"] .dropdown-divider,
+:root[data-design="modern"][data-theme="dark"] .custom-divider-header,
+:root[data-design="modern"][data-theme="dark"] .border,
+:root[data-design="modern"][data-theme="dark"] .border-top,
+:root[data-design="modern"][data-theme="dark"] .border-bottom,
+:root[data-design="modern"][data-theme="dark"] .border-left,
+:root[data-design="modern"][data-theme="dark"] .border-right {
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .custom-divider-header {
+  background: var(--ds-color-border, #1E293B) !important;
+}
+
+/* ---------------- Buttons that ship light backgrounds ---------------- */
+:root[data-design="modern"][data-theme="dark"] .btn-light,
+:root[data-design="modern"][data-theme="dark"] .btn-outline-secondary,
+:root[data-design="modern"][data-theme="dark"] .btn-default,
+:root[data-design="modern"][data-theme="dark"] .btn-white {
+  background-color: var(--ds-color-panel2, #0F172A) !important;
+  color: var(--ds-color-text, #E2E8F0) !important;
+  border-color: var(--ds-color-border, #1E293B) !important;
+}
+
+/* Solid bootstrap buttons (btn-primary/success/info/secondary) render as filled
+   blocks — on dark switch to the outlined chip look (transparent bg + colored
+   border/text) like the table toolbar buttons. Each variant keeps its hue. */
+:root[data-design="modern"][data-theme="dark"] .btn-primary,
+:root[data-design="modern"][data-theme="dark"] .btn-success,
+:root[data-design="modern"][data-theme="dark"] .btn-info,
+:root[data-design="modern"][data-theme="dark"] .btn-secondary {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-primary {
+  border: 1px solid #60A5FA !important;
+  color: #60A5FA !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-success {
+  border: 1px solid #34D399 !important;
+  color: #34D399 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-info {
+  border: 1px solid #22D3EE !important;
+  color: #22D3EE !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-secondary {
+  border: 1px solid #94A3B8 !important;
+  color: #94A3B8 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-primary:hover {
+  background: rgba(96,165,250,.14) !important;
+  color: #93C5FD !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-success:hover {
+  background: rgba(52,211,153,.14) !important;
+  color: #6EE7B7 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-info:hover {
+  background: rgba(34,211,238,.14) !important;
+  color: #67E8F9 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .btn-secondary:hover {
+  background: rgba(148,163,184,.14) !important;
+  color: #CBD5E1 !important;
+}
+
+/* close (×) icons on modal/dialog headers */
+:root[data-design="modern"][data-theme="dark"] .close,
+:root[data-design="modern"][data-theme="dark"] .modal-header .close {
+  color: var(--ds-color-text, #E2E8F0) !important;
+  opacity: 0.85;
+}
+
+/* ---------------- Modern Tables table-view header (modernCompact ships an
+   inline light gradient + #41557a text — keep it dark) ---------------- */
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact thead th {
+  background: linear-gradient(180deg, #1e293b, #172033) !important;
+  background-image: linear-gradient(180deg, #1e293b, #172033) !important;
+  color: #cbd5e1 !important;
+  border-bottom-color: #334155 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact thead th:hover {
+  background: linear-gradient(180deg, #243044, #1b2436) !important;
+  color: #e2e8f0 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact tbody td {
+  border-bottom-color: #1f2a3a !important;
+}
+
+/* index.css sets `.mainTable { border:1px solid rgba(235,233,233,.747)
+   !important }` — a near-white outline that reads as a WHITE border on dark.
+   Kill it (modern wrapper already draws its own theme border). */
+:root[data-design="modern"][data-theme="dark"] .mainTable {
+  border-color: transparent !important;
+}
+
+/* column separators: the modernCompact inline <style> strips border-right
+   (border-right:0 !important). Re-add a subtle vertical grid line for dark so
+   columns read as a table; keep the last column flush. */
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact thead th,
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact tbody td {
+  border-right: 1px solid #2B3A52 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact tr > th:last-child,
+:root[data-design="modern"][data-theme="dark"] .mainTable.modernCompact tr > td:last-child {
+  border-right: 0 !important;
+}
+/* index.css `.mainTable tbody tr { border:1px solid rgba(6,3,3,.747) }` paints
+   faint dark-red row lines on dark — neutralize to the grid color. */
+:root[data-design="modern"][data-theme="dark"] .mainTable tbody tr {
+  border-color: #2B3A52 !important;
+}
+
+/* index.css pins `.mainTable tbody tr { color:#000 !important }` for EVERY
+   theme → black body text = invisible on dark. That !important beats the
+   modern table's inline color:text AND nested-table.css's color (no
+   !important), so cells render black on dark. Force readable text for dark —
+   covers both the modernCompact inline-styled table and the
+   nested-table.css-skinned .mainTable / .nestedTable. */
+:root[data-design="modern"][data-theme="dark"] .mainTable tbody tr,
+:root[data-design="modern"][data-theme="dark"] .mainTable tbody td,
+:root[data-design="modern"][data-theme="dark"] .nestedTable tbody tr,
+:root[data-design="modern"][data-theme="dark"] .nestedTable tbody td {
+  color: var(--ds-color-text, #E2E8F0) !important;
+}
+
+/* ---------------- Icons that default to dark ink ---------------- */
+:root[data-design="modern"][data-theme="dark"] .text-black svg,
+:root[data-design="modern"][data-theme="dark"] .text-dark svg,
+:root[data-design="modern"][data-theme="dark"] svg[stroke="#000"],
+:root[data-design="modern"][data-theme="dark"] svg[fill="#000"],
+:root[data-design="modern"][data-theme="dark"] svg[color="#000"] {
+  color: var(--ds-color-text, #E2E8F0) !important;
+  stroke: currentColor;
+}
+
+/* ---------------- Scrollbars ----------------
+   index.css paints a global light scrollbar (track #f5f5f5, thumb #a1c6db blue)
+   that reads as a light-blue bar on dark. Recolor to the dark palette. */
+:root[data-design="modern"][data-theme="dark"] ::-webkit-scrollbar,
+:root[data-design="modern"][data-theme="dark"] ::-webkit-scrollbar-track {
+  background-color: var(--ds-color-bg, #0B1120);
+}
+:root[data-design="modern"][data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: #243044;
+  border-radius: 5px;
+}
+:root[data-design="modern"][data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background-color: #334155;
+}
+/* Firefox — inherits to descendants from the root scope */
+:root[data-design="modern"][data-theme="dark"] {
+  scrollbar-color: #243044 var(--ds-color-bg, #0B1120);
+  scrollbar-width: thin;
+}

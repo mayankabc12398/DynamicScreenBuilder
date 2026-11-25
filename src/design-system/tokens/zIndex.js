@@ -1,0 +1,18 @@
+export const zIndex = {
+  base: 0,
+  sticky: 20,
+  sidebar: 25,
+  topstrip: 30,
+  resizer: 35,
+  overlayBackdrop: 900,
+  tooltip: 1000,
+  dropdown: 1100,
+  autocomplete: 1200,
+  datepicker: 1300,
+  popover: 1350,
+  drawer: 1400,
+  modal: 1500,
+  notification: 1600,
+  fullscreen: 1700,
+  devtools: 1800,
+};

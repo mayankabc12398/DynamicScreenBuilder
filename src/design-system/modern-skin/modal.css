@@ -1,0 +1,143 @@
+/* Modern skin — modal (PrimeReact Dialog) recolor.
+   Dialog renders in a portal under <html data-design="modern">, so this
+   still matches. Overrides any active theme (orange_theme etc.) so modal
+   buttons use the blue gradient and the header is a lighter blue.
+   Activates only when html[data-design="modern"]. */
+
+/* SlideScreen is a full-height overlay but sits at z-index:2, while the modern
+   shell header is position:sticky z-index:30 — so on mobile/tablet the header
+   paints over the top of the slide screen and hides its content. Raise the
+   slide screen above the header. Modern view only. */
+:root[data-design="modern"] .side-screen {
+  z-index: 100 !important;
+}
+
+/* Reserve the form-rail width on the slide screen / dialog so the full blue
+   header ends exactly where the rail begins — the rail sits AFTER the panel,
+   never on top of it. Keyed on a body class (set by RightFormSidebar) so it is
+   immune to CSS-var timing. 60px = rail width (RAIL in RightFormSidebar.jsx).
+   Applies on mobile too: the sidebar vars are 0 there, so it insets by just the
+   60px rail — keeps the slide screen (and its × button) clear of the rail
+   overlay instead of hiding under it. */
+:root[data-design="modern"] body.rfs-open-right .side-screen,
+:root[data-design="modern"] body.rfs-open-right .p-dialog-mask {
+  left: var(--modern-sidebar-l, 0px) !important;
+  right: calc(var(--modern-sidebar-r, 0px) + 60px) !important;
+  width: auto !important;
+}
+:root[data-design="modern"] body.rfs-open-left .side-screen,
+:root[data-design="modern"] body.rfs-open-left .p-dialog-mask {
+  left: calc(var(--modern-sidebar-l, 0px) + 60px) !important;
+  right: var(--modern-sidebar-r, 0px) !important;
+  width: auto !important;
+}
+/* give the close (×) breathing room from the rail edge (rail-right case) */
+:root[data-design="modern"] body.rfs-open-right .side-screen .p-dialog-header {
+  padding-right: 18px !important;
+}
+:root[data-design="modern"] .side-screen .p-dialog-header {
+  flex-wrap: nowrap !important;
+}
+:root[data-design="modern"] .side-screen .p-dialog-header .p-dialog-header-close {
+  flex: 0 0 auto !important;
+  margin-left: 8px !important;
+  z-index: 2 !important;
+}
+/* title/name area shrinks (or clips) so it can never shove the × out of view */
+:root[data-design="modern"] .side-screen .p-dialog-header > div:first-child {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* --- Header: lighter blue (PrimeReact Dialog + SlideScreen share .p-dialog-header) --- */
+:root[data-design="modern"] .p-dialog .p-dialog-header,
+:root[data-design="modern"] .side-screen .p-dialog-header {
+  background: linear-gradient(135deg, #5CC2F8 0%, #38A8F0 100%) !important;
+  background-color: #38A8F0 !important;
+  background-image: linear-gradient(135deg, #5CC2F8 0%, #38A8F0 100%) !important;
+  color: #FFFFFF !important;
+  border-bottom: none !important;
+}
+
+:root[data-design="modern"] .p-dialog .p-dialog-header .p-dialog-title,
+:root[data-design="modern"] .side-screen .p-dialog-header .p-dialog-title,
+:root[data-design="modern"] .side-screen .p-dialog-header,
+:root[data-design="modern"] .side-screen .p-dialog-header * {
+  color: #FFFFFF !important;
+}
+
+/* Close (×) icon on header */
+:root[data-design="modern"] .p-dialog .p-dialog-header .p-dialog-header-icon,
+:root[data-design="modern"] .p-dialog .p-dialog-header .p-dialog-header-icon span,
+:root[data-design="modern"] .side-screen .p-dialog-header .p-dialog-header-icon,
+:root[data-design="modern"] .side-screen .p-dialog-header .p-dialog-header-icon svg {
+  color: #FFFFFF !important;
+  fill: currentColor !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+:root[data-design="modern"] .p-dialog .p-dialog-header .p-dialog-header-icon:hover,
+:root[data-design="modern"] .side-screen .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* --- Footer buttons (Save / Cancel / any modal button): blue gradient --- */
+:root[data-design="modern"] .p-dialog .p-dialog-footer button,
+:root[data-design="modern"] .p-dialog .ftr_btn button,
+:root[data-design="modern"] .p-dialog .p-dialog-footer .btn {
+  background: linear-gradient(135deg, #29B6F6 0%, #1E88E5 50%, #1976D2 100%) !important;
+  background-color: #1E88E5 !important;
+  background-image: linear-gradient(135deg, #29B6F6 0%, #1E88E5 50%, #1976D2 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:root[data-design="modern"] .p-dialog .p-dialog-footer button:hover,
+:root[data-design="modern"] .p-dialog .p-dialog-footer button:focus,
+:root[data-design="modern"] .p-dialog .ftr_btn button:hover,
+:root[data-design="modern"] .p-dialog .ftr_btn button:focus {
+  background: linear-gradient(135deg, #1E88E5 0%, #1976D2 50%, #1565C0 100%) !important;
+  background-color: #1976D2 !important;
+  background-image: linear-gradient(135deg, #1E88E5 0%, #1976D2 50%, #1565C0 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* --- Mobile: SlideScreen content must stay fully visible + scrollable.
+   The modern <Tables/> card area carries an inline maxHeight + wide card grid
+   (minmax 340px) that, inside the narrow slide screen, clips lower rows and
+   overflows the viewport (main-content has overflow-x:hidden). On phones drop
+   the inner height cap and force a single-column card grid so nothing is cut.
+   Modern view only. --- */
+@media (max-width: 768px) {
+  :root[data-design="modern"] .side-screen #no-more-tables {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* card grid → single column (kills the 340px min-width overflow) */
+  :root[data-design="modern"] .side-screen #no-more-tables > div {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* whole slide screen scrolls down to the footer (Save etc.) */
+  :root[data-design="modern"] .side-screen .main-content {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* --- Input focus: blue (FieldShell adds .border-colornew + .text-theme-colornew
+   on focus; theme.css colors those orange under orange_theme). Force blue. --- */
+:root[data-design="modern"] .p-dialog .border-colornew {
+  border: 1.4px solid #1E9BF0 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.14) !important;
+}
+
+:root[data-design="modern"] .p-dialog .text-theme-colornew {
+  color: #1976D2 !important;
+}

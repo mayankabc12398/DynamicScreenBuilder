@@ -1,0 +1,56 @@
+/* Modern skin — AuroraHeading + primary action buttons recolor.
+   In modern view some content renders inside theme-class portals (orange_theme
+   etc.), so headings/buttons inherit the orange theme. Force the modern blue.
+   Activates only when html[data-design="modern"]. */
+
+/* --- AuroraHeading: bluish accent, tile, chip --- */
+:root[data-design="modern"] .ah-head {
+  border-left-color: #1E88E5 !important;
+}
+
+:root[data-design="modern"] .ah-tile.background-theme-colornew,
+:root[data-design="modern"] .ah-head .ah-tile {
+  background-color: #E8F2FE !important;
+  color: #1976D2 !important;
+}
+
+:root[data-design="modern"] .ah-tile.text-theme-colornew,
+:root[data-design="modern"] .ah-head .ah-tile svg {
+  color: #1976D2 !important;
+}
+
+:root[data-design="modern"] .ah-head .ah-chip {
+  background: #E8F2FE !important;
+  color: #1976D2 !important;
+}
+
+:root[data-design="modern"] .ah-head .ah-search:focus {
+  border-color: #1E9BF0 !important;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.14) !important;
+}
+
+/* --- Primary action buttons → modern blue gradient.
+   Only .btn-primary + AuroraHeading action button. Semantic buttons
+   (success/danger/warning) keep their meaning. --- */
+:root[data-design="modern"] .btn-primary,
+:root[data-design="modern"] button.btn-primary,
+:root[data-design="modern"] .ah-action {
+  background: linear-gradient(135deg, #29B6F6 0%, #1E88E5 50%, #1976D2 100%) !important;
+  background-color: #1E88E5 !important;
+  background-image: linear-gradient(135deg, #29B6F6 0%, #1E88E5 50%, #1976D2 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:root[data-design="modern"] .btn-primary:hover,
+:root[data-design="modern"] .btn-primary:focus,
+:root[data-design="modern"] .btn-primary:active,
+:root[data-design="modern"] button.btn-primary:hover,
+:root[data-design="modern"] .ah-action:hover {
+  background: linear-gradient(135deg, #1E88E5 0%, #1976D2 50%, #1565C0 100%) !important;
+  background-color: #1976D2 !important;
+  background-image: linear-gradient(135deg, #1E88E5 0%, #1976D2 50%, #1565C0 100%) !important;
+  color: #FFFFFF !important;
+}

@@ -1,0 +1,65 @@
+/* Wrapper styles for a JSON screen rendered at /screen/:screenId. */
+
+.dsb-route {
+  min-height: calc(100vh - 120px);
+  background: var(--dsb-canvas, #f4f6fb);
+}
+.dsb-route .dsb-screen {
+  min-height: inherit;
+}
+
+.dsb-route-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 24px;
+}
+.dsb-route-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 22px;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  background: #fff;
+  color: #4f46e5;
+  font-weight: 600;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.08);
+}
+.dsb-route-card.is-empty {
+  flex-direction: column;
+  text-align: center;
+  color: #64748b;
+  max-width: 380px;
+}
+.dsb-route-card.is-empty h3 {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+.dsb-route-card.is-empty p {
+  margin: 0;
+  font-size: 1.0417rem;
+}
+.dsb-route-card.is-empty code {
+  background: #f1f5f9;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.9583rem;
+}
+.dsb-route-card.is-empty button {
+  margin-top: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.dsb-route-card.is-empty button:hover {
+  background: #4338ca;
+}

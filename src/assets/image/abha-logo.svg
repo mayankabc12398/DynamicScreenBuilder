@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ABHA">
+  <defs>
+    <linearGradient id="abhaBg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="112" height="112" rx="26" fill="url(#abhaBg)"/>
+  <path d="M60 30c-9 0-16 6.6-16 16.5 0 12.5 16 27.5 16 27.5s16-15 16-27.5C76 36.6 69 30 60 30Z" fill="#fff" opacity="0.95"/>
+  <path d="M57 41.5h6v5.5h5.5v6H63v5.5h-6V53h-5.5v-6H57v-5.5Z" fill="url(#abhaBg)"/>
+  <path d="M38 84h44" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <text x="60" y="100" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">ABHA</text>
+</svg>

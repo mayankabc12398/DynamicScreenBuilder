@@ -1,0 +1,133 @@
+/* Modern skin for legacy <Input/> — activates only when html[data-design="modern"] */
+
+:root[data-design="modern"] .custominputbox {
+  --mi-radius: 9px;
+  --mi-pad-x: 11px;
+  --mi-height: 2.25rem;
+  --mi-border: var(--ds-color-border, #E2E8F0);
+  --mi-border-hover: rgba(15, 118, 110, 0.35);
+  --mi-border-focus: var(--ds-color-accent, #0F766E);
+  --mi-bg: var(--ds-color-input-bg, #FFFFFF);
+  --mi-text: var(--ds-color-text, #0F172A);
+  --mi-muted: var(--ds-color-text-muted, #64748B);
+  --mi-accent-soft: var(--ds-color-accent-soft, rgba(15, 118, 110, 0.08));
+  --mi-danger: var(--ds-color-danger, #F43F5E);
+}
+
+/* Required-field underline on FieldShell boxes. !important + extra specificity so
+   theme focus classes (.xxx_theme .border-colornew { border: ... !important }) can't erase it. */
+:root[data-design="modern"] [data-mi-required="true"] {
+  border-bottom: 1.5px solid #FCA5A5 !important;
+}
+
+/* Keyboard (TAB) focus on FieldShell-based triggers must match mouse focus.
+   FieldShell paints the visible blue ring (.border-colornew), so suppress the
+   browser's default keyboard outline that otherwise stacks into a double border. */
+:root[data-design="modern"] [data-tab-field]:focus,
+:root[data-design="modern"] [data-tab-field]:focus-visible {
+  outline: none !important;
+}
+
+:root[data-design="modern"] .custominputbox .form-group,
+:root[data-design="modern"] .custominputbox > div:not(.form-group) {
+  position: relative;
+  margin-bottom: 4px;
+}
+
+:root[data-design="modern"] .custominputbox input,
+:root[data-design="modern"] .custominputbox textarea,
+:root[data-design="modern"] .custominputbox select {
+  width: 100%;
+  height: var(--mi-height);
+  padding: 0 var(--mi-pad-x);
+  border-radius: var(--mi-radius);
+  border: 1.5px solid var(--mi-border);
+  background: var(--mi-bg);
+  color: var(--mi-text);
+  font-size: 1.0417rem;
+  font-family: "Plus Jakarta Sans", "Outfit", system-ui, sans-serif;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+:root[data-design="modern"] .custominputbox textarea {
+  height: auto;
+  min-height: 64px;
+  padding: 8px var(--mi-pad-x);
+}
+
+:root[data-design="modern"] .custominputbox input:hover,
+:root[data-design="modern"] .custominputbox textarea:hover,
+:root[data-design="modern"] .custominputbox select:hover {
+  border-color: var(--mi-border-hover);
+}
+
+:root[data-design="modern"] .custominputbox input:focus,
+:root[data-design="modern"] .custominputbox textarea:focus,
+:root[data-design="modern"] .custominputbox select:focus {
+  border-color: var(--mi-border-focus);
+  box-shadow: 0 0 0 4px var(--mi-accent-soft);
+}
+
+:root[data-design="modern"] .custominputbox input:disabled,
+:root[data-design="modern"] .custominputbox textarea:disabled,
+:root[data-design="modern"] .custominputbox select:disabled {
+  background: var(--ds-color-panel2, #F8FAFC);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Checkbox wrapper (Checkbox.jsx) ships inline #ccc / 5px — match modern input
+   border + radius (FieldShell radius 8). Dark border handled in dark.css. */
+:root[data-design="modern"] .checkbox-shell {
+  border: 1px solid var(--ds-color-border, #E2E8F0) !important;
+  border-radius: 8px !important;
+}
+
+/* Any disabled input in modern view → lighter blue + not-allowed cursor.
+   :disabled ONLY (readonly fields like the date-range input must stay normal). */
+:root[data-design="modern"] input:disabled,
+:root[data-design="modern"] textarea:disabled,
+:root[data-design="modern"] select:disabled,
+:root[data-design="modern"] .form-control:disabled,
+:root[data-design="modern"] .form-select:disabled {
+  background-color: #EAF2FF !important;
+  color: #64748B !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+:root[data-design="modern"] .custominputbox label {
+  font-size: 0.9583rem;
+  font-weight: 500;
+  color: var(--mi-muted);
+  margin-bottom: 3px;
+  display: inline-block;
+}
+
+:root[data-design="modern"] .custominputbox .invalid-feedback,
+:root[data-design="modern"] .custominputbox .error-message {
+  color: var(--mi-danger);
+  font-size: 0.875rem;
+  margin-top: 2px;
+}
+
+/* EasyUI search input — vertically center the magnifier button on the field
+   (modern input is taller; legacy top:0 inline sat it too high). Old view keeps
+   its inline positioning. */
+:root[data-design="modern"] .easyuiSearchBtn {
+  top: 50% !important;
+  transform: translateY(-50%);
+  right: 6px !important;
+}
+
+/* AutoComplete (ReactSelect >500-option fallback) required cue.
+   Legacy `.required-fields` red border-bottom landed on the outer .p-autocomplete
+   span and peeked out below the rounded input. Move the marker onto the input box
+   itself with the modern required color (#FCA5A5), matching FieldShell. */
+:root[data-design="modern"] .p-autocomplete.required-fields {
+  border-bottom: none !important;
+}
+:root[data-design="modern"] .p-autocomplete.required-fields .p-autocomplete-input {
+  border-bottom: 1.5px solid #fca5a5 !important;
+}

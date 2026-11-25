@@ -1,0 +1,375 @@
+/* Modern clock-dial time picker */
+.mtp-wrapper {
+  position: relative;
+}
+
+/* closed-state input */
+.mtp-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.mtp-field .mtp-input {
+  width: 100%;
+  cursor: pointer;
+  padding-right: 30px;
+}
+.mtp-field .mtp-input:read-only {
+  background-color: #fff;
+}
+.mtp-field .mtp-clock-icon {
+  position: absolute;
+  right: 10px;
+  color: #1976d2;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.mtp-field .mtp-clock-icon:hover {
+  background: #e3edf9;
+}
+.mtp-field.mtp-disabled .mtp-input {
+  cursor: not-allowed;
+  background-color: #f1f3f5;
+}
+.mtp-field.mtp-disabled .mtp-clock-icon {
+  color: #adb5bd;
+}
+
+/* popup */
+.mtp-popup {
+  position: absolute;
+  z-index: 1100;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 208px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 5px 14px -4px,
+    rgba(0, 0, 0, 0.18) 0px 2px 6px -3px;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  animation: mtp-pop 0.12s ease-out;
+}
+@keyframes mtp-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* header: digital display + AM/PM */
+.mtp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f1f6fc;
+  border: 1px solid #e3edf9;
+  border-radius: 8px;
+  padding: 5px 8px;
+  margin-bottom: 8px;
+}
+.mtp-display {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #344050;
+}
+.mtp-display .mtp-seg {
+  padding: 1px 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mtp-display .mtp-seg.mtp-seg-active {
+  background: #1976d2;
+  color: #fff;
+}
+.mtp-display .mtp-colon {
+  color: #8a97a8;
+}
+.mtp-display .mtp-clock-glyph {
+  color: #1976d2;
+  font-size: 13px;
+  margin-right: 2px;
+}
+
+/* AM/PM sliding toggle */
+.mtp-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  width: 82px;
+  height: 26px;
+  padding: 2px;
+  background: #eef2f7;
+  border: 1px solid #dbe3ec;
+  border-radius: 999px;
+  box-sizing: border-box;
+}
+.mtp-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: #1976d2;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(25, 118, 210, 0.45);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+.mtp-switch.is-pm .mtp-switch-thumb {
+  transform: translateX(100%);
+}
+.mtp-switch button {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 50%;
+  background: transparent !important;
+  border: none !important;
+  color: #6b7785 !important;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.mtp-switch button:focus {
+  outline: none;
+  border-color: transparent !important;
+}
+.mtp-switch button.mtp-sw-active {
+  color: #ffffff !important;
+}
+
+/* clock face */
+.mtp-face {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  margin: 2px auto;
+  background: #f4f4ee;
+  border-radius: 50%;
+}
+.mtp-center {
+  position: absolute;
+  left: 84px;
+  top: 84px;
+  width: 7px;
+  height: 7px;
+  background: #1976d2;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.mtp-needle {
+  position: absolute;
+  left: 84px;
+  top: 18px;
+  width: 2px;
+  height: 66px;
+  background: #1976d2;
+  transform-origin: bottom center;
+  transition: transform 0.25s ease;
+  z-index: 1;
+}
+.mtp-num {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  color: #344050;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: background 0.15s, color 0.15s;
+  z-index: 2;
+  user-select: none;
+  line-height: 1;
+}
+.mtp-num:hover {
+  width: 17px;
+  height: 17px;
+  background: #e3edf9;
+  color: #1565c0;
+}
+.mtp-num.mtp-num-active {
+  width: 18px;
+  height: 18px;
+  background: #1976d2;
+  color: #fff !important;
+  font-weight: 700;
+}
+/* in-between minute markers */
+.mtp-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #c7ccc2;
+  transform: translate(-50%, -50%);
+  transition: background 0.15s, transform 0.15s;
+  z-index: 1;
+}
+.mtp-dot-active {
+  width: 6px;
+  height: 6px;
+  background: #1976d2;
+  z-index: 2;
+}
+
+/* footer actions */
+.mtp-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+.mtp-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 3px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mtp-btn-ghost {
+  background: transparent;
+  color: #6b7785;
+}
+.mtp-btn-primary {
+  background: #1976d2;
+  color: #fff;
+}
+.mtp-btn-primary:hover {
+  background: #1565c0;
+}
+
+/* keep existing floating label behaviour */
+.mtp-wrapper .label.lable.time_Lable {
+  z-index: 5;
+}
+
+/* =========================================================
+   DARK MODE — scoped to the modern dark theme only.
+   Tokens: panel #111827 · panel2 #0F172A · border #1E293B
+           text #E2E8F0 · muted #94A3B8 · accent #2DD4BF
+   ========================================================= */
+:root[data-design="modern"][data-theme="dark"] .mtp-wrapper .label.lable.time_Lable {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+  background: var(--ds-color-input-bg, #0F172A) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-field .mtp-clock-icon {
+  color: var(--ds-color-accent, #2DD4BF);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-field .mtp-clock-icon:hover {
+  background: var(--ds-color-panel, #111827);
+}
+
+/* popup surface */
+:root[data-design="modern"][data-theme="dark"] .mtp-popup {
+  background: var(--ds-color-panel, #111827);
+  color: var(--ds-color-text, #E2E8F0);
+  box-shadow: rgba(0, 0, 0, 0.55) 0px 8px 22px -6px,
+    rgba(0, 0, 0, 0.4) 0px 3px 8px -3px;
+  border: 1px solid var(--ds-color-border, #1E293B);
+}
+
+/* digital header */
+:root[data-design="modern"][data-theme="dark"] .mtp-header {
+  background: var(--ds-color-panel2, #0F172A);
+  border-color: var(--ds-color-border, #1E293B);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-display {
+  color: var(--ds-color-text, #E2E8F0);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-display .mtp-colon {
+  color: var(--ds-color-text-muted, #94A3B8);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-display .mtp-clock-glyph {
+  color: var(--ds-color-accent, #2DD4BF);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-display .mtp-seg-active {
+  background: var(--ds-color-accent, #2DD4BF);
+  color: #0B1120;
+}
+
+/* AM/PM slider */
+:root[data-design="modern"][data-theme="dark"] .mtp-switch {
+  background: var(--ds-color-panel2, #0F172A);
+  border-color: var(--ds-color-border, #1E293B);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-switch-thumb {
+  background: var(--ds-color-accent, #2DD4BF);
+  box-shadow: 0 1px 3px rgba(45, 212, 191, 0.45);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-switch button {
+  color: var(--ds-color-text-muted, #94A3B8) !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-switch button.mtp-sw-active {
+  color: #0B1120 !important;
+}
+
+/* clock face */
+:root[data-design="modern"][data-theme="dark"] .mtp-face {
+  background: var(--ds-color-panel2, #0F172A);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-needle,
+:root[data-design="modern"][data-theme="dark"] .mtp-center {
+  background: var(--ds-color-accent, #2DD4BF);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-num {
+  color: var(--ds-color-text, #E2E8F0);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-num:hover {
+  background: var(--ds-color-panel, #111827);
+  color: var(--ds-color-accent, #2DD4BF);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-num.mtp-num-active {
+  background: var(--ds-color-accent, #2DD4BF);
+  color: #0B1120 !important;
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-dot {
+  background: var(--ds-color-text-muted, #94A3B8);
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-dot-active {
+  background: var(--ds-color-accent, #2DD4BF);
+}
+
+/* OK button */
+:root[data-design="modern"][data-theme="dark"] .mtp-btn-primary {
+  background: var(--ds-color-accent, #2DD4BF);
+  color: #0B1120;
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+/* Optional "Now" (showNow prop). Two classes so the host theme's blanket
+   `.<theme>_theme button` colour cannot override it. */
+.mtp-actions .mtp-btn-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  background: #e8f3fd;
+  border: 1px solid #bcdcf6;
+  color: #1565c0;
+}
+.mtp-actions .mtp-btn-now:hover {
+  background: #d6e9fb;
+  border-color: #1565c0;
+}
+.mtp-actions .mtp-btn-now .pi {
+  font-size: 11px;
+}
+:root[data-design="modern"][data-theme="dark"] .mtp-actions .mtp-btn-now {
+  background: transparent;
+  border-color: var(--ds-color-accent, #2DD4BF);
+  color: var(--ds-color-accent, #2DD4BF);
+}

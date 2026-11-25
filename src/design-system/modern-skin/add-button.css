@@ -1,0 +1,80 @@
+/* Modern skin for inline "+" add buttons inside form rows — activates only when html[data-design="modern"] */
+
+:root[data-design="modern"] .card .row > [class*="col-"]:has(> button > .fa-plus-circle.new_record_pluse):not(:has(> *:not(button):not(.d-flex))) {
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  display: flex !important;
+  align-items: center;
+}
+
+:root[data-design="modern"] .card .row > [class*="col-"] > button > .fa-plus-circle.new_record_pluse {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--ds-color-accent, #0F766E);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  transition: transform 0.15s, background 0.15s;
+}
+
+:root[data-design="modern"] .card .row > [class*="col-"] > button:hover > .fa-plus-circle.new_record_pluse {
+  transform: scale(1.08);
+  background: var(--ds-color-accent, #0F766E);
+}
+
+:root[data-design="modern"] .card .row > [class*="col-"] > button:has(> .fa-plus-circle.new_record_pluse) {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  height: 32px;
+}
+
+/* Compound add-row: input + button as flex pair */
+:root[data-design="modern"] .card .row > [class*="col-"] > .d-flex:has(> button > .fa-plus-circle.new_record_pluse) {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+:root[data-design="modern"] .card .row > [class*="col-"] > .d-flex:has(> button > .fa-plus-circle.new_record_pluse) > .form-group,
+:root[data-design="modern"] .card .row > [class*="col-"] > .d-flex:has(> button > .fa-plus-circle.new_record_pluse) > .custominputbox {
+  flex: 1 1 var(--field-min-w, 165px);
+  margin-bottom: 0 !important;
+  width: auto !important;
+}
+
+/* Override Bootstrap .w-100 forcing 100% inside flex */
+:root[data-design="modern"] .card .row .d-flex > .w-100 {
+  width: auto !important;
+  flex: 1 1 0 !important;
+}
+
+/* Align inline action buttons (btn-success/primary/info/danger/warning) inside form rows to match field height */
+:root[data-design="modern"] .card .row > [class*="col-"]:has(> button.btn-success, > button.btn-primary, > button.btn-info, > button.btn-danger, > button.btn-warning, > button.btn-secondary) {
+  display: flex;
+  align-items: center;
+}
+
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-success,
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-primary,
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-info,
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-danger,
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-warning,
+:root[data-design="modern"] .card .row > [class*="col-"] > button.btn-secondary {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  white-space: nowrap;
+}

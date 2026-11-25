@@ -1,0 +1,25 @@
+/** Always-visible "which backend / which database" pill, bottom right. */
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { activeApiBase, getConnection } from "./connection";
+import "./sb.css";
+
+export default function ConnectionChip() {
+  const { pathname } = useLocation();
+  const { profileName } = getConnection();
+  const loggedIn = !!window.localStorage.getItem("token");
+  if (pathname === "/connect" || pathname.startsWith("/screen/")) return null;
+
+  return (
+    <div className="sbc-chip" title={activeApiBase()}>
+      <span>API: {activeApiBase().replace(/^https?:\/\//, "")}</span>
+      <Link to="/connect">change</Link>
+      {loggedIn && (
+        <>
+          <span>· DB: {profileName || "backend default"}</span>
+          <Link to="/db-connection">change</Link>
+        </>
+      )}
+    </div>
+  );
+}

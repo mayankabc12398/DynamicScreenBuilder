@@ -1,0 +1,71 @@
+/* Modern skin for legacy .card / .row layouts — activates only when html[data-design="modern"] */
+
+:root[data-design="modern"] .card {
+  background: var(--ds-color-panel, #FFFFFF) !important;
+  border: 1px solid var(--ds-color-border, #E2E8F0) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  /* Was `overflow: hidden` — it clipped absolutely-positioned popouts that
+     escape the card box (EasyUI search dropdown, tooltips, overlays), hiding
+     them in modern view. Old view never clipped the card. Table rounded
+     corners are unaffected: .table-container/.scrollView self-clip (table.css). */
+  overflow: visible;
+}
+
+:root[data-design="modern"] .card .card-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--ds-color-border, #E2E8F0) !important;
+  padding: 8px 12px !important;
+  font-family: "Sora", "Outfit", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ds-color-text, #0F172A);
+}
+
+:root[data-design="modern"] .card .card-body {
+  padding: 10px 10px !important;
+}
+
+/* Patient registration nested card flatten */
+:root[data-design="modern"] .patient_registration_card .card,
+:root[data-design="modern"] .patient_registration_card > .card {
+  box-shadow: none !important;
+}
+
+/* Hide legacy ".modern-only" injected sliders unless data-design=modern */
+.modern-only { display: none; }
+:root[data-design="modern"] .modern-only { display: inline-flex; }
+
+/* Per-card field-width grid via --field-min-w CSS var (set by Accordion injection) */
+/* :root[data-design="modern"] .card .row,
+:root[data-design="modern"] .patient_registration_card .row {
+  display: flex !important;
+  flex-wrap: wrap;
+  row-gap: 6px;
+  column-gap: 6px;
+  margin: 0 !important;
+} */
+
+/* :root[data-design="modern"] .card .row > [class*="col-"],
+:root[data-design="modern"] .patient_registration_card .row > [class*="col-"] {
+  flex: 1 1 var(--field-min-w, 165px);
+  min-width: 165px;
+  max-width: 100%;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+} */
+
+/* Wrapper cols (with nested .row) get full width */
+/* :root[data-design="modern"] .card .row > [class*="col-"]:has(> .row),
+:root[data-design="modern"] .patient_registration_card .row > [class*="col-"]:has(> .row) {
+  flex: 1 1 100%;
+  max-width: 100%;
+} */
+
+/* Placeholder cells hidden at md+ */
+@media (min-width: 768px) {
+  :root[data-design="modern"] .card .row > .d-md-none,
+  :root[data-design="modern"] .patient_registration_card .row > .d-md-none {
+    display: none !important;
+  }
+}

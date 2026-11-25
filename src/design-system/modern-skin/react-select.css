@@ -1,0 +1,269 @@
+/* Modern skin for legacy ReactSelect ONLY (react-select w/ classNamePrefix "remove-extrapadding react-select-font").
+   Vars scoped to react-select container — no global :root pollution, no input-element rules. */
+
+:root[data-design="modern"] .react-select-font__control,
+:root[data-design="modern"] .remove-extrapadding__control {
+  --rs-radius: 9px;
+  --rs-height: 2.25rem;
+  --rs-border: var(--ds-color-border, #E2E8F0);
+  --rs-border-focus: var(--ds-color-accent, #0F766E);
+  --rs-bg: var(--ds-color-input-bg, #FFFFFF);
+  --rs-text: var(--ds-color-text, #0F172A);
+  --rs-muted: var(--ds-color-text-muted, #64748B);
+  --rs-accent: var(--ds-color-accent, #0F766E);
+  --rs-accent-soft: var(--ds-color-accent-soft, rgba(15, 118, 110, 0.08));
+  --rs-panel: var(--ds-color-panel, #FFFFFF);
+  --rs-panel2: var(--ds-color-panel2, #F8FAFC);
+  --rs-grad: var(--ds-color-header-gradient, linear-gradient(110deg, #0F766E, #14B8A6));
+
+  min-height: var(--rs-height) !important;
+  height: auto !important;
+  margin: 3px 0 !important;
+  border-radius: var(--rs-radius) !important;
+  border: 1.5px solid var(--rs-border) !important;
+  background: var(--rs-bg) !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s, box-shadow 0.18s !important;
+  font-family: "Plus Jakarta Sans", "Outfit", system-ui, sans-serif !important;
+  font-size: 1.0417rem !important;
+  cursor: pointer !important;
+}
+
+/* React-select renders its menu in a portal (document.body) — replicate vars there too */
+:root[data-design="modern"] .react-select-font__menu,
+:root[data-design="modern"] .remove-extrapadding__menu {
+  --rs-radius: 9px;
+  --rs-border: var(--ds-color-border, #E2E8F0);
+  --rs-bg: var(--ds-color-input-bg, #FFFFFF);
+  --rs-text: var(--ds-color-text, #0F172A);
+  --rs-muted: var(--ds-color-text-muted, #64748B);
+  --rs-accent: var(--ds-color-accent, #0F766E);
+  --rs-accent-soft: var(--ds-color-accent-soft, rgba(15, 118, 110, 0.08));
+  --rs-panel: var(--ds-color-panel, #FFFFFF);
+  --rs-grad: var(--ds-color-header-gradient, linear-gradient(110deg, #0F766E, #14B8A6));
+  --rs-muted: var(--ds-color-text-muted, #64748B);
+}
+
+:root[data-design="modern"] .react-select-font__control:hover,
+:root[data-design="modern"] .remove-extrapadding__control:hover {
+  border-color: rgba(15, 118, 110, 0.35) !important;
+}
+
+:root[data-design="modern"] .react-select-font__control--is-focused,
+:root[data-design="modern"] .remove-extrapadding__control--is-focused {
+  border-color: var(--rs-border-focus) !important;
+  box-shadow: 0 0 0 4px var(--rs-accent-soft) !important;
+}
+
+:root[data-design="modern"] .react-select-font__control--is-disabled,
+:root[data-design="modern"] .remove-extrapadding__control--is-disabled {
+  background: var(--rs-panel2) !important;
+  opacity: 0.7;
+}
+
+:root[data-design="modern"] .react-select-font__single-value,
+:root[data-design="modern"] .remove-extrapadding__single-value {
+  color: var(--rs-text) !important;
+  font-size: 1.0417rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+:root[data-design="modern"] .react-select-font__placeholder,
+:root[data-design="modern"] .remove-extrapadding__placeholder {
+  color: var(--rs-muted) !important;
+  font-family: inherit !important;
+}
+
+:root[data-design="modern"] .react-select-font__indicators,
+:root[data-design="modern"] .remove-extrapadding__indicators {
+  align-items: center !important;
+}
+
+:root[data-design="modern"] .react-select-font__indicator,
+:root[data-design="modern"] .remove-extrapadding__indicator,
+:root[data-design="modern"] .react-select-font__dropdown-indicator,
+:root[data-design="modern"] .remove-extrapadding__dropdown-indicator,
+:root[data-design="modern"] .react-select-font__clear-indicator,
+:root[data-design="modern"] .remove-extrapadding__clear-indicator,
+:root[data-design="modern"] .custom-dropdown-indicator {
+  color: var(--rs-muted) !important;
+  padding: 2px 6px !important;
+  transition: color 0.15s, transform 0.18s !important;
+  cursor: pointer !important;
+}
+
+:root[data-design="modern"] .react-select-font__control--is-focused .react-select-font__dropdown-indicator,
+:root[data-design="modern"] .remove-extrapadding__control--is-focused .remove-extrapadding__dropdown-indicator,
+:root[data-design="modern"] .react-select-font__control--menu-is-open .custom-dropdown-indicator,
+:root[data-design="modern"] .react-select-font__control--menu-is-open .react-select-font__dropdown-indicator {
+  color: var(--rs-accent) !important;
+}
+
+:root[data-design="modern"] .react-select-font__control--menu-is-open .custom-dropdown-indicator svg,
+:root[data-design="modern"] .react-select-font__control--menu-is-open .react-select-font__dropdown-indicator svg,
+:root[data-design="modern"] .remove-extrapadding__control--menu-is-open .remove-extrapadding__dropdown-indicator svg {
+  transform: rotate(180deg);
+}
+
+:root[data-design="modern"] .react-select-font__clear-indicator:hover,
+:root[data-design="modern"] .remove-extrapadding__clear-indicator:hover {
+  color: var(--ds-color-danger, #F43F5E) !important;
+}
+
+:root[data-design="modern"] .react-select-font__indicator-separator,
+:root[data-design="modern"] .remove-extrapadding__indicator-separator {
+  display: none !important;
+}
+
+:root[data-design="modern"] .react-select-font__value-container,
+:root[data-design="modern"] .remove-extrapadding__value-container {
+  padding: 2px 10px !important;
+}
+
+:root[data-design="modern"] .react-select-font__menu,
+:root[data-design="modern"] .remove-extrapadding__menu {
+  border-radius: 12px !important;
+  background: var(--rs-panel) !important;
+  border: 1px solid var(--rs-border) !important;
+  box-shadow: 0 20px 48px -18px rgba(15, 23, 42, 0.4), 0 0 0 4px var(--rs-accent-soft) !important;
+  overflow: hidden !important;
+  margin-top: 6px !important;
+  font-family: inherit !important;
+  animation: rs-pop 0.18s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes rs-pop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+:root[data-design="modern"] .react-select-font__menu-list,
+:root[data-design="modern"] .remove-extrapadding__menu-list {
+  padding: 4px !important;
+  max-height: 260px !important;
+  scrollbar-width: thin !important;
+}
+
+:root[data-design="modern"] .react-select-font__menu-list::-webkit-scrollbar,
+:root[data-design="modern"] .remove-extrapadding__menu-list::-webkit-scrollbar {
+  width: 5px;
+}
+:root[data-design="modern"] .react-select-font__menu-list::-webkit-scrollbar-thumb,
+:root[data-design="modern"] .remove-extrapadding__menu-list::-webkit-scrollbar-thumb {
+  background: var(--rs-border);
+  border-radius: 3px;
+}
+
+:root[data-design="modern"] .react-select-font__option,
+:root[data-design="modern"] .remove-extrapadding__option {
+  padding: 7px 10px !important;
+  border-radius: 8px !important;
+  margin-bottom: 1px !important;
+  font-size: 1.0417rem !important;
+  font-weight: 500 !important;
+  color: var(--rs-text) !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  border: none !important;
+  transition: background 0.12s, color 0.12s, transform 0.12s !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+:root[data-design="modern"] .react-select-font__option--is-focused,
+:root[data-design="modern"] .remove-extrapadding__option--is-focused {
+  background: var(--rs-accent-soft) !important;
+  color: var(--rs-text) !important;
+}
+
+:root[data-design="modern"] .react-select-font__option--is-selected,
+:root[data-design="modern"] .remove-extrapadding__option--is-selected {
+  background: var(--rs-grad) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px -6px var(--rs-accent) !important;
+}
+
+:root[data-design="modern"] .react-select-font__option--is-disabled,
+:root[data-design="modern"] .remove-extrapadding__option--is-disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+:root[data-design="modern"] .react-select-font__menu-notice,
+:root[data-design="modern"] .remove-extrapadding__menu-notice,
+:root[data-design="modern"] .react-select-font__menu-notice--no-options,
+:root[data-design="modern"] .remove-extrapadding__menu-notice--no-options {
+  color: var(--rs-muted) !important;
+  font-size: 1.0417rem !important;
+  padding: 14px 10px !important;
+  text-align: center !important;
+  font-style: italic !important;
+}
+
+:root[data-design="modern"] .react-select-font__group-heading,
+:root[data-design="modern"] .remove-extrapadding__group-heading {
+  color: var(--rs-muted) !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4px !important;
+  padding: 8px 10px 4px !important;
+}
+
+:root[data-design="modern"] .react-select-font__multi-value,
+:root[data-design="modern"] .remove-extrapadding__multi-value {
+  background: var(--rs-accent-soft) !important;
+  border-radius: 6px !important;
+  margin: 2px !important;
+}
+
+:root[data-design="modern"] .react-select-font__multi-value__label,
+:root[data-design="modern"] .remove-extrapadding__multi-value__label {
+  color: var(--rs-accent) !important;
+  font-size: 0.9583rem !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+}
+
+:root[data-design="modern"] .react-select-font__multi-value__remove,
+:root[data-design="modern"] .remove-extrapadding__multi-value__remove {
+  color: var(--rs-accent) !important;
+  border-radius: 0 6px 6px 0 !important;
+  cursor: pointer !important;
+}
+
+:root[data-design="modern"] .react-select-font__multi-value__remove:hover,
+:root[data-design="modern"] .remove-extrapadding__multi-value__remove:hover {
+  background: var(--ds-color-danger, #F43F5E) !important;
+  color: #fff !important;
+}
+
+:root[data-design="modern"] .react-select-font__control--is-focused .react-select-font__placeholder,
+:root[data-design="modern"] .remove-extrapadding__control--is-focused .remove-extrapadding__placeholder {
+  color: var(--rs-accent) !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .react-select-font__control,
+:root[data-design="modern"][data-theme="dark"] .remove-extrapadding__control {
+  background: var(--ds-color-input-bg, #0F172A) !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .react-select-font__menu,
+:root[data-design="modern"][data-theme="dark"] .remove-extrapadding__menu {
+  background: var(--ds-color-panel, #111827) !important;
+}
+
+:root[data-design="modern"][data-theme="dark"] .react-select-font__option--is-focused,
+:root[data-design="modern"][data-theme="dark"] .remove-extrapadding__option--is-focused {
+  background: rgba(45, 212, 191, 0.12) !important;
+}
+
+:root[data-design="modern"] .react-select-font__placeholder[style*="background"],
+:root[data-design="modern"] .remove-extrapadding__placeholder[style*="background"] {
+  background: var(--rs-bg) !important;
+  color: var(--rs-muted) !important;
+  padding: 0 4px !important;
+  border-radius: 3px !important;
+}
