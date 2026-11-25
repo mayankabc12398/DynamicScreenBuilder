@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { PageIconSVG } from "../SvgIcons";
 import { GetSubScreenMenuByRole } from "../../networkServices/EDP/edpApi";
 import { useSelector } from "react-redux";
-import EDPSeeMoreList from "../../pages/EDP/EDPSeeMoreList";
+// Standalone builder: hospital sub-screen menu replaced by a stub.
+import EDPSeeMoreList from "@app/sb/stubs/EDPSeeMoreList";
 import SlideScreen from "../front-office/SlideScreen";
 import SeeMoreSlideScreen from "./SeeMoreSlideScreen";
 import { BindFrameMenuByRoleID } from "../../store/reducers/common/CommonExportFunction";

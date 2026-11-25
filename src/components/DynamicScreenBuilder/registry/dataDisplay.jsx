@@ -59,7 +59,8 @@ import { resolveTokens, tokensToCssVars } from "../theme/tokens";
 import { formGridVars } from "./layout";
 import { flatten } from "../utils/tree";
 import { validateValue } from "../utils/validation";
-import EmergencySeeMoreList from "@app/components/commonComponents/EmergencySeeMoreList";
+// Standalone builder: hospital frame menu replaced by stubs (src/sb/stubs).
+import EmergencySeeMoreList from "@app/sb/stubs/EmergencySeeMoreList";
 import SlideScreen from "@app/components/front-office/SlideScreen";
 import NO_IMAGE from "@app/assets/image/avatar.gif";
 import SeeMoreSlideScreen from "@app/components/UI/SeeMoreSlideScreen";
@@ -69,8 +70,8 @@ import { appModal, APP_MODAL_OPTIONS, customModalOptions } from "../utils/appMod
 import { propNamesOf, standInProps } from "../utils/componentProps";
 import { toast } from "react-toastify";
 import { useRuntime } from "../runtime/RuntimeContext";
-import { EMERGENCY_FRAME_COMPONENTS } from "@app/components/commonComponents/EmergencySeeMoreList";
-import EMGPersonalDetailsOfPatient from "@app/components/FrameMenu/Emergency/EMGPersonalDetailsOfPatient";
+import { EMERGENCY_FRAME_COMPONENTS } from "@app/sb/stubs/EmergencySeeMoreList";
+import EMGPersonalDetailsOfPatient from "@app/sb/stubs/EMGPersonalDetailsOfPatient";
 
 /* ------------------------------------------------------------ sample data */
 

@@ -1,9 +1,8 @@
 import moment from "moment";
 import { Line, Bar, Pie, Doughnut, Bubble, PolarArea } from "react-chartjs-2";
 import { generateColors } from "./utils";
-import ConcetForm from "../pages/doctor/OPD/ConcetForm";
-import ViewLabReport from "../pages/doctor/OPD/ViewLabReport";
-import VitalSign from "../pages/doctor/OPD/VitalSign";
+// Standalone builder: unused import of a hospital page removed (was ConcetForm).
+// Standalone builder: unused imports of hospital pages removed (ViewLabReport, VitalSign).
 import i18next from "i18next";
 import { register } from "../serviceWorker";
 import { formatAmount } from "./ustil2";

@@ -30,7 +30,7 @@ import dataDisplay from "./dataDisplay";
 import cardList from "./cardList";
 import layout from "./layout";
 import charts from "./charts";
-import payment from "./payment";
+// Standalone builder: the hospital payment panel (registry/payment.jsx) is not included.
 import calendarTable from "./calendarTable";
 import nestedRowTable from "./nestedRowTable";
 
@@ -56,7 +56,7 @@ export const COMMON_CATEGORY = { key: "Common", label: "Common Components", colo
 export const categoryColor = (key) =>
   key === COMMON_CATEGORY.key ? COMMON_CATEGORY.color : (CATEGORIES.find((c) => c.key === key) || {}).color || "#64748b";
 
-const ALL = [...layout, ...formControls, ...payment, ...dataDisplay, ...calendarTable, ...nestedRowTable, ...cardList, ...charts];
+const ALL = [...layout, ...formControls, ...dataDisplay, ...calendarTable, ...nestedRowTable, ...cardList, ...charts];
 
 /** type -> definition */
 export const REGISTRY = ALL.reduce((acc, def) => {

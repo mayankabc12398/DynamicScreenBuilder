@@ -44,7 +44,10 @@ import { tr } from "../utils/i18n";
 
 // The page's two big modals, loaded when first opened rather than with the builder.
 const SlotModal = lazy(() => import("@app/components/modalComponent/Utils/SlotModal"));
-const OPDServiceBooking = lazy(() => import("@app/pages/frontOffice/OPD/OPDServiceBooking"));
+// Standalone builder: the hospital OPD Service Booking page is not included.
+const OPDServiceBooking = () => (
+  <div style={{ padding: 24 }}>{tr("OPD Service Booking is not available in the standalone screen builder.")}</div>
+);
 
 // ── Colour ramp: the page's own, flipped on the modern dark skin ────────────
 const C_LIGHT = {
