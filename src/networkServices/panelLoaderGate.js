@@ -17,19 +17,6 @@ let watchdog;
 
 const onInteract = () => disarmPanelLoaderSuppress();
 
-export function armPanelLoaderSuppress() {
-  suppressed = true;
-  if (typeof document === "undefined") return;
-  if (!armed) {
-    armed = true;
-    // capture-phase so we catch the first real interaction inside the panel.
-    document.addEventListener("pointerdown", onInteract, true);
-    document.addEventListener("keydown", onInteract, true);
-  }
-  clearTimeout(watchdog);
-  // failsafe: never keep the overlay suppressed indefinitely.
-  watchdog = setTimeout(disarmPanelLoaderSuppress, 12000);
-}
 
 export function disarmPanelLoaderSuppress() {
   suppressed = false;

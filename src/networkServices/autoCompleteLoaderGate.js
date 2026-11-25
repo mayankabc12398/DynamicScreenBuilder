@@ -47,7 +47,6 @@ export function setAutoCompleteSearching(isSearching) {
   }
 }
 
-export const isAutoCompleteLoaderSuppressed = () => suppressed;
 
 export const subscribeAutoCompleteLoader = (fn) => {
   subs.add(fn);

@@ -25,17 +25,6 @@ export const getApiEndpoints = async (controller) =>
     ...SILENT,
   });
 
-/**
- * The whole catalog in one call. Parameters are omitted unless asked for —
- * with them the payload runs to megabytes across a few hundred controllers.
- */
-export const getApiCatalog = async ({ includeParameters = false, search = "" } = {}) => {
-  const q = new URLSearchParams();
-  if (includeParameters) q.set("includeParameters", "true");
-  if (search) q.set("search", search);
-  const qs = q.toString();
-  return makeApiRequest(`${apiUrls.ScreenBuilderGetCatalog}${qs ? `?${qs}` : ""}`, { method: "get", ...SILENT });
-};
 
 /* -------------------------------------------------------------------------- */
 /*  screen storage                                                            */
@@ -51,8 +40,6 @@ export const getApiCatalog = async ({ includeParameters = false, search = "" } =
 const post = (url, data) => makeApiRequest(url, { method: "post", data, ...SILENT });
 const get = (url) => makeApiRequest(url, { method: "get", ...SILENT });
 
-/** Whether the storage tables exist yet. */
-export const screensInstalled = async () => get(apiUrls.ScreenBuilderIsInstalled);
 
 /** Creates the tables. Safe to call twice — the script is CREATE TABLE IF NOT EXISTS. */
 export const installScreenStorage = async () => post(apiUrls.ScreenBuilderInstall, {});
@@ -166,26 +153,12 @@ export const bindRoleMasterList = async () => get(apiUrls.ScreenBuilderBindRoleM
 export const getRoleEmployees = async (roleId) =>
   get(`${apiUrls.ScreenBuilderGetRoleEmployees}?roleId=${encodeURIComponent(roleId ?? "")}`);
 
-/** Every box one employee holds under one role, on every screen: [{ screenKey, nodeId, nodeName, … }]. */
-export const getEmployeeScreenAccess = async (employeeId, roleId) =>
-  get(
-    `${apiUrls.ScreenBuilderGetEmployeeScreenAccess}?employeeId=${encodeURIComponent(
-      employeeId ?? "",
-    )}&roleId=${encodeURIComponent(roleId ?? "")}`,
-  );
 
-/** Replaces one employee's boxes on one screen under one role: { screenKey, employeeID, employeeName, roleID, nodes: [{ nodeId, nodeName }] }. */
-export const saveEmployeeScreenAccess = async (payload) => post(apiUrls.ScreenBuilderSaveEmployeeScreenAccess, payload);
 
 /** Every grant under one role, all screens and employees: [{ screenKey, nodeId, nodeName, employeeID, … }]. */
 export const getRoleScreenAccess = async (roleId) =>
   get(`${apiUrls.ScreenBuilderGetRoleScreenAccess}?roleId=${encodeURIComponent(roleId ?? "")}`);
 
-/**
- * Replaces several employees' boxes on one screen under one role, in one transaction:
- * { screenKey, roleID, employees: [{ employeeID, employeeName, nodes: [{ nodeId, nodeName }] }] }.
- */
-export const saveRoleScreenAccess = async (payload) => post(apiUrls.ScreenBuilderSaveRoleScreenAccess, payload);
 
 /**
  * Replaces several employees' boxes on several screens under one role, in one transaction:
@@ -212,9 +185,3 @@ export const getScreenPageAccess = async (screenKey) =>
 /** { screenKey, displayName, menuID, roles: [roleId], employees: [{ roleID, employeeID }] } — complete lists; left-out rows are switched off. */
 export const saveScreenPageAccess = async (payload) => post(apiUrls.ScreenPageAccessSaveAccess, payload);
 
-/** Active employees by name or id. `take = 0` returns every active employee. */
-export const searchAccessUsers = async (search = "", take = 50) => {
-  const q = new URLSearchParams({ take: String(take) });
-  if (search) q.set("search", search);
-  return get(`${apiUrls.ScreenBuilderSearchAccessUsers}?${q.toString()}`);
-};
