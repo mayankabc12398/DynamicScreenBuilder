@@ -9,7 +9,7 @@
  * `allRoutes` is still exported with the same shape: copied app code
  * (pages/EDP/EDPConfiguration/RenderComponents.jsx) reads it.
  */
-import React, { Fragment, Suspense, lazy, useContext, useEffect, useState, useTransition } from "react";
+import { Fragment, Suspense, lazy, useContext, useEffect, useState, useTransition } from "react";
 import { DesignContext } from "@app/providers/DesignProvider";
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Loading from "@app/components/loader/Loading";
@@ -34,7 +34,7 @@ import IdleLogout from "../components/commonComponents/IdleLogout.jsx";
 import ConnectionChip from "@app/sb/ConnectionChip.jsx";
 
 /** Where a signed-in user lands. The main app's /dashboard is not part of this project. */
-export const HOME = "/dynamic-screen-builder";
+const HOME = "/dynamic-screen-builder";
 
 function PageFade({ children }) {
   const { pathname } = useLocation();
@@ -188,7 +188,7 @@ function RenderRoute() {
 
 export default RenderRoute;
 
-export const allRoutes = {
+const allRoutes = {
   commonRoutes: [
     {
       // Step 1: which backend. Before login, because login goes to that backend.
@@ -209,14 +209,6 @@ export const allRoutes = {
     },
   ],
   roleRoutes: [
-    {
-      // Step 2: which database screens are saved into.
-      Guard: Authenticated,
-      layout: Layout,
-      path: "/db-connection",
-      component: lazy(() => import("@app/sb/DbConnectionPage.jsx")),
-      exact: true,
-    },
     {
       Guard: Authenticated,
       layout: Layout,

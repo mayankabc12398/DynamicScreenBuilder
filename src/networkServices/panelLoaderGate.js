@@ -18,7 +18,7 @@ let watchdog;
 const onInteract = () => disarmPanelLoaderSuppress();
 
 
-export function disarmPanelLoaderSuppress() {
+function disarmPanelLoaderSuppress() {
   suppressed = false;
   clearTimeout(watchdog);
   if (armed && typeof document !== "undefined") {

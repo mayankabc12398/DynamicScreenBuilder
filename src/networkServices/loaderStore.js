@@ -75,7 +75,7 @@ export function done() {
 }
 
 /** Failsafe — clears everything and hides. Called by the watchdog. */
-export function reset() {
+function reset() {
   count = 0;
   clearTimeout(showT);
   clearTimeout(hideT);

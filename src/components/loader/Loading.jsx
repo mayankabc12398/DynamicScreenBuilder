@@ -1,4 +1,4 @@
-import React, { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 // import logoitdose from "../../assets/image/logoitdose.png";
 import logoitdose from "../../assets/image/logo.png";
 import useDesignMode from "@app/hooks/useDesignMode";

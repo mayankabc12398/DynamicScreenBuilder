@@ -1,4 +1,3 @@
-import React from "react";
 import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
 import SaveButton from "@components/UI/SaveButton";

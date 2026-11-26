@@ -1,4 +1,3 @@
-import React from "react";
 import Heading from "@app/components/UI/Heading";
 import FilterBar from "./FilterBar";
 import SmartTable from "./SmartTable";

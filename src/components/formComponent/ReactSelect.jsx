@@ -171,11 +171,10 @@
 // export default ReactSelect;
 
 import { Tooltip } from "primereact/tooltip";
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useRef, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import Select, { components } from "react-select";
 import { useLocalStorage } from "../../utils/hooks/useLocalStorage";
-import AutoCompleteReactSelect from "./AutoCompleteReactSelect";
 import CustomAutoCompleteReactSelect from "./AutoCompleteReactSelect";
 import { DesignContext } from "@app/providers/DesignProvider";
 import { SmoothSelect } from "@app/components/modern";

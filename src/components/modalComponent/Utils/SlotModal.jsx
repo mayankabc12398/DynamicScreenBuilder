@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import DatePicker from "../../formComponent/DatePicker";
 import LabeledInput from "../../formComponent/LabeledInput";
 import { GetDoctorAppointmentTimeSlotConsecutive } from "../../../networkServices/opdserviceAPI";
 import moment from "moment";
-import { Tooltip } from "primereact/tooltip";
 import { handleModifiedDoctorSlotData } from "../../../utils/utils";
 
 const SlotModal = (props) => {

@@ -1,6 +1,5 @@
-import { BindReportData } from "./CollectionReportApi";
-import { BindVendor } from "./InventoryApi";
-
+// URL strings only. Importing API modules here created a cycle back into store.js
+// (logoutSlice -> apiEndpoints -> CollectionReportApi -> store) and broke start-up.
 export const apiUrls = {
   // onBoarding
   // onBoarding

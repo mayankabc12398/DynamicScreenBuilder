@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Breadcrumb from "../Breadcrumb";
-import { useLocation, useNavigate } from "react-router-dom";
-import { PageIconSVG } from "../SvgIcons";
+import { useLocation } from "react-router-dom";
 import { GetSubScreenMenuByRole } from "../../networkServices/EDP/edpApi";
 import { useSelector } from "react-redux";
 // Standalone builder: hospital sub-screen menu replaced by a stub.

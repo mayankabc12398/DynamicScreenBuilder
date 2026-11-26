@@ -7,7 +7,7 @@ import makeApiRequest from "./axiosInstance";
 
 
 // GET APPOINTMENT DETAIL
-export const getAppointmentDetailAPIData = async (params) => {
+const getAppointmentDetailAPIData = async (params) => {
   console.log("PPPDDDAA", params);
   store.dispatch(setLoading(true));
   try {

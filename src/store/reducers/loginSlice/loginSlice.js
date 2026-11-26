@@ -1,12 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import makeApiRequest from "../../../networkServices/axiosInstance";
 import { apiUrls } from "../../../networkServices/apiEndpoints";
-import { getLocalIP, notify } from "../../../utils/utils";
+import { notify } from "../../../utils/utils";
 import { setLoading } from "../loadingSlice/loadingSlice";
 import { useLocalStorage } from "../../../utils/hooks/useLocalStorage";
 import store from "../../store";
 
-import { jwtDecode } from "jwt-decode";
 
 const initialState = {
   user: {},

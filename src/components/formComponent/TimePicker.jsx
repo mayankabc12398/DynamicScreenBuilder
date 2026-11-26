@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import moment from "moment";
 import { Calendar } from "primereact/calendar";
 import { notify } from "../../utils/ustil2";
@@ -67,7 +67,7 @@ import { translateIfKnown } from "@components/WrapTranslate";
  * Without AM/PM, an hour 13-23 is read as 24-hour time; an hour 1-12 keeps the AM/PM of the
  * time already in the box. Hour 0 is only accepted as 24-hour time (00:00 - 00:59).
  */
-export const parseManualTime = (text, current) => {
+const parseManualTime = (text, current) => {
   const m = String(text ?? "")
     .trim()
     .match(/^(d{1,2})s*[:.]s*(d{1,2})s*([AaPp])?.?s*([Mm])?.?$/);

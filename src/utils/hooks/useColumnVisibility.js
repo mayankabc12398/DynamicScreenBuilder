@@ -61,7 +61,7 @@ const slug = (s) =>
  *     SHARE one stored state.
  * Always pass an explicit tableId when you can; the hook prefers it.
  */
-export function getTableKey(thead) {
+function getTableKey(thead) {
   if (!Array.isArray(thead) || thead.length === 0) return "default-table";
 
   const names = thead
@@ -136,7 +136,7 @@ const readVisibility = (tableId, columns) => {
  *   resetToDefaults: () => void
  * }}
  */
-export function useColumnVisibility(tableId, columns, thead) {
+function useColumnVisibility(tableId, columns, thead) {
   // Explicit id wins; otherwise derive from thead. See getTableKey tradeoffs.
   const resolvedId = useMemo(
     () => (tableId ? String(tableId) : getTableKey(thead)),

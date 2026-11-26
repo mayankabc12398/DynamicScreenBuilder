@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Tooltip } from "primereact/tooltip";
 import { DesignContext } from "@app/providers/DesignProvider";

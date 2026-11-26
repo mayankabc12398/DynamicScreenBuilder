@@ -30,20 +30,6 @@ const getChannel = (() => {
   };
 })();
 
-export const broadcastSessionChange = (type = "ROLE_CHANGED") => {
-  const message = { type, from: tabId, at: Date.now() };
-  const channel = getChannel();
-  if (channel) {
-    channel.postMessage(message);
-    return;
-  }
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(message));
-    window.localStorage.removeItem(STORAGE_KEY);
-  } catch (e) {
-    // storage unavailable — nothing else to fall back to
-  }
-};
 
 let reloadScheduled = false;
 

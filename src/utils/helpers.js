@@ -155,77 +155,7 @@ export const applyRootThemeClass = () => {
   if (target) root.classList.add(target);
 };
 
-export const toggleFullScreen = () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
-};
 
-export const Tabfunctionality = (event) => {
-  if (event.key === "Tab") {
-    const currentInput = event.target;
-    const inputs = Array.from(document.querySelectorAll("input[required]"));
-    const currentIndex = inputs.findIndex((input) => input === currentInput);
 
-    if (currentIndex !== -1) {
-      const nextIndex = (currentIndex + 1) % inputs.length; // Get the index of the next required input
-      inputs[nextIndex].focus(); // Focus on the next required input
-      event.preventDefault(); // Prevent the default tab behavior
-    }
-  }
-};
 
-export const TruncatedLabel = (lable, length) => {
-  if (typeof lable === "string" || typeof lable === "number") {
-    const labelAsString = typeof lable === "number" ? lable.toString() : lable;
-    if (length === undefined) {
-      return labelAsString.length > 15
-        ? labelAsString.substring(0, 15) + "..."
-        : labelAsString;
-    } else {
-      return labelAsString.length > 8
-        ? labelAsString.substring(0, 8) + "..."
-        : labelAsString;
-    }
-  }
-};
 
-export const getSubString = (value, maxlength) => {
-  if (value?.length > maxlength) {
-    return value?.substring(0, maxlength) + "...";
-  } else {
-    return value
-  }
-};
-
-/**
- * Tab / Shift+Tab inside an item-entry grid (GRN, Purchase Order): move straight to the next /
- * previous editable box of the grid, in the order they appear. Put it on the element that wraps the
- * grid (onKeyDown), so every box inside is covered. Read-only, disabled, hidden and tabindex="-1"
- * boxes (the date pickers) are skipped, as they are with the native Tab. At the first / last box the
- * key is left alone, so Tab still leaves the grid normally.
- */
-export const handleGridTabNavigation = (event) => {
-  if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return;
-
-  const container = event.currentTarget;
-  const fields = Array.from(
-    container.querySelectorAll(
-      'input:not([type="hidden"]):not([type="checkbox"]):not([disabled]):not([readonly]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([readonly]):not([tabindex="-1"])',
-    ),
-  ).filter((el) => el.offsetParent !== null);
-
-  const current = fields.indexOf(event.target);
-  if (current === -1) return;
-
-  const next = fields[current + (event.shiftKey ? -1 : 1)];
-  if (!next) return;
-
-  event.preventDefault();
-  next.focus();
-  if (typeof next.select === "function" && next.type !== "number") next.select();
-};

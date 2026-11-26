@@ -135,18 +135,6 @@ export const GetSubScreenMenuByRole = async (vSubMenuID, vIsFrameMenu) => {
 
 
 
-// ---- Import Rate List (/import-rate-list) ----
-const importRateListRequest = async (url, options = { method: "get" }) => {
-  store.dispatch(setLoading(true));
-  try {
-    const data = await makeApiRequest(url, options);
-    store.dispatch(setLoading(false));
-    return data;
-  } catch (error) {
-    store.dispatch(setLoading(false));
-    throw error;
-  }
-};
 
 
 

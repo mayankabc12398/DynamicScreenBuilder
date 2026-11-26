@@ -15,10 +15,9 @@
  *   chip  the label sits in a rounded badge
  *   dot   a small circle in front of the label
  */
-import React from "react";
 
 /** The paint an option asks for, or null when it asks for none. */
-export function optionPaint(option) {
+function optionPaint(option) {
   if (!option || !option.paint) return null;
   const { bg = "", fg = "", border = "", paint } = option;
   if (!bg && !fg && !border) return null;

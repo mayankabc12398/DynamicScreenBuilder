@@ -34,40 +34,8 @@ export const translateIfKnown = (t, text) => {
     return translated === text.toUpperCase() ? text : translated
 }
 
-/**
- * Translate the `label` of a static option list ({ label, value }) at the usage site
- * without mutating it. Non-string labels and API-driven lists should not be passed here.
- */
-export const translateOptions = (options, t) => {
-    if (!Array.isArray(options)) return options
-    return options.map((o) => (o && typeof o === "object" && typeof o.label === "string" && o.label.trim() ? { ...o, label: t(o.label) } : o))
-}
-
-export const translateHead = (heads, t) => {
-    if (!Array.isArray(heads)) return heads
-    return heads.map((h) => {
-        if (typeof h === "string") return h.trim() ? t(h) : h
-        if (h && typeof h === "object" && typeof h.name === "string" && h.name.trim()) return { ...h, name: t(h.name) }
-        return h
-    })
-}
 
 
-export const transformDataInTranslate = (data,t) => {
-    // const [t] = useTranslation()
-    return data.map((item) => {
-      let newItem = {};
-  
-      Object.keys(item).forEach((key) => {
-        // Convert keys: Replace "_" with " " and add t("...")
-        let newKey = t(`${key.replace(/_/g, " ")}`);
-  
-        // Assign the transformed key-value pair
-        newItem[newKey] = item[key];
-      });
-  
-      return newItem;
-    });
-  };
+
   
   

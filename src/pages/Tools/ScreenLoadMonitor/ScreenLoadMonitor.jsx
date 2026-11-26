@@ -8,7 +8,7 @@
  * Kept simple on purpose: four numbers, then one table at a time
  * (By screen / By user / Recent). Looks come from CacheManager.css.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import {

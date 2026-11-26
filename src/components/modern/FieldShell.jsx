@@ -1,4 +1,3 @@
-import React from "react";
 import { X } from "lucide-react";
 import { useTheme } from "@app/hooks/useTheme";
 import { FIELD_H } from "./hooks";

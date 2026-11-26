@@ -44,7 +44,7 @@ installLoader(axiosInstance);
 
 let globalErrorFlag = false;
 
-export const debounce = (func, wait) => {
+const debounce = (func, wait) => {
   let timeout;
   return function (...args) {
     const context = this;
@@ -101,7 +101,7 @@ const extractFirstError = (errors) => {
 };
 
 // Build a proper, status-aware error message for any failed request.
-export const getApiErrorMessage = (error) => {
+const getApiErrorMessage = (error) => {
   // No response => network down, CORS, DNS, or aborted request.
   if (!error?.response) {
     if (error?.code === "ERR_NETWORK")

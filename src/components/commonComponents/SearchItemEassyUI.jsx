@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import EasyUI from "../EasyUI/EasyUI";
 import { useTranslation } from "react-i18next";
 import Input from "../formComponent/Input";
-import { Oldpatientsearch } from "../../networkServices/opdserviceAPI";
-import { BIND_TABLE_BY_MED_FIRST_NAME, BIND_TABLE_OLDPATIENTSEARCH } from "../../utils/constant";
-import { debounce, focusInput } from "../../utils/utils";
+import { debounce } from "../../utils/utils";
 
 /** Narrowest a floating result grid may be, whatever the field's own width. */
 const FLOAT_MIN_WIDTH = 620;

@@ -1,5 +1,5 @@
 import { Tooltip } from "primereact/tooltip";
-import React, { useCallback, useContext } from "react";
+import { useCallback, useContext } from "react";
 import { DesignContext } from "@app/providers/DesignProvider";
 
 function LabeledInput({ label, value, className, style = {}, isClickable = false, substringEnd = 27, isNote = false, PatientType }) {

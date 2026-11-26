@@ -1,4 +1,3 @@
-import React from "react";
 import { useTheme } from "@app/hooks/useTheme";
 import { Search } from "lucide-react";
 import TextField from "./TextField";

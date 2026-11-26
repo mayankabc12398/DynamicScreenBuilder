@@ -41,7 +41,7 @@ const legacyCopy = (value) => {
 };
 
 /** Resolves true when the text is on the clipboard, false when it could not be put there. */
-export const copyText = async (text) => {
+const copyText = async (text) => {
   const value = text == null ? "" : String(text);
 
   if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {

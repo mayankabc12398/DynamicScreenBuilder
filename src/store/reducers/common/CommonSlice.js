@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { isArrayFunction, notify, renameKeys } from "../../../utils/utils";
+import { isArrayFunction, notify } from "../../../utils/utils";
 import {
   CentreWiseCacheByCenterID,
   GetBindDepartment,

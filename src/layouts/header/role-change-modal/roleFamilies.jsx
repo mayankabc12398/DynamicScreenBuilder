@@ -91,7 +91,7 @@ export const FAMILIES = {
   },
 };
 
-export const FAMILY_ORDER = [
+const FAMILY_ORDER = [
   "clinical",
   "critical",
   "diagnostics",
@@ -120,7 +120,7 @@ export function resolveFamily(roleName = "") {
    ============================================================ */
 
 /** iconSVG key (from backend) -> distinct icon. */
-export const ROLE_ICONS = {
+const ROLE_ICONS = {
   medicalStore: Store,
   billing: ReceiptText,
   bloodBank: Droplets,

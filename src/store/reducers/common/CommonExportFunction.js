@@ -3,7 +3,6 @@ import { setLoading } from "../loadingSlice/loadingSlice";
 import { apiUrls } from "../../../networkServices/apiEndpoints";
 import makeApiRequest from "../../../networkServices/axiosInstance";
 import { handleReactSelectDropDownOptions, notify } from "../../../utils/utils";
-import store from "../../store";
 
 export const CentreWiseCacheByCenterID = createAsyncThunk(
   "CentreWiseCache",
@@ -312,93 +311,11 @@ export const GetPatientUploadDocument = createAsyncThunk(
 );
 
 
-// GetPatientDocument PID
-
-
-// latestAll: the latest upload of every document (any date) - used when a patient is
-// opened for update on Registration. Default: today's documents.
-export const GetPatientDocument = async (PID, latestAll = false) => {
-  store.dispatch(setLoading(true));
-  try {
-    const data = await makeApiRequest(
-      `${apiUrls.GetPatientDocument}?PID=${PID}${latestAll ? "&LatestAll=true" : ""}`,
-      {
-        method: "get",
-      }
-    );
-    store.dispatch(setLoading(false));
-    return data;
-  } catch (error) {
-    store.dispatch(setLoading(false));
-    throw error;
-  }
-}; 
  
 
 
-/* Panel documents uploaded from the "Panel Document" popup
-   (OPD Booking -> See More -> Add/Remove Panels List -> Upload on a panel row).
 
-   Each document is stored against the visit it was uploaded in, so Patient Encounter
-   History can show one folder per visit day and, inside it, one block per panel.
-   TransactionID may be blank - the popup is usually opened before the visit is booked,
-   and the API then falls back to the patient's most recent visit. */
-export const SavePatientPanelDocument = async (payload) => {
-  store.dispatch(setLoading(true));
-  try {
-    const data = await makeApiRequest(apiUrls.SavePatientPanelDocument, {
-      method: "post",
-      data: payload,
-    });
-    store.dispatch(setLoading(false));
-    return data;
-  } catch (error) {
-    store.dispatch(setLoading(false));
-    throw error;
-  }
-};
 
-// One row per uploaded document, carrying its visit. The scan itself is not included
-// here - a patient with years of visits would pull megabytes of base64 on every search.
-export const GetPatientPanelDocumentVisitWise = async ({
-  PID,
-  FromDate,
-  ToDate,
-}) => {
-  store.dispatch(setLoading(true));
-  try {
-    let url = `${apiUrls.GetPatientPanelDocumentVisitWise}?PID=${PID}`;
-    if (FromDate && ToDate) url += `&FromDate=${FromDate}&ToDate=${ToDate}`;
-    const data = await makeApiRequest(url, { method: "get" });
-    store.dispatch(setLoading(false));
-    return data;
-  } catch (error) {
-    store.dispatch(setLoading(false));
-    throw error;
-  }
-};
-
-// The scan itself, fetched only when a document is opened. Addressed by the same
-// (TransactionID, PanelID, PanelDocumentID) key the save upserts on.
-export const GetPatientPanelDocumentFile = async ({
-  TransactionID,
-  PanelID,
-  PanelDocumentID,
-  ID = 0, // f_paneldocument_patient.ID - picks the exact row when a visit has several (e.g. receipts)
-}) => {
-  store.dispatch(setLoading(true));
-  try {
-    const data = await makeApiRequest(
-      `${apiUrls.GetPatientPanelDocumentFile}?TransactionID=${TransactionID}&PanelID=${PanelID}&PanelDocumentID=${PanelDocumentID}&ID=${Number(ID) || 0}`,
-      { method: "get" },
-    );
-    store.dispatch(setLoading(false));
-    return data;
-  } catch (error) {
-    store.dispatch(setLoading(false));
-    throw error;
-  }
-};
 
 export const ReferenceTypeInsert = createAsyncThunk(
   "REFERENCETYPE",
