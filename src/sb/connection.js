@@ -15,8 +15,12 @@ import { axiosInstance } from "@app/networkServices/axiosInstance";
 export const CONNECTION_KEY = "sb.connection";
 export const PROFILE_HEADER = "X-Db-Profile";
 
-/** Calls that read or write screen-builder data and therefore follow the chosen database. */
-const FOLLOWS_PROFILE = /(^|\/)ScreenBuilder\//i;
+/**
+ * Calls that read or write builder data and therefore follow the chosen database:
+ * screens (ScreenBuilder/*) and print templates (PrintBuilder/*). On the API the print
+ * builder's template storage follows the profile; the hospital data a print shows does not.
+ */
+const FOLLOWS_PROFILE = /(^|\/)(ScreenBuilder|PrintBuilder)\//i;
 
 export const envApiBase = () => import.meta.env.VITE_APP_REACT_APP_BASE_URL || "";
 

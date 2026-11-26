@@ -12,7 +12,7 @@
 import { useLocalStorage } from "../utils/hooks/useLocalStorage";
 
 /** The current print language ("Hindi"), or "" when none is set (the API then uses the user's). */
-const printLanguage = () => {
+export const printLanguage = () => {
   try {
     return String(useLocalStorage("userData", "get")?.empLanguage ?? "").trim();
   } catch {

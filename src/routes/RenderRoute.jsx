@@ -238,5 +238,21 @@ const allRoutes = {
       component: lazy(() => import("@app/pages/Tools/ScreenLoadMonitor/ScreenLoadMonitor.jsx")),
       exact: true,
     },
+    {
+      // Dynamic print builder — template library. Templates print through HospediaAPI PrintBuilder/*.
+      Guard: Authenticated,
+      layout: Layout,
+      path: "/print-builder",
+      component: lazy(() => import("@app/components/DynamicPrintbuilder/Index.jsx")),
+      exact: true,
+    },
+    {
+      // The designer for one print template.
+      Guard: Authenticated,
+      layout: Layout,
+      path: "/print-builder/:code",
+      component: lazy(() => import("@app/components/DynamicPrintbuilder/DesignerRoute.jsx")),
+      exact: true,
+    },
   ],
 };

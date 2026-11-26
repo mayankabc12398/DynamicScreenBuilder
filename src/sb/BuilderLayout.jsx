@@ -16,6 +16,7 @@ import "./sb.css";
 
 const LINKS = [
   { to: "/dynamic-screen-builder", label: "Screen Builder", icon: "pi pi-th-large" },
+  { to: "/print-builder", label: "Print Builder", icon: "pi pi-print" },
   { to: "/screen-box-permission", label: "Box Permission", icon: "pi pi-lock" },
   { to: "/screen-load-monitor", label: "Load Monitor", icon: "pi pi-chart-line" },
 ];
